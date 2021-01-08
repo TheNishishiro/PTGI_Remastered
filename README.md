@@ -7,11 +7,18 @@
 ## Example screenshots
 ### Renders
 
-//TODO
+<p align="center">
+ <img src="https://github.com/TheNishishiro/PTGI_Remastered/blob/main/Images/render1.png?raw=true">
+ <img src="https://github.com/TheNishishiro/PTGI_Remastered/blob/main/Images/color%20bleeding.png?raw=true">
+ <img src="https://github.com/TheNishishiro/PTGI_Remastered/blob/main/Images/render2.png?raw=true">
+</p>
 
 ### User Interface
 
-//TODO
+<p align="center">
+ <img src="https://github.com/TheNishishiro/PTGI_Remastered/blob/main/Images/ui.png?raw=true">
+ <img src="https://github.com/TheNishishiro/PTGI_Remastered/blob/main/Images/ui2.png?raw=true">
+</p>
 
 ## Project 
 
