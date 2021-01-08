@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 
 namespace PTGI_Remastered.Structs
 {
+    [Serializable]
     public struct Color
     {
         public double R;
@@ -88,6 +89,9 @@ namespace PTGI_Remastered.Structs
         }
     }
 
+    /// <summary>
+    /// Custom bitmap to contain colors of pixel and basic information about the render
+    /// </summary>
     public struct Bitmap
     {
         public Color[] pixels;

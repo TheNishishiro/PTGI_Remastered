@@ -31,9 +31,11 @@ namespace PTGI_UI
         {
             this.components = new System.ComponentModel.Container();
             this.panel1 = new System.Windows.Forms.Panel();
-            this.startRenderButton = new MaterialSkin.Controls.MaterialButton();
             this.materialTabControl1 = new MaterialSkin.Controls.MaterialTabControl();
             this.tabPage1 = new System.Windows.Forms.TabPage();
+            this.renderingButtonsPanel = new MaterialSkin.Controls.MaterialCard();
+            this.saveRenderButton = new MaterialSkin.Controls.MaterialButton();
+            this.startRenderButton = new MaterialSkin.Controls.MaterialButton();
             this.renderReportBox = new MaterialSkin.Controls.MaterialCard();
             this.renderReportTime = new MaterialSkin.Controls.MaterialLabel();
             this.objectSpecificationCard = new MaterialSkin.Controls.MaterialCard();
@@ -45,6 +47,8 @@ namespace PTGI_UI
             this.objectMaterialControl = new MaterialSkin.Controls.MaterialComboBox();
             this.materialLabel9 = new MaterialSkin.Controls.MaterialLabel();
             this.emitsLightControl = new MaterialSkin.Controls.MaterialSwitch();
+            this.objectNameControl = new MaterialSkin.Controls.MaterialTextBox();
+            this.materialLabel13 = new MaterialSkin.Controls.MaterialLabel();
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
             this.tabPage2 = new System.Windows.Forms.TabPage();
             this.materialCard2 = new MaterialSkin.Controls.MaterialCard();
@@ -66,26 +70,31 @@ namespace PTGI_UI
             this.useCudaCheckbox = new MaterialSkin.Controls.MaterialSwitch();
             this.materialLabel1 = new MaterialSkin.Controls.MaterialLabel();
             this.tabPage3 = new System.Windows.Forms.TabPage();
+            this.materialCard3 = new MaterialSkin.Controls.MaterialCard();
+            this.objectListControl = new MaterialSkin.Controls.MaterialComboBox();
+            this.materialLabel8 = new MaterialSkin.Controls.MaterialLabel();
+            this.materialButton1 = new MaterialSkin.Controls.MaterialButton();
             this.materialCard4 = new MaterialSkin.Controls.MaterialCard();
             this.verticiesListControl = new MaterialSkin.Controls.MaterialListView();
             this.columnHeader = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.materialLabel10 = new MaterialSkin.Controls.MaterialLabel();
             this.deleteVerticie = new MaterialSkin.Controls.MaterialButton();
+            this.tabPage5 = new System.Windows.Forms.TabPage();
             this.tabPage4 = new System.Windows.Forms.TabPage();
             this.materialCard5 = new MaterialSkin.Controls.MaterialCard();
+            this.objectsOverlineControl = new MaterialSkin.Controls.MaterialSwitch();
             this.drawCellGridControl = new MaterialSkin.Controls.MaterialSwitch();
             this.applyDebugSettingsButton = new MaterialSkin.Controls.MaterialButton();
             this.materialDrawer1 = new MaterialSkin.Controls.MaterialDrawer();
             this.timer1 = new System.Windows.Forms.Timer(this.components);
-            this.objectNameControl = new MaterialSkin.Controls.MaterialTextBox();
-            this.materialLabel13 = new MaterialSkin.Controls.MaterialLabel();
-            this.materialCard3 = new MaterialSkin.Controls.MaterialCard();
-            this.materialLabel8 = new MaterialSkin.Controls.MaterialLabel();
-            this.materialButton1 = new MaterialSkin.Controls.MaterialButton();
-            this.objectListControl = new MaterialSkin.Controls.MaterialComboBox();
+            this.saveSceneButton = new MaterialSkin.Controls.MaterialButton();
+            this.loadSceneButton = new MaterialSkin.Controls.MaterialButton();
+            this.materialCard6 = new MaterialSkin.Controls.MaterialCard();
+            this.minecraftWorldGeneration = new MaterialSkin.Controls.MaterialButton();
             this.panel1.SuspendLayout();
             this.materialTabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
+            this.renderingButtonsPanel.SuspendLayout();
             this.renderReportBox.SuspendLayout();
             this.objectSpecificationCard.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
@@ -93,10 +102,12 @@ namespace PTGI_UI
             this.materialCard2.SuspendLayout();
             this.materialCard1.SuspendLayout();
             this.tabPage3.SuspendLayout();
+            this.materialCard3.SuspendLayout();
             this.materialCard4.SuspendLayout();
+            this.tabPage5.SuspendLayout();
             this.tabPage4.SuspendLayout();
             this.materialCard5.SuspendLayout();
-            this.materialCard3.SuspendLayout();
+            this.materialCard6.SuspendLayout();
             this.SuspendLayout();
             // 
             // panel1
@@ -104,7 +115,6 @@ namespace PTGI_UI
             this.panel1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.panel1.Controls.Add(this.startRenderButton);
             this.panel1.Controls.Add(this.materialTabControl1);
             this.panel1.Controls.Add(this.materialDrawer1);
             this.panel1.Location = new System.Drawing.Point(0, 63);
@@ -112,31 +122,12 @@ namespace PTGI_UI
             this.panel1.Size = new System.Drawing.Size(1602, 840);
             this.panel1.TabIndex = 0;
             // 
-            // startRenderButton
-            // 
-            this.startRenderButton.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this.startRenderButton.Depth = 0;
-            this.startRenderButton.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.startRenderButton.DrawShadows = true;
-            this.startRenderButton.HighEmphasis = true;
-            this.startRenderButton.Icon = null;
-            this.startRenderButton.Location = new System.Drawing.Point(250, 804);
-            this.startRenderButton.Margin = new System.Windows.Forms.Padding(4, 6, 4, 6);
-            this.startRenderButton.MouseState = MaterialSkin.MouseState.HOVER;
-            this.startRenderButton.Name = "startRenderButton";
-            this.startRenderButton.Size = new System.Drawing.Size(1352, 36);
-            this.startRenderButton.TabIndex = 4;
-            this.startRenderButton.Text = "Render";
-            this.startRenderButton.Type = MaterialSkin.Controls.MaterialButton.MaterialButtonType.Contained;
-            this.startRenderButton.UseAccentColor = false;
-            this.startRenderButton.UseVisualStyleBackColor = true;
-            this.startRenderButton.Click += new System.EventHandler(this.startRenderButton_Click);
-            // 
             // materialTabControl1
             // 
             this.materialTabControl1.Controls.Add(this.tabPage1);
             this.materialTabControl1.Controls.Add(this.tabPage2);
             this.materialTabControl1.Controls.Add(this.tabPage3);
+            this.materialTabControl1.Controls.Add(this.tabPage5);
             this.materialTabControl1.Controls.Add(this.tabPage4);
             this.materialTabControl1.Depth = 0;
             this.materialTabControl1.Dock = System.Windows.Forms.DockStyle.Fill;
@@ -152,6 +143,7 @@ namespace PTGI_UI
             // tabPage1
             // 
             this.tabPage1.AutoScroll = true;
+            this.tabPage1.Controls.Add(this.renderingButtonsPanel);
             this.tabPage1.Controls.Add(this.renderReportBox);
             this.tabPage1.Controls.Add(this.objectSpecificationCard);
             this.tabPage1.Controls.Add(this.pictureBox1);
@@ -163,6 +155,64 @@ namespace PTGI_UI
             this.tabPage1.Text = "Render view";
             this.tabPage1.UseVisualStyleBackColor = true;
             // 
+            // renderingButtonsPanel
+            // 
+            this.renderingButtonsPanel.AutoScroll = true;
+            this.renderingButtonsPanel.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
+            this.renderingButtonsPanel.Controls.Add(this.loadSceneButton);
+            this.renderingButtonsPanel.Controls.Add(this.saveSceneButton);
+            this.renderingButtonsPanel.Controls.Add(this.saveRenderButton);
+            this.renderingButtonsPanel.Controls.Add(this.startRenderButton);
+            this.renderingButtonsPanel.Depth = 0;
+            this.renderingButtonsPanel.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(222)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))));
+            this.renderingButtonsPanel.Location = new System.Drawing.Point(1051, 696);
+            this.renderingButtonsPanel.Margin = new System.Windows.Forms.Padding(14);
+            this.renderingButtonsPanel.MouseState = MaterialSkin.MouseState.HOVER;
+            this.renderingButtonsPanel.Name = "renderingButtonsPanel";
+            this.renderingButtonsPanel.Padding = new System.Windows.Forms.Padding(14);
+            this.renderingButtonsPanel.Size = new System.Drawing.Size(297, 93);
+            this.renderingButtonsPanel.TabIndex = 6;
+            // 
+            // saveRenderButton
+            // 
+            this.saveRenderButton.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+            this.saveRenderButton.Depth = 0;
+            this.saveRenderButton.Dock = System.Windows.Forms.DockStyle.Top;
+            this.saveRenderButton.DrawShadows = true;
+            this.saveRenderButton.HighEmphasis = true;
+            this.saveRenderButton.Icon = null;
+            this.saveRenderButton.Location = new System.Drawing.Point(14, 50);
+            this.saveRenderButton.Margin = new System.Windows.Forms.Padding(4, 60, 4, 6);
+            this.saveRenderButton.MouseState = MaterialSkin.MouseState.HOVER;
+            this.saveRenderButton.Name = "saveRenderButton";
+            this.saveRenderButton.Size = new System.Drawing.Size(252, 36);
+            this.saveRenderButton.TabIndex = 5;
+            this.saveRenderButton.Text = "Save rendered image";
+            this.saveRenderButton.Type = MaterialSkin.Controls.MaterialButton.MaterialButtonType.Contained;
+            this.saveRenderButton.UseAccentColor = false;
+            this.saveRenderButton.UseVisualStyleBackColor = true;
+            this.saveRenderButton.Click += new System.EventHandler(this.saveRenderButton_Click);
+            // 
+            // startRenderButton
+            // 
+            this.startRenderButton.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+            this.startRenderButton.Depth = 0;
+            this.startRenderButton.Dock = System.Windows.Forms.DockStyle.Top;
+            this.startRenderButton.DrawShadows = true;
+            this.startRenderButton.HighEmphasis = true;
+            this.startRenderButton.Icon = null;
+            this.startRenderButton.Location = new System.Drawing.Point(14, 14);
+            this.startRenderButton.Margin = new System.Windows.Forms.Padding(4, 6, 4, 60);
+            this.startRenderButton.MouseState = MaterialSkin.MouseState.HOVER;
+            this.startRenderButton.Name = "startRenderButton";
+            this.startRenderButton.Size = new System.Drawing.Size(252, 36);
+            this.startRenderButton.TabIndex = 4;
+            this.startRenderButton.Text = "Render";
+            this.startRenderButton.Type = MaterialSkin.Controls.MaterialButton.MaterialButtonType.Contained;
+            this.startRenderButton.UseAccentColor = false;
+            this.startRenderButton.UseVisualStyleBackColor = true;
+            this.startRenderButton.Click += new System.EventHandler(this.startRenderButton_Click);
+            // 
             // renderReportBox
             // 
             this.renderReportBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
@@ -170,7 +220,7 @@ namespace PTGI_UI
             this.renderReportBox.Controls.Add(this.renderReportTime);
             this.renderReportBox.Depth = 0;
             this.renderReportBox.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(222)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))));
-            this.renderReportBox.Location = new System.Drawing.Point(1044, 3);
+            this.renderReportBox.Location = new System.Drawing.Point(1055, 3);
             this.renderReportBox.Margin = new System.Windows.Forms.Padding(14);
             this.renderReportBox.MouseState = MaterialSkin.MouseState.HOVER;
             this.renderReportBox.Name = "renderReportBox";
@@ -206,12 +256,12 @@ namespace PTGI_UI
             this.objectSpecificationCard.Controls.Add(this.materialLabel13);
             this.objectSpecificationCard.Depth = 0;
             this.objectSpecificationCard.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(222)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))));
-            this.objectSpecificationCard.Location = new System.Drawing.Point(1044, 62);
+            this.objectSpecificationCard.Location = new System.Drawing.Point(1047, 62);
             this.objectSpecificationCard.Margin = new System.Windows.Forms.Padding(14);
             this.objectSpecificationCard.MouseState = MaterialSkin.MouseState.HOVER;
             this.objectSpecificationCard.Name = "objectSpecificationCard";
             this.objectSpecificationCard.Padding = new System.Windows.Forms.Padding(14);
-            this.objectSpecificationCard.Size = new System.Drawing.Size(297, 557);
+            this.objectSpecificationCard.Size = new System.Drawing.Size(296, 628);
             this.objectSpecificationCard.TabIndex = 3;
             // 
             // objectEmissionStrengthControl
@@ -225,7 +275,7 @@ namespace PTGI_UI
             this.objectEmissionStrengthControl.MouseState = MaterialSkin.MouseState.OUT;
             this.objectEmissionStrengthControl.Multiline = false;
             this.objectEmissionStrengthControl.Name = "objectEmissionStrengthControl";
-            this.objectEmissionStrengthControl.Size = new System.Drawing.Size(252, 50);
+            this.objectEmissionStrengthControl.Size = new System.Drawing.Size(268, 50);
             this.objectEmissionStrengthControl.TabIndex = 13;
             this.objectEmissionStrengthControl.Text = "1";
             // 
@@ -253,7 +303,7 @@ namespace PTGI_UI
             this.objectDensityControl.MouseState = MaterialSkin.MouseState.OUT;
             this.objectDensityControl.Multiline = false;
             this.objectDensityControl.Name = "objectDensityControl";
-            this.objectDensityControl.Size = new System.Drawing.Size(252, 50);
+            this.objectDensityControl.Size = new System.Drawing.Size(268, 50);
             this.objectDensityControl.TabIndex = 12;
             this.objectDensityControl.Text = "1.4";
             // 
@@ -275,8 +325,9 @@ namespace PTGI_UI
             this.colorEditor1.Color = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(192)))), ((int)(((byte)(255)))));
             this.colorEditor1.Dock = System.Windows.Forms.DockStyle.Top;
             this.colorEditor1.Location = new System.Drawing.Point(14, 188);
+            this.colorEditor1.Margin = new System.Windows.Forms.Padding(4);
             this.colorEditor1.Name = "colorEditor1";
-            this.colorEditor1.Size = new System.Drawing.Size(252, 260);
+            this.colorEditor1.Size = new System.Drawing.Size(268, 260);
             this.colorEditor1.TabIndex = 11;
             this.colorEditor1.ColorChanged += new System.EventHandler(this.UpdateObjectSettings);
             // 
@@ -299,7 +350,7 @@ namespace PTGI_UI
             this.objectMaterialControl.MaxDropDownItems = 4;
             this.objectMaterialControl.MouseState = MaterialSkin.MouseState.OUT;
             this.objectMaterialControl.Name = "objectMaterialControl";
-            this.objectMaterialControl.Size = new System.Drawing.Size(252, 49);
+            this.objectMaterialControl.Size = new System.Drawing.Size(268, 49);
             this.objectMaterialControl.TabIndex = 10;
             this.objectMaterialControl.SelectedIndexChanged += new System.EventHandler(this.UpdateObjectSettings);
             // 
@@ -329,11 +380,40 @@ namespace PTGI_UI
             this.emitsLightControl.MouseState = MaterialSkin.MouseState.HOVER;
             this.emitsLightControl.Name = "emitsLightControl";
             this.emitsLightControl.Ripple = true;
-            this.emitsLightControl.Size = new System.Drawing.Size(252, 37);
+            this.emitsLightControl.Size = new System.Drawing.Size(268, 37);
             this.emitsLightControl.TabIndex = 8;
             this.emitsLightControl.Text = "Emit light";
             this.emitsLightControl.UseVisualStyleBackColor = true;
             this.emitsLightControl.CheckedChanged += new System.EventHandler(this.UpdateObjectSettings);
+            // 
+            // objectNameControl
+            // 
+            this.objectNameControl.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.objectNameControl.Depth = 0;
+            this.objectNameControl.Dock = System.Windows.Forms.DockStyle.Top;
+            this.objectNameControl.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F);
+            this.objectNameControl.Location = new System.Drawing.Point(14, 33);
+            this.objectNameControl.MaxLength = 50;
+            this.objectNameControl.MouseState = MaterialSkin.MouseState.OUT;
+            this.objectNameControl.Multiline = false;
+            this.objectNameControl.Name = "objectNameControl";
+            this.objectNameControl.Size = new System.Drawing.Size(268, 50);
+            this.objectNameControl.TabIndex = 16;
+            this.objectNameControl.Text = "ObjectName";
+            this.objectNameControl.KeyDown += new System.Windows.Forms.KeyEventHandler(this.objectNameControl_KeyDown);
+            // 
+            // materialLabel13
+            // 
+            this.materialLabel13.AutoSize = true;
+            this.materialLabel13.Depth = 0;
+            this.materialLabel13.Dock = System.Windows.Forms.DockStyle.Top;
+            this.materialLabel13.Font = new System.Drawing.Font("Roboto", 14F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Pixel);
+            this.materialLabel13.Location = new System.Drawing.Point(14, 14);
+            this.materialLabel13.MouseState = MaterialSkin.MouseState.HOVER;
+            this.materialLabel13.Name = "materialLabel13";
+            this.materialLabel13.Size = new System.Drawing.Size(92, 19);
+            this.materialLabel13.TabIndex = 17;
+            this.materialLabel13.Text = "Object Name";
             // 
             // pictureBox1
             // 
@@ -651,6 +731,77 @@ namespace PTGI_UI
             this.tabPage3.Text = "Object options";
             this.tabPage3.UseVisualStyleBackColor = true;
             // 
+            // materialCard3
+            // 
+            this.materialCard3.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
+            this.materialCard3.Controls.Add(this.objectListControl);
+            this.materialCard3.Controls.Add(this.materialLabel8);
+            this.materialCard3.Controls.Add(this.materialButton1);
+            this.materialCard3.Depth = 0;
+            this.materialCard3.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(222)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))));
+            this.materialCard3.Location = new System.Drawing.Point(338, 14);
+            this.materialCard3.Margin = new System.Windows.Forms.Padding(14);
+            this.materialCard3.MouseState = MaterialSkin.MouseState.HOVER;
+            this.materialCard3.Name = "materialCard3";
+            this.materialCard3.Padding = new System.Windows.Forms.Padding(14);
+            this.materialCard3.Size = new System.Drawing.Size(310, 438);
+            this.materialCard3.TabIndex = 10;
+            // 
+            // objectListControl
+            // 
+            this.objectListControl.AutoResize = false;
+            this.objectListControl.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
+            this.objectListControl.Depth = 0;
+            this.objectListControl.Dock = System.Windows.Forms.DockStyle.Top;
+            this.objectListControl.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawVariable;
+            this.objectListControl.DropDownHeight = 174;
+            this.objectListControl.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.objectListControl.DropDownWidth = 121;
+            this.objectListControl.Font = new System.Drawing.Font("Microsoft Sans Serif", 14F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Pixel);
+            this.objectListControl.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(222)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))));
+            this.objectListControl.FormattingEnabled = true;
+            this.objectListControl.IntegralHeight = false;
+            this.objectListControl.ItemHeight = 43;
+            this.objectListControl.Location = new System.Drawing.Point(14, 33);
+            this.objectListControl.MaxDropDownItems = 4;
+            this.objectListControl.MouseState = MaterialSkin.MouseState.OUT;
+            this.objectListControl.Name = "objectListControl";
+            this.objectListControl.Size = new System.Drawing.Size(282, 49);
+            this.objectListControl.TabIndex = 10;
+            // 
+            // materialLabel8
+            // 
+            this.materialLabel8.AutoSize = true;
+            this.materialLabel8.Depth = 0;
+            this.materialLabel8.Dock = System.Windows.Forms.DockStyle.Top;
+            this.materialLabel8.Font = new System.Drawing.Font("Roboto", 14F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Pixel);
+            this.materialLabel8.Location = new System.Drawing.Point(14, 14);
+            this.materialLabel8.MouseState = MaterialSkin.MouseState.HOVER;
+            this.materialLabel8.Name = "materialLabel8";
+            this.materialLabel8.Size = new System.Drawing.Size(112, 19);
+            this.materialLabel8.TabIndex = 8;
+            this.materialLabel8.Text = "Objects on map";
+            // 
+            // materialButton1
+            // 
+            this.materialButton1.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+            this.materialButton1.Depth = 0;
+            this.materialButton1.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.materialButton1.DrawShadows = true;
+            this.materialButton1.HighEmphasis = true;
+            this.materialButton1.Icon = null;
+            this.materialButton1.Location = new System.Drawing.Point(14, 388);
+            this.materialButton1.Margin = new System.Windows.Forms.Padding(4, 6, 4, 6);
+            this.materialButton1.MouseState = MaterialSkin.MouseState.HOVER;
+            this.materialButton1.Name = "materialButton1";
+            this.materialButton1.Size = new System.Drawing.Size(282, 36);
+            this.materialButton1.TabIndex = 9;
+            this.materialButton1.Text = "Delete selected";
+            this.materialButton1.Type = MaterialSkin.Controls.MaterialButton.MaterialButtonType.Contained;
+            this.materialButton1.UseAccentColor = true;
+            this.materialButton1.UseVisualStyleBackColor = true;
+            this.materialButton1.Click += new System.EventHandler(this.materialButton1_Click);
+            // 
             // materialCard4
             // 
             this.materialCard4.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
@@ -727,6 +878,17 @@ namespace PTGI_UI
             this.deleteVerticie.UseVisualStyleBackColor = true;
             this.deleteVerticie.Click += new System.EventHandler(this.deleteVerticie_Click);
             // 
+            // tabPage5
+            // 
+            this.tabPage5.Controls.Add(this.materialCard6);
+            this.tabPage5.Location = new System.Drawing.Point(4, 22);
+            this.tabPage5.Name = "tabPage5";
+            this.tabPage5.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPage5.Size = new System.Drawing.Size(1344, 814);
+            this.tabPage5.TabIndex = 4;
+            this.tabPage5.Text = "Misc";
+            this.tabPage5.UseVisualStyleBackColor = true;
+            // 
             // tabPage4
             // 
             this.tabPage4.Controls.Add(this.materialCard5);
@@ -741,6 +903,7 @@ namespace PTGI_UI
             // materialCard5
             // 
             this.materialCard5.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
+            this.materialCard5.Controls.Add(this.objectsOverlineControl);
             this.materialCard5.Controls.Add(this.drawCellGridControl);
             this.materialCard5.Controls.Add(this.applyDebugSettingsButton);
             this.materialCard5.Depth = 0;
@@ -752,6 +915,24 @@ namespace PTGI_UI
             this.materialCard5.Padding = new System.Windows.Forms.Padding(14);
             this.materialCard5.Size = new System.Drawing.Size(297, 438);
             this.materialCard5.TabIndex = 3;
+            // 
+            // objectsOverlineControl
+            // 
+            this.objectsOverlineControl.AutoSize = true;
+            this.objectsOverlineControl.Checked = true;
+            this.objectsOverlineControl.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.objectsOverlineControl.Depth = 0;
+            this.objectsOverlineControl.Dock = System.Windows.Forms.DockStyle.Top;
+            this.objectsOverlineControl.Location = new System.Drawing.Point(14, 51);
+            this.objectsOverlineControl.Margin = new System.Windows.Forms.Padding(0);
+            this.objectsOverlineControl.MouseLocation = new System.Drawing.Point(-1, -1);
+            this.objectsOverlineControl.MouseState = MaterialSkin.MouseState.HOVER;
+            this.objectsOverlineControl.Name = "objectsOverlineControl";
+            this.objectsOverlineControl.Ripple = true;
+            this.objectsOverlineControl.Size = new System.Drawing.Size(269, 37);
+            this.objectsOverlineControl.TabIndex = 9;
+            this.objectsOverlineControl.Text = "Draw objects overline";
+            this.objectsOverlineControl.UseVisualStyleBackColor = true;
             // 
             // drawCellGridControl
             // 
@@ -814,104 +995,79 @@ namespace PTGI_UI
             this.timer1.Interval = 1000;
             this.timer1.Tick += new System.EventHandler(this.timer1_Tick);
             // 
-            // objectNameControl
+            // saveSceneButton
             // 
-            this.objectNameControl.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this.objectNameControl.Depth = 0;
-            this.objectNameControl.Dock = System.Windows.Forms.DockStyle.Top;
-            this.objectNameControl.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F);
-            this.objectNameControl.Location = new System.Drawing.Point(14, 33);
-            this.objectNameControl.MaxLength = 50;
-            this.objectNameControl.MouseState = MaterialSkin.MouseState.OUT;
-            this.objectNameControl.Multiline = false;
-            this.objectNameControl.Name = "objectNameControl";
-            this.objectNameControl.Size = new System.Drawing.Size(252, 50);
-            this.objectNameControl.TabIndex = 16;
-            this.objectNameControl.Text = "ObjectName";
+            this.saveSceneButton.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+            this.saveSceneButton.Depth = 0;
+            this.saveSceneButton.Dock = System.Windows.Forms.DockStyle.Top;
+            this.saveSceneButton.DrawShadows = true;
+            this.saveSceneButton.HighEmphasis = true;
+            this.saveSceneButton.Icon = null;
+            this.saveSceneButton.Location = new System.Drawing.Point(14, 86);
+            this.saveSceneButton.Margin = new System.Windows.Forms.Padding(4, 60, 4, 6);
+            this.saveSceneButton.MouseState = MaterialSkin.MouseState.HOVER;
+            this.saveSceneButton.Name = "saveSceneButton";
+            this.saveSceneButton.Size = new System.Drawing.Size(252, 36);
+            this.saveSceneButton.TabIndex = 6;
+            this.saveSceneButton.Text = "Save scene";
+            this.saveSceneButton.Type = MaterialSkin.Controls.MaterialButton.MaterialButtonType.Contained;
+            this.saveSceneButton.UseAccentColor = false;
+            this.saveSceneButton.UseVisualStyleBackColor = true;
+            this.saveSceneButton.Click += new System.EventHandler(this.saveSceneButton_Click);
             // 
-            // materialLabel13
+            // loadSceneButton
             // 
-            this.materialLabel13.AutoSize = true;
-            this.materialLabel13.Depth = 0;
-            this.materialLabel13.Dock = System.Windows.Forms.DockStyle.Top;
-            this.materialLabel13.Font = new System.Drawing.Font("Roboto", 14F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Pixel);
-            this.materialLabel13.Location = new System.Drawing.Point(14, 14);
-            this.materialLabel13.MouseState = MaterialSkin.MouseState.HOVER;
-            this.materialLabel13.Name = "materialLabel13";
-            this.materialLabel13.Size = new System.Drawing.Size(92, 19);
-            this.materialLabel13.TabIndex = 17;
-            this.materialLabel13.Text = "Object Name";
+            this.loadSceneButton.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+            this.loadSceneButton.Depth = 0;
+            this.loadSceneButton.Dock = System.Windows.Forms.DockStyle.Top;
+            this.loadSceneButton.DrawShadows = true;
+            this.loadSceneButton.HighEmphasis = true;
+            this.loadSceneButton.Icon = null;
+            this.loadSceneButton.Location = new System.Drawing.Point(14, 122);
+            this.loadSceneButton.Margin = new System.Windows.Forms.Padding(4, 60, 4, 6);
+            this.loadSceneButton.MouseState = MaterialSkin.MouseState.HOVER;
+            this.loadSceneButton.Name = "loadSceneButton";
+            this.loadSceneButton.Size = new System.Drawing.Size(252, 36);
+            this.loadSceneButton.TabIndex = 7;
+            this.loadSceneButton.Text = "Load scene";
+            this.loadSceneButton.Type = MaterialSkin.Controls.MaterialButton.MaterialButtonType.Contained;
+            this.loadSceneButton.UseAccentColor = false;
+            this.loadSceneButton.UseVisualStyleBackColor = true;
+            this.loadSceneButton.Click += new System.EventHandler(this.loadSceneButton_Click);
             // 
-            // materialCard3
+            // materialCard6
             // 
-            this.materialCard3.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
-            this.materialCard3.Controls.Add(this.objectListControl);
-            this.materialCard3.Controls.Add(this.materialLabel8);
-            this.materialCard3.Controls.Add(this.materialButton1);
-            this.materialCard3.Depth = 0;
-            this.materialCard3.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(222)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))));
-            this.materialCard3.Location = new System.Drawing.Point(338, 14);
-            this.materialCard3.Margin = new System.Windows.Forms.Padding(14);
-            this.materialCard3.MouseState = MaterialSkin.MouseState.HOVER;
-            this.materialCard3.Name = "materialCard3";
-            this.materialCard3.Padding = new System.Windows.Forms.Padding(14);
-            this.materialCard3.Size = new System.Drawing.Size(310, 438);
-            this.materialCard3.TabIndex = 10;
+            this.materialCard6.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
+            this.materialCard6.Controls.Add(this.minecraftWorldGeneration);
+            this.materialCard6.Depth = 0;
+            this.materialCard6.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(222)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))));
+            this.materialCard6.Location = new System.Drawing.Point(13, 14);
+            this.materialCard6.Margin = new System.Windows.Forms.Padding(14);
+            this.materialCard6.MouseState = MaterialSkin.MouseState.HOVER;
+            this.materialCard6.Name = "materialCard6";
+            this.materialCard6.Padding = new System.Windows.Forms.Padding(14);
+            this.materialCard6.Size = new System.Drawing.Size(297, 438);
+            this.materialCard6.TabIndex = 4;
             // 
-            // materialLabel8
+            // minecraftWorldGeneration
             // 
-            this.materialLabel8.AutoSize = true;
-            this.materialLabel8.Depth = 0;
-            this.materialLabel8.Dock = System.Windows.Forms.DockStyle.Top;
-            this.materialLabel8.Font = new System.Drawing.Font("Roboto", 14F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Pixel);
-            this.materialLabel8.Location = new System.Drawing.Point(14, 14);
-            this.materialLabel8.MouseState = MaterialSkin.MouseState.HOVER;
-            this.materialLabel8.Name = "materialLabel8";
-            this.materialLabel8.Size = new System.Drawing.Size(112, 19);
-            this.materialLabel8.TabIndex = 8;
-            this.materialLabel8.Text = "Objects on map";
-            // 
-            // materialButton1
-            // 
-            this.materialButton1.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this.materialButton1.Depth = 0;
-            this.materialButton1.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.materialButton1.DrawShadows = true;
-            this.materialButton1.HighEmphasis = true;
-            this.materialButton1.Icon = null;
-            this.materialButton1.Location = new System.Drawing.Point(14, 388);
-            this.materialButton1.Margin = new System.Windows.Forms.Padding(4, 6, 4, 6);
-            this.materialButton1.MouseState = MaterialSkin.MouseState.HOVER;
-            this.materialButton1.Name = "materialButton1";
-            this.materialButton1.Size = new System.Drawing.Size(282, 36);
-            this.materialButton1.TabIndex = 9;
-            this.materialButton1.Text = "Delete selected";
-            this.materialButton1.Type = MaterialSkin.Controls.MaterialButton.MaterialButtonType.Contained;
-            this.materialButton1.UseAccentColor = true;
-            this.materialButton1.UseVisualStyleBackColor = true;
-            this.materialButton1.Click += new System.EventHandler(this.materialButton1_Click);
-            // 
-            // objectListControl
-            // 
-            this.objectListControl.AutoResize = false;
-            this.objectListControl.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
-            this.objectListControl.Depth = 0;
-            this.objectListControl.Dock = System.Windows.Forms.DockStyle.Top;
-            this.objectListControl.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawVariable;
-            this.objectListControl.DropDownHeight = 174;
-            this.objectListControl.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.objectListControl.DropDownWidth = 121;
-            this.objectListControl.Font = new System.Drawing.Font("Roboto Medium", 14F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Pixel);
-            this.objectListControl.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(222)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))));
-            this.objectListControl.FormattingEnabled = true;
-            this.objectListControl.IntegralHeight = false;
-            this.objectListControl.ItemHeight = 43;
-            this.objectListControl.Location = new System.Drawing.Point(14, 33);
-            this.objectListControl.MaxDropDownItems = 4;
-            this.objectListControl.MouseState = MaterialSkin.MouseState.OUT;
-            this.objectListControl.Name = "objectListControl";
-            this.objectListControl.Size = new System.Drawing.Size(282, 49);
-            this.objectListControl.TabIndex = 10;
+            this.minecraftWorldGeneration.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+            this.minecraftWorldGeneration.Depth = 0;
+            this.minecraftWorldGeneration.Dock = System.Windows.Forms.DockStyle.Top;
+            this.minecraftWorldGeneration.DrawShadows = true;
+            this.minecraftWorldGeneration.HighEmphasis = true;
+            this.minecraftWorldGeneration.Icon = null;
+            this.minecraftWorldGeneration.Location = new System.Drawing.Point(14, 14);
+            this.minecraftWorldGeneration.Margin = new System.Windows.Forms.Padding(4, 6, 4, 6);
+            this.minecraftWorldGeneration.MouseState = MaterialSkin.MouseState.HOVER;
+            this.minecraftWorldGeneration.Name = "minecraftWorldGeneration";
+            this.minecraftWorldGeneration.Size = new System.Drawing.Size(269, 36);
+            this.minecraftWorldGeneration.TabIndex = 6;
+            this.minecraftWorldGeneration.Text = "Generate terraria world";
+            this.minecraftWorldGeneration.Type = MaterialSkin.Controls.MaterialButton.MaterialButtonType.Contained;
+            this.minecraftWorldGeneration.UseAccentColor = false;
+            this.minecraftWorldGeneration.UseVisualStyleBackColor = true;
+            this.minecraftWorldGeneration.Click += new System.EventHandler(this.minecraftWorldGeneration_Click);
             // 
             // PTGIForm
             // 
@@ -931,9 +1087,10 @@ namespace PTGI_UI
             this.Load += new System.EventHandler(this.Form1_Load);
             this.KeyUp += new System.Windows.Forms.KeyEventHandler(this.PTGIForm_KeyUp);
             this.panel1.ResumeLayout(false);
-            this.panel1.PerformLayout();
             this.materialTabControl1.ResumeLayout(false);
             this.tabPage1.ResumeLayout(false);
+            this.renderingButtonsPanel.ResumeLayout(false);
+            this.renderingButtonsPanel.PerformLayout();
             this.renderReportBox.ResumeLayout(false);
             this.renderReportBox.PerformLayout();
             this.objectSpecificationCard.ResumeLayout(false);
@@ -945,13 +1102,16 @@ namespace PTGI_UI
             this.materialCard1.ResumeLayout(false);
             this.materialCard1.PerformLayout();
             this.tabPage3.ResumeLayout(false);
+            this.materialCard3.ResumeLayout(false);
+            this.materialCard3.PerformLayout();
             this.materialCard4.ResumeLayout(false);
             this.materialCard4.PerformLayout();
+            this.tabPage5.ResumeLayout(false);
             this.tabPage4.ResumeLayout(false);
             this.materialCard5.ResumeLayout(false);
             this.materialCard5.PerformLayout();
-            this.materialCard3.ResumeLayout(false);
-            this.materialCard3.PerformLayout();
+            this.materialCard6.ResumeLayout(false);
+            this.materialCard6.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -1011,6 +1171,14 @@ namespace PTGI_UI
         private MaterialSkin.Controls.MaterialLabel materialLabel8;
         private MaterialSkin.Controls.MaterialButton materialButton1;
         private MaterialSkin.Controls.MaterialComboBox objectListControl;
+        private MaterialSkin.Controls.MaterialButton saveRenderButton;
+        private MaterialSkin.Controls.MaterialCard renderingButtonsPanel;
+        private System.Windows.Forms.TabPage tabPage5;
+        private MaterialSkin.Controls.MaterialSwitch objectsOverlineControl;
+        private MaterialSkin.Controls.MaterialButton loadSceneButton;
+        private MaterialSkin.Controls.MaterialButton saveSceneButton;
+        private MaterialSkin.Controls.MaterialCard materialCard6;
+        private MaterialSkin.Controls.MaterialButton minecraftWorldGeneration;
     }
 }
 

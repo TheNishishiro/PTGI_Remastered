@@ -24,6 +24,7 @@ namespace PTGI_Remastered.Utilities
 
     public class TraceRayUtility
     {
+        [GpuManaged]
         public static NextRay NextRayDirection(ref int randomSeed, Polygon collisionObject, Line wallToIgnore, Point raySource, Point intersection, double reflectionArea, bool swapDensity)
         {
             double reflectFromGlassChanceThreshold = 0.15;
@@ -52,6 +53,7 @@ namespace PTGI_Remastered.Utilities
             return nextRay;
         }
 
+        [GpuManaged]
         private static NextRay ProcessRough(ref int randomSeed, double directionRayOffset, Point closestNormal, Point intersection, bool swapDensity)
         {
             NextRay nextRay = new NextRay();
@@ -70,6 +72,7 @@ namespace PTGI_Remastered.Utilities
             return nextRay;
         }
 
+        [GpuManaged]
         private static NextRay ProcessSmooth(Point closestNormal, double directionRayOffset, Point raySource, Point intersection, bool swapDensity)
         {
             NextRay nextRay = new NextRay();
@@ -91,6 +94,7 @@ namespace PTGI_Remastered.Utilities
             return nextRay;
         }
 
+        [GpuManaged]
         private static NextRay ProcessSemiRough(ref int randomSeed, double directionRayOffset, Point closestNormal, Point raySource, Point intersection, double reflectionArea, bool swapDensity)
         {
             NextRay nextRay = new NextRay();
@@ -102,6 +106,7 @@ namespace PTGI_Remastered.Utilities
             return nextRay;
         }
 
+        [GpuManaged]
         private static NextRay ProcessGlass(Polygon collisionObject, double directionRayOffset, double airDensity, Point closestNormal, Point raySource, Point intersection, bool swapDensity)
         {
             NextRay nextRay = new NextRay();
@@ -134,6 +139,7 @@ namespace PTGI_Remastered.Utilities
             return nextRay;
         }
 
+        [GpuManaged]
         private static NextRay ReflectInternally(NextRay nextRay, double r, double c, double directionRayOffset, Point direction, Point intersection, Point normal, bool swapDensity)
         {
             Point destination = new Point();
@@ -149,6 +155,7 @@ namespace PTGI_Remastered.Utilities
             return nextRay;
         }
 
+        [GpuManaged]
         private static NextRay PassThrough(NextRay nextRay, Point raySource, Point intersection, Point closestNormal, double directionRayOffset, bool swapDensity)
         {
             swapDensity = !swapDensity;
@@ -168,7 +175,14 @@ namespace PTGI_Remastered.Utilities
             return nextRay;
         }
 
-        public static PixelInformaton IsRayStartingInPolygon(ref Bitmap bitmap, int ThreadId, Point raySource, Polygon[] collisionObjects)
+        /// <summary>
+        /// Checks if point specified is contained inside of polygon and get it's color data
+        /// </summary>
+        /// <param name="raySource">Point to check for</param>
+        /// <param name="collisionObjects">Array of polygons to check with</param>
+        /// <returns>PixelInformaton.ShouldCancelRender if object lies within non-transparent polygon and it's color data</returns>
+        [GpuManaged]
+        public static PixelInformaton IsRayStartingInPolygon(Point raySource, Polygon[] collisionObjects)
         {
             PixelInformaton pixelInformaton = new PixelInformaton();
             pixelInformaton.DensityRegionSwap = false;

@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 
 namespace PTGI_Remastered.Structs
 {
+    [Serializable]
     public struct Polygon
     {
         public PTGI_StructTypes structType;
@@ -78,10 +79,10 @@ namespace PTGI_Remastered.Structs
                 throw new Exception("Not enough verticies to construct polygon");
 
             Walls = new Line[verticiesCount];
-            for (int i = 1, wallIndex = 0; i < verticiesCount - 1; i++, wallIndex++)
+            for (int i = 0, wallIndex = 0; i < verticiesCount - 1; i++, wallIndex++)
             {
                 Walls[wallIndex] = new Line();
-                Walls[wallIndex].Setup(Verticies[i - 1], Verticies[i]);
+                Walls[wallIndex].Setup(Verticies[i], Verticies[i+1]);
             }
             Walls[verticiesCount - 1] = new Line();
             Walls[verticiesCount - 1].Setup(Verticies[verticiesCount - 1], Verticies[0]);

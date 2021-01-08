@@ -13,6 +13,10 @@ namespace PTGI_Remastered
 {
     public class PTGI
     {
+        /// <summary>
+        /// Iterates over CUDA capable GPUs installed on system
+        /// </summary>
+        /// <returns>List of available GPUs as PTGI_Gpu</returns>
         public List<PTGI_Remastered.Structs.Gpu> GetAvailableGpus()
         {
             List<PTGI_Remastered.Structs.Gpu> myGpus = new List<Structs.Gpu>();
@@ -62,15 +66,15 @@ namespace PTGI_Remastered
         /// <summary>
         /// Prepares data and initiates path tracer 
         /// </summary>
-        /// <param name="collisionObjects"></param>
-        /// <param name="imageWidth"></param>
-        /// <param name="imageHeight"></param>
-        /// <param name="samples"></param>
-        /// <param name="bounceLimit"></param>
-        /// <param name="gridDivides"></param>
-        /// <param name="UseCUDARenderer"></param>
-        /// <param name="GpuId"></param>
-        /// <returns>Rendered image as PTGI_Bitmap</returns>
+        /// <param name="collisionObjects">World objects that light interacts with</param>
+        /// <param name="imageWidth">Render width</param>
+        /// <param name="imageHeight">Render height</param>
+        /// <param name="samples">Number of light samples per pixel</param>
+        /// <param name="bounceLimit">Max number of light bounces</param>
+        /// <param name="gridDivides">Number of columns</param>
+        /// <param name="UseCUDARenderer">Specified to use GPU for rendering</param>
+        /// <param name="GpuId">GPU to use for rendering</param>
+        /// <returns>Rendered result as RenderResult</returns>
         public RenderResult PathTraceRender(Polygon[] collisionObjects, int imageWidth, int imageHeight, int samples, int bounceLimit, int gridDivides, bool UseCUDARenderer, int GpuId)
         {
             RenderResult renderResult = new RenderResult();
@@ -152,7 +156,7 @@ namespace PTGI_Remastered
                 Line lightRay = new Line();
                 lightRay.Setup(raySource, new Point());
 
-                var pixelInformaton = TraceRayUtility.IsRayStartingInPolygon(ref bitmap, ThreadId, raySource, CUDA_collisionObjects);
+                var pixelInformaton = TraceRayUtility.IsRayStartingInPolygon(raySource, CUDA_collisionObjects);
 
                 if (pixelInformaton.ShouldCancelRender)
                 {
@@ -174,7 +178,7 @@ namespace PTGI_Remastered
                 Bitmap bitmap = new Bitmap();
                 bitmap.CopyPixels(pixels, bitmapWidth, bitmapHeight);
 
-                Polygon[] CUDA_collisionObjects = __local__.Array<Polygon>(100);
+                Polygon[] CUDA_collisionObjects = __local__.Array<Polygon>(1000);
                 polygonContainer.CUDA_Copy(CUDA_collisionObjects, walls, verticies);
                 
                 Point raySource = PTGI_Math.GetRaySourceFromThreadIndex(ref bitmap, CUDAThreadId);
@@ -182,7 +186,7 @@ namespace PTGI_Remastered
                 Line lightRay = new Line();
                 lightRay.Setup(raySource, new Point());
 
-                var pixelInformaton = TraceRayUtility.IsRayStartingInPolygon(ref bitmap, CUDAThreadId, raySource, CUDA_collisionObjects);
+                var pixelInformaton = TraceRayUtility.IsRayStartingInPolygon(raySource, CUDA_collisionObjects);
                 
                 if (pixelInformaton.ShouldCancelRender)
                 {
@@ -194,6 +198,7 @@ namespace PTGI_Remastered
             }
         }
 
+        [GpuManaged]
         private static PixelInformaton RenderBitmap(ref Bitmap bitmap, PixelInformaton pixelInformaton, Line lightRay, ref Grid cellGrid, ref int randomSeed, int samples, int bounceLimit, Polygon[] collisionObjects)
         {
             for(int sampleId = 0; sampleId < samples; sampleId++)
@@ -214,6 +219,7 @@ namespace PTGI_Remastered
             return pixelInformaton;
         }
 
+        [GpuManaged]
         private static RayTraceResult CUDA_TraceRay(ref int randomSeed, int bounceLimit, bool originDensitySwap,
             ref Grid cellGrid, Polygon[] collisionObjects, Line lightRay, Line wallToIgnore, RayTraceResult rayTraceResult)
         {

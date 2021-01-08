@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 
 namespace PTGI_Remastered.Structs
 {
+    [Serializable]
     public struct Point
     {
         public double X;

@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 
 namespace PTGI_Remastered.Structs
 {
+    [Serializable]
     public struct Line
     {
         public Point Source;

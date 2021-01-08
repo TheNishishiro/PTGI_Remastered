@@ -2,10 +2,12 @@
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Xml.Serialization;
 
 namespace PTGI_UI
 {
@@ -30,6 +32,7 @@ namespace PTGI_UI
         protected List<PTGI_Remastered.Structs.Point> DebugRayPoints { get; set; }
         protected List<int> DebugRayVisitedCells { get; set; }
         protected bool DrawGrid { get; set; }
+        protected bool DrawObjectsOverline { get; set; }
 
         protected MaterialCard PopupMessage { get; set; }
         protected MaterialLabel PopupMessageText { get; set; }
@@ -77,10 +80,6 @@ namespace PTGI_UI
 
         protected virtual void pictureBox1_Paint(object sender, PaintEventArgs e)
         {
-            if (QueuedVerticiesList.Items.Count <= 0)
-                return;
-
-
             for (int i = 0; i < QueuedVerticiesList.Items.Count; i++)
             {
                 e.Graphics.DrawEllipse(
@@ -137,8 +136,79 @@ namespace PTGI_UI
                             cellGrid.CellHeight);
                     }
                 }
-                
-            }     
+            }    
+            
+            if(DrawObjectsOverline)
+            {
+                foreach(var polygon in Polygons)
+                {
+                    for(int i = 0; i < polygon.Walls.Length; i++)
+                    {
+                        e.Graphics.DrawLine(
+                            new Pen(Color.Green, 1f),
+                            (int)(polygon.Walls[i].Source.X),
+                            (int)(polygon.Walls[i].Source.Y),
+                            (int)(polygon.Walls[i].Destination.X),
+                            (int)(polygon.Walls[i].Destination.Y));
+                    }
+                }
+            }
+        }
+
+        protected virtual void saveSceneButton_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                var aSerializer = new XmlSerializer(typeof(List<PTGI_Remastered.Structs.Polygon>));
+                StringBuilder sb = new StringBuilder();
+                StringWriter sw = new StringWriter(sb);
+                aSerializer.Serialize(sw, Polygons);
+                string xmlResult = sw.GetStringBuilder().ToString();
+
+                using (SaveFileDialog saveFileDialog = new SaveFileDialog())
+                {
+                    saveFileDialog.Title = "Save Scene";
+                    saveFileDialog.Filter = "XML Files|*.xml";
+                    if (saveFileDialog.ShowDialog() == DialogResult.OK)
+                    {
+                        using (var streamWriter = new StreamWriter(saveFileDialog.FileName))
+                        {
+                            streamWriter.Write(xmlResult);
+                        }
+                    }
+                }
+            }
+            catch(Exception ex)
+            {
+                MessageBox.Show(this, ex.Message, "Save error");
+            }
+        }
+
+        protected virtual void loadSceneButton_Click(object sender, EventArgs e)
+        {
+            try 
+            {
+                using (OpenFileDialog openFileDialog = new OpenFileDialog())
+                {
+                    openFileDialog.Title = "Open scene file";
+                    openFileDialog.Filter = "XML Files|*.xml";
+                    if (openFileDialog.ShowDialog() == DialogResult.OK)
+                    {
+                        using (var streamReader = new StreamReader(openFileDialog.FileName))
+                        {
+                            var aSerializer = new XmlSerializer(typeof(List<PTGI_Remastered.Structs.Polygon>));
+                            Polygons = (List<PTGI_Remastered.Structs.Polygon>)aSerializer.Deserialize(streamReader);
+
+                            UpdateObjectList();
+                            RenderedPictureBox.Refresh();
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(this, ex.Message, "Load error");
+            }
         }
 
         protected void SendDebugRay()
@@ -209,6 +279,9 @@ namespace PTGI_UI
 
         protected void SelectObject(Point mouseLocation)
         {
+            if (WorldObjectList.Items.Count <= 0)
+                return;
+
             var mousePoint = new PTGI_Remastered.Structs.Point();
             mousePoint.SetCoords(mouseLocation.X, mouseLocation.Y);
 
@@ -224,5 +297,71 @@ namespace PTGI_UI
             WorldObjectList.SelectedIndex = SelectedPolygon;
         }
 
+        protected void SaveRender()
+        {
+            try
+            {
+                using (SaveFileDialog saveFileDialog = new SaveFileDialog())
+                {
+                    saveFileDialog.Title = "Save an Image File";
+                    saveFileDialog.Filter = "PNG Files|*.png";
+                    if (saveFileDialog.ShowDialog() == DialogResult.OK)
+                        RenderedPictureBox.BackgroundImage.Save(saveFileDialog.FileName, System.Drawing.Imaging.ImageFormat.Png);
+                }
+            }
+            catch(Exception ex)
+            {
+                MessageBox.Show(this, ex.Message, "Save render error");
+            }
+        }
+
+        protected void DeleteObject()
+        {
+            if (WorldObjectList.Items.Count <= 0 && SelectedPolygon < 0)
+                return;
+
+            try
+            {
+                Polygons.RemoveAt(SelectedPolygon);
+                SelectedPolygon = -1; 
+            }
+            catch(Exception ex)
+            {
+                MessageBox.Show("Object you are trying to remove no longer exists");
+            }
+            UpdateObjectList();
+        }
+
+        protected void TerrariaWorldGenerator()
+        {
+            Random rnd = new Random();
+            int maxY = RenderHeight / 2;
+            for (int x = 0; x <= RenderWidth; x += 32)
+            {
+                for(int y = maxY; y <= RenderHeight; y+=32)
+                {
+                    PTGI_Remastered.Structs.Point topRight = new PTGI_Remastered.Structs.Point();
+                    topRight.SetCoords(x, y);
+                    PTGI_Remastered.Structs.Point rightBottom = new PTGI_Remastered.Structs.Point();
+                    rightBottom.SetCoords(x + 32, y + 32);
+
+                    PTGI_Remastered.Structs.Polygon block = new PTGI_Remastered.Structs.Polygon();
+                    PTGI_Remastered.Structs.Color color = new PTGI_Remastered.Structs.Color();
+                    color.SetColor(255, 255, 255);
+                    block.Setup(new PTGI_Remastered.Structs.Point[] { topRight, rightBottom }, PTGI_Remastered.Utilities.PTGI_ObjectTypes.Solid, PTGI_Remastered.Utilities.PTGI_MaterialReflectivness.Rough, color, 1, 1);
+
+                    Polygons.Add(block);
+                    if (Polygons.Count == 999)
+                    {
+                        UpdateObjectList();
+                        return;
+                    }
+                }
+                int yDirection = rnd.Next(2) == 0 ? -32 : 32;
+                maxY += yDirection;
+            }
+
+            UpdateObjectList();
+        }
     }
 }

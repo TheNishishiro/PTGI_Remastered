@@ -41,12 +41,15 @@ namespace PTGI_UI
                 this.Invoke(new MethodInvoker(delegate () {
                     ShowPopupMessage($"Render time: {pathTraceResult.RenderTime} ms", 5);
                     RenderedPictureBox.Size = new Size(RenderWidth, RenderHeight);
+                    RenderedPictureBox.BackgroundImage = bitmap;
                 }));
-                RenderedPictureBox.BackgroundImage = bitmap;
             }
             catch(Exception ex)
             {
-                MessageBox.Show(this, ex.Message, "Render failed");
+                this.Invoke(new MethodInvoker(delegate ()
+                {
+                    MessageBox.Show(this, ex.Message, "Render failed");
+                }));
             }
         }
 
@@ -59,6 +62,7 @@ namespace PTGI_UI
 
             ControlExtension.Draggable(renderReportBox, true);
             ControlExtension.Draggable(objectSpecificationCard, true);
+            ControlExtension.Draggable(renderingButtonsPanel, true);
 
             objectMaterialControl.Items.AddRange(Enum.GetNames(typeof(PTGI_Remastered.Utilities.PTGI_MaterialReflectivness)));
             objectMaterialControl.SelectedIndex = 0;
@@ -80,6 +84,7 @@ namespace PTGI_UI
             UseCUDA = useCudaCheckbox.Checked;
             BounceLimit = int.Parse(bounceLimitControl.Text);
             GridDivider = int.Parse(gridDividerControl.Text);
+            DrawObjectsOverline = objectsOverlineControl.Checked;
 
             UpdateObjectSettings(null, null);
 
@@ -129,6 +134,7 @@ namespace PTGI_UI
         private void applyDebugSettingsButton_Click(object sender, EventArgs e)
         {
             DrawGrid = drawCellGridControl.Checked;
+            DrawObjectsOverline = objectsOverlineControl.Checked;
         }
 
         private void startRenderButton_Click(object sender, EventArgs e)
@@ -168,6 +174,7 @@ namespace PTGI_UI
             else if(mouseEvent.Button == MouseButtons.Right)
             {
                 SelectObject(mouseEvent.Location);
+                Refresh();
             }
         }
 
@@ -181,17 +188,49 @@ namespace PTGI_UI
             if(e.KeyCode == Keys.I)
             {
                 AddPolygonToObjects();
+                Refresh();
             }
             else if(e.KeyCode == Keys.R)
             {
                 SendDebugRay();
+                Refresh();
+            }
+            else if(e.KeyCode == Keys.Delete)
+            {
+                DeleteObject();
+                Refresh();
             }
         }
 
         private void materialButton1_Click(object sender, EventArgs e)
         {
-            Polygons.RemoveAt(SelectedPolygon);
-            UpdateObjectList();
+            DeleteObject();
+        }
+
+        private void saveRenderButton_Click(object sender, EventArgs e)
+        {
+            SaveRender();
+        }
+
+        protected override void saveSceneButton_Click(object sender, EventArgs e)
+        {
+            base.saveSceneButton_Click(sender, e);
+        }
+
+        protected override void loadSceneButton_Click(object sender, EventArgs e)
+        {
+            base.loadSceneButton_Click(sender, e);
+        }
+
+        private void objectNameControl_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Enter)
+                ActiveControl = materialLabel1;
+        }
+
+        private void minecraftWorldGeneration_Click(object sender, EventArgs e)
+        {
+            TerrariaWorldGenerator();
         }
     }
 }
