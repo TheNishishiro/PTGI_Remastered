@@ -5,7 +5,7 @@
  Following project tries to replicate this behaviour in order to light up a 2D environment 
 
 ## Example screenshots
-### Renders
+### Renders (500 sppx)
 
 <p align="center">
  <img src="https://github.com/TheNishishiro/PTGI_Remastered/blob/main/Images/render1.png?raw=true">
