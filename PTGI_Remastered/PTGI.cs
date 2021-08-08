@@ -110,7 +110,6 @@ namespace PTGI_Remastered
             wallArrayView.Dispose();
             seedArrayView.Dispose();
             bitmapPixels.Dispose();
-            accelerator.ClearCache(ClearCacheMode.Default);
             accelerator.Dispose();
             return renderResult;
         }
