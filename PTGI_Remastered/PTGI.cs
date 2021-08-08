@@ -51,12 +51,14 @@ namespace PTGI_Remastered
         /// <returns>Rendered result as RenderResult</returns>
         public RenderResult PathTraceRender(Polygon[] collisionObjects, int imageWidth, int imageHeight, int samples, int bounceLimit, int gridDivides, bool UseCUDARenderer, AcceleratorId GpuId)
         {
-            var walls = new List<Line>();
+            var polygons = new List<List<Line>>();
+            int index = 0;
             foreach (var polygon in collisionObjects)
             {
+                polygons.Add(new List<Line>());
                 foreach (var wall in polygon.Walls)
                 {
-                    walls.Add(new Line()
+                    polygons[index].Add(new Line()
                     {
                         Coefficient = wall.Coefficient,
                         Color = polygon.Color,
@@ -71,6 +73,7 @@ namespace PTGI_Remastered
                         WasChecked = wall.WasChecked
                     });
                 }
+                index++;
             }
 
             var context = new Context(ContextFlags.Force32BitFloats, ILGPU.IR.Transformations.OptimizationLevel.O2);
@@ -94,7 +97,7 @@ namespace PTGI_Remastered
                 randomSeed[i] = PTGI_Random.Next();
             });
             var seedArrayView = accelerator.Allocate<int>(randomSeed);
-            var wallArrayView = accelerator.Allocate<Line>(walls.ToArray());
+            var wallArrayView = accelerator.Allocate<Line>(polygons.Select(a => a.ToArray()).ToArray(),);
 
             Stopwatch renderTimeStopwatch = new Stopwatch();
             renderTimeStopwatch.Start();
