@@ -1,4 +1,5 @@
-﻿using Alea;
+﻿using ILGPU;
+using ILGPU.Algorithms;
 using PTGI_Remastered.Structs;
 using System;
 using System.Collections.Generic;
@@ -38,7 +39,7 @@ namespace PTGI_Remastered.Utilities
             return inst.Next(x, y);
         }
 
-        public static double NextDouble()
+        public static float Nextfloat()
         {
             Random inst = _local;
             if (inst == null)
@@ -47,33 +48,33 @@ namespace PTGI_Remastered.Utilities
                 lock (_global) seed = _global.Next();
                 _local = inst = new Random(seed);
             }
-            return inst.NextDouble();
+            return (float)inst.NextDouble();
         }
 
-        public static double GetRandom(ref int seed, int Xn)
+        public static float GetRandom(Index1 index, ArrayView<int> seed, int Xn)
         {
             int a = 1103515245;
             int c = 12345;
-            int m = (int)DeviceFunction.Pow(2, 31);
+            int m = (int)PTGI_Math.Pow(2, 31);
 
-            seed = (a * Xn + c) % m;
+            seed[index] = (a * Xn + c) % m;
 
-            return DeviceFunction.Abs((float)seed / (float)m);
+            return XMath.Abs((float)seed[index] / (float)m);
         }
 
-        public static double GetRandomBetween(ref int seed, double minimum, double maximum)
+        public static float GetRandomBetween(Index1 index, ArrayView<int> seed, float minimum, float maximum)
         {
-            double random = GetRandom(ref seed, seed);
+            float random = GetRandom(index, seed, seed[index]);
             return random * (maximum - minimum) + minimum;
         }
 
-        public static Point GetPointInRadius(ref int seed, double radius)
+        public static Point GetPointInRadius(Index1 index, ArrayView<int> seed, float radius)
         {
-            double distance = GetRandomBetween(ref seed, 0, DeviceFunction.Floor(radius));
-            double angleInRadians = GetRandomBetween(ref seed, 0, 360) / (2 * 3.14);
+            float distance = GetRandomBetween(index, seed, 0, XMath.Floor(radius));
+            float angleInRadians = GetRandomBetween(index, seed, 0, 360) / (2 * 3.14f);
 
             Point pointInRadius = new Point();
-            pointInRadius.SetCoords(distance * DeviceFunction.Cos(angleInRadians), distance * DeviceFunction.Sin(angleInRadians));
+            pointInRadius.SetCoords(distance * XMath.Cos(angleInRadians), distance * XMath.Sin(angleInRadians));
 
             return pointInRadius;
         }

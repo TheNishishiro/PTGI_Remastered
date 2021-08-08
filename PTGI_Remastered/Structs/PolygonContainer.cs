@@ -14,14 +14,14 @@ namespace PTGI_Remastered.Structs
         public PTGI_StructTypes[] StructType;
         public PTGI_MaterialReflectivness[] ReflectivnessType;
         public Color[] Color;
-        public double[] EmissionStrength;
-        public double[] Density;
+        public float[] EmissionStrength;
+        public float[] Density;
         public bool[] HasValue;
         public void Setup(Polygon[] collisionObjects, Line[][] walls, Point[][] verticies)
         {
             HasValue = new bool[PolygonCount];
-            EmissionStrength = new double[PolygonCount];
-            Density = new double[PolygonCount];
+            EmissionStrength = new float[PolygonCount];
+            Density = new float[PolygonCount];
             Color = new Color[PolygonCount];
             ReflectivnessType = new PTGI_MaterialReflectivness[PolygonCount];
             StructType = new PTGI_StructTypes[PolygonCount];

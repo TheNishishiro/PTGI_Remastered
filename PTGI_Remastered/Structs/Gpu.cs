@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ILGPU.Runtime;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,7 +9,7 @@ namespace PTGI_Remastered.Structs
 {
     public class Gpu
     {
-        public int Id { get; set; }
+        public AcceleratorId Id { get; set; }
         public string Name { get; set; }
     }
 }

@@ -1,5 +1,7 @@
-﻿using Alea;
-using Alea.CSharp;
+﻿using ILGPU;
+using ILGPU.Runtime;
+using ILGPU.Runtime.CPU;
+using ILGPU.Runtime.Cuda;
 using PTGI_Remastered.Structs;
 using PTGI_Remastered.Utilities;
 using System;
@@ -13,54 +15,26 @@ namespace PTGI_Remastered
 {
     public class PTGI
     {
-        /// <summary>
-        /// Iterates over CUDA capable GPUs installed on system
-        /// </summary>
-        /// <returns>List of available GPUs as PTGI_Gpu</returns>
-        public List<PTGI_Remastered.Structs.Gpu> GetAvailableGpus()
+        public List<Gpu> GetAvaiableHardwareAccelerators()
         {
-            List<PTGI_Remastered.Structs.Gpu> myGpus = new List<Structs.Gpu>();
-            try
+            var context = new Context();
+            var gpus = new List<Gpu>();
+            foreach (var acceleratorId in Accelerator.Accelerators)
             {
-                var gpus = Device.Devices;
-                foreach (var gpu in gpus)
+                using (var accl = Accelerator.Create(context, acceleratorId))
                 {
-                    myGpus.Add(new Structs.Gpu() { Id = gpu.Id, Name = gpu.Name });
+                    gpus.Add(new Gpu()
+                    {
+                        Id = acceleratorId,
+                        Name = accl.Name
+                    });
+
+                    accl.PrintInformation();
                 }
             }
-            catch(Exception ex)
-            {
-                Console.WriteLine($"{ex.Message}");
-            }
-            return myGpus;
-        }
+            context.Dispose();
 
-        public RayTraceResult DebugRay(Polygon[] collisionObjects, Point source, Point Destination, int imageWidth, int imageHeight, int bounceLimit, int gridDivides)
-        {
-            List<Point> rayTrace = new List<Point>();
-            Bitmap bitmap = new Bitmap();
-            bitmap.Create(imageWidth, imageHeight);
-
-            Random rnd = new Random();
-            Grid cellGrid = new Grid();
-            cellGrid.Create(bitmap, gridDivides);
-            cellGrid.CPU_FillGrid(collisionObjects);
-
-            Line ray = new Line();
-            ray.Setup(source, Destination);
-
-            int[] randomSeedArray = new int[bitmap.Size];
-            int randomSeed = rnd.Next(1000000);
-            RayTraceResult rayTraceResult = new RayTraceResult();
-            rayTraceResult.collectRayTrace = true;
-            rayTraceResult.rayTrace = new Point[bounceLimit+1];
-            rayTraceResult.rayGridMovement = new int[gridDivides * 4];
-            for (int i = 0; i < rayTraceResult.rayGridMovement.Length; i++)
-                rayTraceResult.rayGridMovement[i] = int.MaxValue;
-
-            var traceResult = CUDA_TraceRay(ref randomSeed, bounceLimit, false, ref cellGrid, collisionObjects, ray, new Line(), rayTraceResult);
-
-            return traceResult;
+            return gpus;
         }
 
         /// <summary>
@@ -75,135 +49,118 @@ namespace PTGI_Remastered
         /// <param name="UseCUDARenderer">Specified to use GPU for rendering</param>
         /// <param name="GpuId">GPU to use for rendering</param>
         /// <returns>Rendered result as RenderResult</returns>
-        public RenderResult PathTraceRender(Polygon[] collisionObjects, int imageWidth, int imageHeight, int samples, int bounceLimit, int gridDivides, bool UseCUDARenderer, int GpuId)
+        public RenderResult PathTraceRender(Polygon[] collisionObjects, int imageWidth, int imageHeight, int samples, int bounceLimit, int gridDivides, bool UseCUDARenderer, AcceleratorId GpuId)
         {
+            var walls = new List<Line>();
+            foreach (var polygon in collisionObjects)
+            {
+                foreach (var wall in polygon.Walls)
+                {
+                    walls.Add(new Line()
+                    {
+                        Coefficient = wall.Coefficient,
+                        Color = polygon.Color,
+                        Density = polygon.Density,
+                        Destination = wall.Destination,
+                        EmissionStrength = polygon.EmissionStrength,
+                        HasValue = wall.HasValue,
+                        ObjectType = (int)polygon.objectType,
+                        ReflectivnessType = (int)polygon.reflectivnessType,
+                        Source = wall.Source,
+                        StructType = (int)PTGI_StructTypes.Line,
+                        WasChecked = wall.WasChecked
+                    });
+                }
+            }
+
+            var context = new Context(ContextFlags.Force32BitFloats, ILGPU.IR.Transformations.OptimizationLevel.O2);
+            Accelerator accelerator = null;
+
+            if (GpuId != null)
+                accelerator = Accelerator.Create(context, GpuId);
+            else if (UseCUDARenderer)
+                accelerator = new CudaAccelerator(context);
+            else
+                accelerator = new CPUAccelerator(context);
+
             RenderResult renderResult = new RenderResult();
             Bitmap bitmap = new Bitmap();
-            bitmap.Create(imageWidth, imageHeight);
+            var bitmapPixels = bitmap.CreateColorArrayView(imageWidth, imageHeight, walls.Count, accelerator);
 
             Random rnd = new Random();
-            Grid cellGrid = new Grid();
-            cellGrid.Create(bitmap, gridDivides);
-            cellGrid.CPU_FillGrid(collisionObjects);
-
-            int[] randomSeedArray = new int[bitmap.Size];
+            int[] randomSeed = new int[bitmap.Size];
             Parallel.For(0, bitmap.Size, (i) =>
             {
-                randomSeedArray[i] = PTGI_Random.Next();
+                randomSeed[i] = PTGI_Random.Next();
             });
+            var seedArrayView = accelerator.Allocate<int>(randomSeed);
+            var wallArrayView = accelerator.Allocate<Line>(walls.ToArray());
 
             Stopwatch renderTimeStopwatch = new Stopwatch();
             renderTimeStopwatch.Start();
-            StartRender(bitmap, cellGrid, randomSeedArray, collisionObjects, samples, bounceLimit, UseCUDARenderer, GpuId);
+            renderResult.Pixels = StartRender(accelerator, bitmap, bitmapPixels, seedArrayView, wallArrayView, samples, bounceLimit);
             renderTimeStopwatch.Stop();
+
+            var isAnyPixelColored = renderResult.Pixels.Any(x => x.B != 0 || x.G != 0 || x.R != 0);
 
             renderResult.RenderTime = renderTimeStopwatch.ElapsedMilliseconds;
             renderResult.bitmap = bitmap;
 
+            context.Dispose();
+            wallArrayView.Dispose();
+            seedArrayView.Dispose();
+            bitmapPixels.Dispose();
+            accelerator.ClearCache(ClearCacheMode.Default);
+            accelerator.Dispose();
             return renderResult;
         }
 
-        private static void StartRender(Bitmap bitmap, Grid cellGrid, int[] randomSeedArray, Polygon[] collisionObjects, int samples, int bounceLimit, bool UseCUDARenderer, int GpuId)
+        private static Color[] StartRender(Accelerator accelerator, Bitmap bitmap, MemoryBuffer<Color> bitmapPixels, MemoryBuffer<int> randomSeedArray, MemoryBuffer<Line> walls, int samples, int bounceLimit)
         {
-            PolygonContainer polygonContainer = new PolygonContainer();
-            polygonContainer.PolygonCount = collisionObjects.Length;
-            Line[][] walls = new Line[collisionObjects.Length][];
-            Point[][] verticies = new Point[collisionObjects.Length][];
+            
+            var ptgiKernel = accelerator.LoadAutoGroupedStreamKernel<
+                Index1,
+                Bitmap,
+                ArrayView<Color>,
+                ArrayView<int>,
+                int, int, ArrayView<Line>>(CUDA_StartRender);
 
-            polygonContainer.Setup(collisionObjects, walls, verticies);
-
-            if (UseCUDARenderer)
+            try
             {
-                Alea.Gpu gpu = Alea.Gpu.Get(GpuId);
-                int block_size = 128;
-                int grid_size = (((bitmap.Size) + block_size) / block_size);
-                var lp = new LaunchParam(grid_size, block_size);
-
-                try
-                {
-                    gpu.Launch(CUDA_StartRender, lp, bitmap.Width, bitmap.Height, bitmap.pixels, cellGrid, randomSeedArray, samples, bounceLimit, polygonContainer, walls, verticies);
-                }
-                catch(Exception ex)
-                {
-                    Console.WriteLine($"{ex.Message}");
-                }
+                ptgiKernel(bitmapPixels.Length, bitmap, bitmapPixels.View, randomSeedArray.View, samples, bounceLimit, walls.View);
+                accelerator.Synchronize();
+                return bitmapPixels.GetAsArray();
             }
-            else
+            catch(Exception ex)
             {
-                for(int i = 0; i < bitmap.Size; i++)
-                    CPU_StartRender(i, bitmap.Width, bitmap.Height, bitmap.pixels, cellGrid, randomSeedArray, samples, bounceLimit, polygonContainer, walls, verticies);
-
-                //Parallel.For(0, bitmap.Size, (i) =>
-                //{
-                //    CPU_StartRender(i, bitmap.Width, bitmap.Height, bitmap.pixels, cellGrid, randomSeedArray, samples, bounceLimit, polygonContainer, walls, verticies);
-                //});
+                Console.WriteLine($"{ex.Message}");
             }
+            
+            return null;
         }
 
-        private static void CPU_StartRender(int ThreadId, int bitmapWidth, int bitmapHeight, Color[] pixels, Grid cellGrid, int[] seedArray, int samples, int bounceLimit, PolygonContainer polygonContainer, Line[][] walls, Point[][] verticies)
+        private static void CUDA_StartRender(Index1 index, Bitmap bitmap, ArrayView<Color> pixels, ArrayView<int> seedArray, int samples, int bounceLimit, ArrayView<Line> walls)
         {
-
-            if (ThreadId < pixels.Length)
-            {
-                Bitmap bitmap = new Bitmap();
-                bitmap.CopyPixels(pixels, bitmapWidth, bitmapHeight);
-
-                Polygon[] CUDA_collisionObjects = new Polygon[polygonContainer.PolygonCount];
-                polygonContainer.CUDA_Copy(CUDA_collisionObjects, walls, verticies);
-
-                Point raySource = PTGI_Math.GetRaySourceFromThreadIndex(ref bitmap, ThreadId);
-
-                Line lightRay = new Line();
-                lightRay.Setup(raySource, new Point());
-
-                var pixelInformaton = TraceRayUtility.IsRayStartingInPolygon(raySource, CUDA_collisionObjects);
-
-                if (pixelInformaton.ShouldCancelRender)
-                {
-                    bitmap.SetPixel(ThreadId, pixelInformaton.pixelColor, 1);
-                    return;
-                }
-                pixelInformaton = RenderBitmap(ref bitmap, pixelInformaton, lightRay, ref cellGrid, ref seedArray[ThreadId], samples, bounceLimit, CUDA_collisionObjects);
-                bitmap.SetPixel(ThreadId, pixelInformaton.pixelColor, 1.0 / (double)samples);
-            }
-        }
-
-        [GpuManaged]
-        private static void CUDA_StartRender(int bitmapWidth, int bitmapHeight, Color[] pixels, Grid cellGrid, int[] seedArray, int samples, int bounceLimit, PolygonContainer polygonContainer, Line[][] walls, Point[][] verticies)
-        {
-            int CUDAThreadId = blockIdx.x * blockDim.x + threadIdx.x;
-
+            int CUDAThreadId = index;
             if (CUDAThreadId < pixels.Length)
             {
-                Bitmap bitmap = new Bitmap();
-                bitmap.CopyPixels(pixels, bitmapWidth, bitmapHeight);
-
-                Polygon[] CUDA_collisionObjects = __local__.Array<Polygon>(1000);
-                polygonContainer.CUDA_Copy(CUDA_collisionObjects, walls, verticies);
-                
-                Point raySource = PTGI_Math.GetRaySourceFromThreadIndex(ref bitmap, CUDAThreadId);
-
+                Point raySource = PTGI_Math.GetRaySourceFromThreadIndex(bitmap, CUDAThreadId);
                 Line lightRay = new Line();
                 lightRay.Setup(raySource, new Point());
+                var pixelInformaton = RenderBitmap(index, bitmap, lightRay, seedArray, samples, bounceLimit, walls);
+                //if (pixelInformaton.pixelColor.R != 0 || pixelInformaton.pixelColor.G != 0|| pixelInformaton.pixelColor.B!=0)
+                //    Interop.WriteLine("Color {0}, {1}, {2}", pixelInformaton.pixelColor.R, pixelInformaton.pixelColor.G, pixelInformaton.pixelColor.B);
 
-                var pixelInformaton = TraceRayUtility.IsRayStartingInPolygon(raySource, CUDA_collisionObjects);
-                
-                if (pixelInformaton.ShouldCancelRender)
-                {
-                    bitmap.SetPixel(CUDAThreadId, pixelInformaton.pixelColor, 1);
-                    return;
-                }
-                pixelInformaton = RenderBitmap(ref bitmap, pixelInformaton, lightRay, ref cellGrid, ref seedArray[CUDAThreadId], samples, bounceLimit, CUDA_collisionObjects);
-                bitmap.SetPixel(CUDAThreadId, pixelInformaton.pixelColor, 1.0 / (double)samples);
+                bitmap.SetPixel(CUDAThreadId, pixelInformaton.pixelColor, 1.0f / samples, pixels);
             }
         }
 
-        [GpuManaged]
-        private static PixelInformaton RenderBitmap(ref Bitmap bitmap, PixelInformaton pixelInformaton, Line lightRay, ref Grid cellGrid, ref int randomSeed, int samples, int bounceLimit, Polygon[] collisionObjects)
+        private static PixelInformaton RenderBitmap(Index1 index, Bitmap bitmap, Line lightRay, ArrayView<int> seedArray, int samples, int bounceLimit, ArrayView<Line> walls)
         {
-            for(int sampleId = 0; sampleId < samples; sampleId++)
+            var pixelInformation = new PixelInformaton(); 
+            for (int sampleId = 0; sampleId < samples; sampleId++)
             {
-                lightRay.Destination = PTGI_Random.GetPointInRadius(ref randomSeed, 10).AddNew(lightRay.Source);
+                lightRay.Destination = PTGI_Random.GetPointInRadius(index, seedArray, 10).AddNew(lightRay.Source);
 
                 Point rayDirection = lightRay.GetDirection();
                 rayDirection.Normalize();
@@ -211,111 +168,76 @@ namespace PTGI_Remastered
 
                 lightRay.Destination.Add(rayDirection);
                 Line wallToIgnore = new Line();
-                RayTraceResult rayTraceResult = new RayTraceResult();
-                rayTraceResult = CUDA_TraceRay(ref randomSeed, bounceLimit, pixelInformaton.DensityRegionSwap, ref cellGrid, collisionObjects, lightRay, wallToIgnore, rayTraceResult);
+                var rayTraceResult = CUDA_TraceRay(index, seedArray, bitmap, bounceLimit, false, walls, lightRay, wallToIgnore);
 
-                pixelInformaton.pixelColor.Add(rayTraceResult.pixelColor);
+                pixelInformation.pixelColor.Add(rayTraceResult.pixelColor);
             }
-            return pixelInformaton;
+            return pixelInformation;
         }
 
-        [GpuManaged]
-        private static RayTraceResult CUDA_TraceRay(ref int randomSeed, int bounceLimit, bool originDensitySwap,
-            ref Grid cellGrid, Polygon[] collisionObjects, Line lightRay, Line wallToIgnore, RayTraceResult rayTraceResult)
+        private static RayTraceResult CUDA_TraceRay(Index1 index, ArrayView<int> seedArray, Bitmap bitmap, int bounceLimit, bool originDensitySwap,
+            ArrayView<Line> walls, Line lightRay, Line wallToIgnore)
         {
+            var rayTraceResult = new RayTraceResult();
             rayTraceResult.pixelColor = new Color();
             rayTraceResult.pixelColor.SetColor(1, 1, 1);
 
-            double reflectionAreaSize = 10;
-            
-            for(int bounceIndex = 0; bounceIndex < bounceLimit; bounceIndex++)
+            float reflectionAreaSize = 10;
+            for (int bounceIndex = 0; bounceIndex < bounceLimit; bounceIndex++)
             {
-                rayTraceResult.AddRayDebugPoint(lightRay.Source);
-
-                for (int i = 0; i < collisionObjects.Length; i++)
-                {
-                    collisionObjects[i].ResetWallCheckedStatus();
-                }
-
-                double closestDistance = double.MaxValue;
+                float closestDistance = float.MaxValue;
                 Point intersectionPoint = new Point();
                 bool isClosestIntersectionLight = false;
                 var closestIntersectionObjectId = int.MaxValue;
-                var gridVariables = cellGrid.CUDAGetGridTraversalVariables(lightRay);
-                var objectCollidedWith = new Polygon();
                 var wallCollidedWith = new Line();
 
-                while(true)
+                for(int i = 0; i < bitmap.WallsCount; i++)
                 {
-                    int currentGridCellIndex = cellGrid.CUDAGetCellIndex(gridVariables);
-                    if (cellGrid.CUDAIsOutsideGrid(gridVariables))
-                        break;
-
-                    rayTraceResult.AddGridDebugPoint(currentGridCellIndex);
-                    var cellObjects = cellGrid.GetObjectsInCell(currentGridCellIndex);
-
-                    for(int cellObjectId = 0; cellObjectId < cellObjects.Length; cellObjectId++)
+                    var rayWallIntersection = walls[i].GetIntersection(lightRay, wallToIgnore);
+                    if (rayWallIntersection.HasValue == 1)
                     {
-                        var collisionObjectIds = cellObjects[cellObjectId];
-
-                        var polygonObject = collisionObjects[collisionObjectIds.PolygonId];
-                        var rayWallIntersection = polygonObject.Walls[collisionObjectIds.WallId].GetIntersection(lightRay, wallToIgnore);
-
-                        if (rayWallIntersection.HasValue)
+                        var raySourceToWallIntersectionDistance = lightRay.Source.GetDistance(rayWallIntersection);
+                        if (raySourceToWallIntersectionDistance < closestDistance)
                         {
-                            var raySourceToWallIntersectionDistance = lightRay.Source.GetDistance(rayWallIntersection);
-                            if (raySourceToWallIntersectionDistance < closestDistance)
-                            {
-                                intersectionPoint = rayWallIntersection;
-                                closestDistance = raySourceToWallIntersectionDistance;
-                                isClosestIntersectionLight = polygonObject.objectType == PTGI_ObjectTypes.LightSource ? true : false;
-                                closestIntersectionObjectId = collisionObjectIds.PolygonId;
-                                wallCollidedWith = polygonObject.Walls[collisionObjectIds.WallId];
-                                wallCollidedWith.HasValue = true;
-                                objectCollidedWith = collisionObjects[closestIntersectionObjectId];
-                            }
+                            intersectionPoint = rayWallIntersection;
+                            closestDistance = raySourceToWallIntersectionDistance;
+                            isClosestIntersectionLight = walls[i].ObjectType == 2 ? true : false;
+                            wallCollidedWith = walls[i];
+                            wallCollidedWith.HasValue = 1;
                         }
                     }
-
-                    if(intersectionPoint.HasValue)
-                        break;
-
-                    gridVariables.TraverseToNextCell();
                 }
 
-                if(!objectCollidedWith.HasValue)
+                if(wallCollidedWith.HasValue != 1)
                 {
                     rayTraceResult.pixelColor.SetColor(0, 0, 0);
-                    rayTraceResult.AddRayDebugPoint(lightRay.Destination);
                     return rayTraceResult;
                 }
                 else if(isClosestIntersectionLight)
                 {
-                    rayTraceResult.pixelColor.TintWith(objectCollidedWith.Color, objectCollidedWith.EmissionStrength);
+                    rayTraceResult.pixelColor.TintWith(wallCollidedWith.Color, wallCollidedWith.EmissionStrength);
                     rayTraceResult.pixelColor.Rescale(255);
-                    rayTraceResult.AddRayDebugPoint(intersectionPoint);
                     return rayTraceResult;
                 }
-                else if(!isClosestIntersectionLight)
+                else
                 {
                     if(lightRay.Source.IsEqualTo(intersectionPoint))
                     {
                         rayTraceResult.pixelColor.SetColor(0, 0, 0);
-                        rayTraceResult.AddRayDebugPoint(intersectionPoint);
                         return rayTraceResult;
                     }
                     wallToIgnore = wallCollidedWith;
 
-                    var nextRayDirection = TraceRayUtility.NextRayDirection(ref randomSeed, objectCollidedWith, wallToIgnore, lightRay.Source, intersectionPoint, reflectionAreaSize, originDensitySwap);
+                    var nextRayDirection = TraceRayUtility.NextRayDirection(index, seedArray, wallCollidedWith, wallToIgnore, lightRay.Source, intersectionPoint, reflectionAreaSize, originDensitySwap);
                     originDensitySwap = nextRayDirection.SwapDensity;
 
-                    if(objectCollidedWith.reflectivnessType == PTGI_MaterialReflectivness.Transparent)
+                    if(wallCollidedWith.ReflectivnessType == 4)
                     {
-                        rayTraceResult.pixelColor.Multiply(objectCollidedWith.Color.GetRescaled(255));
+                        rayTraceResult.pixelColor.Multiply(wallCollidedWith.Color.GetRescaled(255));
                     }
                     else
                     {
-                        rayTraceResult.pixelColor.Multiply(objectCollidedWith.Color.GetRescaled(255).GetRescaled(3.14159265359));
+                        rayTraceResult.pixelColor.Multiply(wallCollidedWith.Color.GetRescaled(255).GetRescaled(3.14159265359f));
                     }
 
                     lightRay.Source = intersectionPoint;
@@ -324,7 +246,6 @@ namespace PTGI_Remastered
             }
 
             rayTraceResult.pixelColor.SetColor(0, 0, 0);
-            rayTraceResult.AddRayDebugPoint(lightRay.Source);
             return rayTraceResult;
         }
     }

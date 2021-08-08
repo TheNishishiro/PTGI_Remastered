@@ -9,7 +9,7 @@ namespace PTGI_Remastered.Structs
     [Serializable]
     public struct LineCoefficient
     {
-        public double A;
-        public double B;
+        public float A;
+        public float B;
     }
 }

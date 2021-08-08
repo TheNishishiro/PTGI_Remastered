@@ -19,8 +19,8 @@ namespace PTGI_Remastered.Structs
 
         public int LastWallIntersectedIndex;
         public Color Color;
-        public double EmissionStrength;
-        public double Density;
+        public float EmissionStrength;
+        public float Density;
 
         public char[] Name;
 
@@ -47,7 +47,7 @@ namespace PTGI_Remastered.Structs
             structType = PTGI_StructTypes.Rectangle;
         }
 
-        public void Setup(Point[] Verticies, PTGI_ObjectTypes objectType, PTGI_MaterialReflectivness reflectivnessType, Color color, double EmissionStrength, double Density)
+        public void Setup(Point[] Verticies, PTGI_ObjectTypes objectType, PTGI_MaterialReflectivness reflectivnessType, Color color, float EmissionStrength, float Density)
         {
             if (Verticies.Length > 2)
                 CreateWalls(Verticies);
@@ -92,20 +92,20 @@ namespace PTGI_Remastered.Structs
         public Point GetIntersectionPoint(Line line, Line wallToIgnore)
         {
             Point intersectionPoint = new Point();
-            intersectionPoint.HasValue = false;
+            intersectionPoint.HasValue = 0;
 
-            double closestDistance = double.MaxValue;
+            float closestDistance = float.MaxValue;
             int wallsCount = Walls.Count();
 
             for(int wallIndex = 0; wallIndex < wallsCount; wallIndex++)
             {
-                if (Walls[wallIndex].WasChecked || (wallToIgnore.HasValue && Walls[wallIndex].IsEqualTo(wallToIgnore)))
+                if (Walls[wallIndex].WasChecked == 1 || (wallToIgnore.HasValue == 1 && Walls[wallIndex].IsEqualTo(wallToIgnore)))
                     continue;
 
                 Point newIntersection = Walls[wallIndex].GetIntersection(line, wallToIgnore);
-                if(newIntersection.HasValue)
+                if(newIntersection.HasValue == 1)
                 {
-                    double distance = line.Source.GetDistance(newIntersection);
+                    float distance = line.Source.GetDistance(newIntersection);
                     if(closestDistance > distance)
                     {
                         intersectionPoint = newIntersection;

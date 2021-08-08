@@ -8,8 +8,8 @@ namespace PTGI_Remastered.Structs
 {
     public struct PixelInformaton
     {
-        public bool ShouldCancelRender;
-        public bool DensityRegionSwap;
+        public byte ShouldCancelRender;
+        public byte DensityRegionSwap;
         public Color pixelColor;
     }
 }

@@ -1,4 +1,4 @@
-﻿using Alea;
+﻿using PTGI_Remastered.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,21 +7,27 @@ using System.Threading.Tasks;
 
 namespace PTGI_Remastered.Structs
 {
-    [Serializable]
     public struct Line
     {
         public Point Source;
         public Point Destination;
         public LineCoefficient Coefficient;
-        public bool HasValue;
-        public bool WasChecked;
+        public byte HasValue;
+        public byte WasChecked;
+
+        public int StructType;
+        public int ObjectType;
+        public int ReflectivnessType;
+        public Color Color;
+        public float EmissionStrength;
+        public float Density;
 
         public void Setup(Point Source, Point Destination)
         {
             this.Source = Source;
             this.Destination = Destination;
             GetCoefficients();
-            HasValue = true;
+            HasValue = 1;
         }
 
         private LineCoefficient GetCoefficients()
@@ -36,23 +42,23 @@ namespace PTGI_Remastered.Structs
 
         public void MarkAsCheckedForIntersection()
         {
-            WasChecked = true;
+            WasChecked = 1;
         }
 
         public void MarkAsReadyForIntersection()
         {
-            WasChecked = false;
+            WasChecked = 0;
         }
 
-        public double GetLength()
+        public float GetLength()
         {
             return Source.GetDistance(Destination);
         }
 
         public LineNormals GetNormals()
         {
-            double dx = Destination.X - Source.X;
-            double dy = Destination.Y - Source.Y;
+            float dx = Destination.X - Source.X;
+            float dy = Destination.Y - Source.Y;
 
             LineNormals lineNormals = new LineNormals();
             lineNormals.NormalDown = new Point();
@@ -69,7 +75,7 @@ namespace PTGI_Remastered.Structs
             return Source.IsEqualTo(line.Source) && Destination.IsEqualTo(line.Destination);
         }
 
-        private LineNormals MoveNormalsRelative(LineNormals lineNormals, Point intersection, double reflectionArea)
+        private LineNormals MoveNormalsRelative(LineNormals lineNormals, Point intersection, float reflectionArea)
         {
             LineNormals movedLineNormals = new LineNormals();
             movedLineNormals.NormalDown = lineNormals.NormalDown.MultiplyNew(reflectionArea).AddNew(intersection);
@@ -78,7 +84,7 @@ namespace PTGI_Remastered.Structs
             return movedLineNormals;
         }
 
-        public Point GetShiftedClosestNormal(Point source, Point intersection, double reflectionArea)
+        public Point GetShiftedClosestNormal(Point source, Point intersection, float reflectionArea)
         {
             var lineNormals = GetNormals().Normalize();
             var lineShiftedNormals = MoveNormalsRelative(lineNormals, intersection, reflectionArea);
@@ -106,15 +112,15 @@ namespace PTGI_Remastered.Structs
         {
             Point intersectionPoint = new Point();
 
-            if ((ignoredLine.HasValue && ignoredLine.IsEqualTo(this)) || WasChecked)
+            if ((ignoredLine.HasValue == 1 && ignoredLine.IsEqualTo(this)) || WasChecked == 1)
                 return intersectionPoint;
             //MarkAsCheckedForIntersection();
-            double delta = (Source.X - Destination.X) * (intersectingLine.Source.Y - intersectingLine.Destination.Y) - (Source.Y - Destination.Y) * (intersectingLine.Source.X - intersectingLine.Destination.X);
+            float delta = (Source.X - Destination.X) * (intersectingLine.Source.Y - intersectingLine.Destination.Y) - (Source.Y - Destination.Y) * (intersectingLine.Source.X - intersectingLine.Destination.X);
             if(delta == 0)
                 return intersectionPoint;
 
-            double t = ((Source.X - intersectingLine.Source.X) * (intersectingLine.Source.Y - intersectingLine.Destination.Y) - (Source.Y - intersectingLine.Source.Y) * (intersectingLine.Source.X - intersectingLine.Destination.X)) / delta;
-            double u = -((Source.X - Destination.X) * (Source.Y - intersectingLine.Source.Y) - (Source.Y - Destination.Y) * (Source.X - intersectingLine.Source.X)) / delta;
+            float t = ((Source.X - intersectingLine.Source.X) * (intersectingLine.Source.Y - intersectingLine.Destination.Y) - (Source.Y - intersectingLine.Source.Y) * (intersectingLine.Source.X - intersectingLine.Destination.X)) / delta;
+            float u = -((Source.X - Destination.X) * (Source.Y - intersectingLine.Source.Y) - (Source.Y - Destination.Y) * (Source.X - intersectingLine.Source.X)) / delta;
 
             if(t >= 0 && t <= 1 && u >= 0 && u <= 1)
             {

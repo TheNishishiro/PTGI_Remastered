@@ -1,4 +1,5 @@
-﻿using Alea;
+﻿using ILGPU;
+using ILGPU.Algorithms;
 using PTGI_Remastered.Utilities;
 using System;
 using System.Collections.Generic;
@@ -11,15 +12,15 @@ namespace PTGI_Remastered.Structs
     [Serializable]
     public struct Point
     {
-        public double X;
-        public double Y;
-        public bool HasValue;
+        public float X;
+        public float Y;
+        public byte HasValue;
 
-        public void SetCoords(double X, double Y)
+        public void SetCoords(float X, float Y)
         {
             this.X = X;
             this.Y = Y;
-            HasValue = true;
+            HasValue = 1;
         }
 
         public Point SubstractNew(Point point)
@@ -48,7 +49,7 @@ namespace PTGI_Remastered.Structs
             SetCoords(X + point.X, Y + point.Y);
         }
 
-        public Point MultiplyNew(double factor)
+        public Point MultiplyNew(float factor)
         {
             Point newPoint = new Point();
             newPoint.SetCoords(X * factor, Y * factor);
@@ -56,7 +57,7 @@ namespace PTGI_Remastered.Structs
             return newPoint;
         }
 
-        public void Multiply(double factor)
+        public void Multiply(float factor)
         {
             SetCoords(X * factor, Y * factor);
         }
@@ -94,29 +95,29 @@ namespace PTGI_Remastered.Structs
         {
             Point newPoint = new Point();
             var length = X * X + Y * Y;
-            newPoint.SetCoords(X / DeviceFunction.Sqrt(length), Y / DeviceFunction.Sqrt(length));
+            newPoint.SetCoords(X / XMath.Sqrt(length), Y / XMath.Sqrt(length));
             return newPoint;
         }
 
-        public double DotProduct(Point point)
+        public float DotProduct(Point point)
         {
             return X * point.Y + X * point.Y;
         }
 
-        public double GetDistance(Point destination)
+        public float GetDistance(Point destination)
         {
-            return DeviceFunction.Sqrt(DeviceFunction.Pow(destination.X - X, 2) + DeviceFunction.Pow(destination.Y - Y, 2));
+            return XMath.Sqrt(PTGI_Math.Pow(destination.X - X, 2) + PTGI_Math.Pow(destination.Y - Y, 2));
         }
 
-        public double Magnitude()
+        public float Magnitude()
         {
-            return DeviceFunction.Sqrt(X * X + Y * Y);
+            return XMath.Sqrt(X * X + Y * Y);
         }
 
         public bool LiesInLine(Line line)
         {
-            double epsilon = 0.001;
-            return DeviceFunction.Abs(Y - (line.Coefficient.A * X + line.Coefficient.B)) < epsilon;
+            float epsilon = 0.001f;
+            return XMath.Abs(Y - (line.Coefficient.A * X + line.Coefficient.B)) < epsilon;
         }
 
         public bool LiesInObject(Polygon obstacle)

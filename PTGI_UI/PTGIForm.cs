@@ -33,7 +33,7 @@ namespace PTGI_UI
                 {
                     int row = i % RenderWidth;
                     int col = i / RenderWidth;
-                    Color c = Color.FromArgb((int)(pathTracedBitmap.pixels[i].R * 255.0), (int)(pathTracedBitmap.pixels[i].G * 255.0), (int)(pathTracedBitmap.pixels[i].B * 255.0));
+                    Color c = Color.FromArgb((int)(pathTraceResult.Pixels[i].R * 255.0), (int)(pathTraceResult.Pixels[i].G * 255.0), (int)(pathTraceResult.Pixels[i].B * 255.0));
 
                     bitmap.SetPixel(row, col, c);
                 }
@@ -91,12 +91,13 @@ namespace PTGI_UI
             PathTracer = new PTGI_Remastered.PTGI();
             Polygons = new List<PTGI_Remastered.Structs.Polygon>();
 
-            GpuId = 0;
+            GpuId = null;
             try
             {
-                var gpus = PathTracer.GetAvailableGpus().ToArray();
+                var gpus = PathTracer.GetAvaiableHardwareAccelerators().ToArray();
                 gpuSelectorControl.Items.AddRange(gpus);
                 gpuSelectorControl.DisplayMember = "Name";
+                gpuSelectorControl.ValueMember = "Id";
             }
             catch(Exception ex)
             {
@@ -126,9 +127,10 @@ namespace PTGI_UI
             IsObjectEmittingLight = emitsLightControl.Checked;
             SelectedObjectMaterial = (string)objectMaterialControl.SelectedItem;
             ObjectColor = colorEditor1.Color;
-            ObjectEmissionStrength = double.Parse(objectEmissionStrengthControl.Text.Replace('.', ','));
-            ObjectDensity = double.Parse(objectDensityControl.Text.Replace('.', ','));
+            ObjectEmissionStrength = float.Parse(objectEmissionStrengthControl.Text.Replace('.', ','));
+            ObjectDensity = float.Parse(objectDensityControl.Text.Replace('.', ','));
             ObjectName = objectNameControl.Text;
+            colorDisplayPictureBox.BackColor = ObjectColor;
         }
 
         private void applyDebugSettingsButton_Click(object sender, EventArgs e)
@@ -192,7 +194,6 @@ namespace PTGI_UI
             }
             else if(e.KeyCode == Keys.R)
             {
-                SendDebugRay();
                 Refresh();
             }
             else if(e.KeyCode == Keys.Delete)

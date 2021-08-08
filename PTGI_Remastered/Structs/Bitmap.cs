@@ -1,4 +1,6 @@
-﻿using Alea;
+﻿using ILGPU;
+using ILGPU.Algorithms;
+using ILGPU.Runtime;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,36 +12,36 @@ namespace PTGI_Remastered.Structs
     [Serializable]
     public struct Color
     {
-        public double R;
-        public double G;
-        public double B;
+        public float R;
+        public float G;
+        public float B;
 
-        public void SetColor(double R, double G, double B)
+        public void SetColor(float R, float G, float B)
         {
             this.R = R;
             this.G = G;
             this.B = B;
         }
 
-        public void SetColor(Color color, double mixFactor)
+        public void SetColor(Color color, float mixFactor)
         {
             R = color.R * mixFactor;
             G = color.G * mixFactor;
             B = color.B * mixFactor;
         }
 
-        public void TintWith(Color color, double mixFactor)
+        public void TintWith(Color color, float mixFactor)
         {
             R *= color.R * mixFactor;
             G *= color.G * mixFactor;
             B *= color.B * mixFactor;
         }
 
-        public void ApplyGammaCorrection(double scale)
+        public void ApplyGammaCorrection(float scale)
         {
-            R = DeviceFunction.Sqrt(R * scale);
-            G = DeviceFunction.Sqrt(G * scale);
-            B = DeviceFunction.Sqrt(B * scale);
+            R = XMath.Sqrt(R * scale);
+            G = XMath.Sqrt(G * scale);
+            B = XMath.Sqrt(B * scale);
         }
 
         public void Clip()
@@ -60,14 +62,14 @@ namespace PTGI_Remastered.Structs
                 B = 0;
         }
 
-        public void Rescale(double factor)
+        public void Rescale(float factor)
         {
             R /= factor;
             G /= factor;
             B /= factor;
         }
 
-        public Color GetRescaled(double factor)
+        public Color GetRescaled(float factor)
         {
             Color newColor = new Color();
             newColor.SetColor(R / factor, G / factor, B / factor);
@@ -94,29 +96,21 @@ namespace PTGI_Remastered.Structs
     /// </summary>
     public struct Bitmap
     {
-        public Color[] pixels;
         public int Size;
         public int Width;
         public int Height;
+        public int WallsCount;
 
-        public void CopyPixels(Color[] pixels, int Width, int Height)
-        {
-            this.pixels = pixels;
-            this.Width = Width;
-            this.Height = Height;
-            Size = Width * Height;
-        }
-
-        public void Create(int Width, int Height)
+        public MemoryBuffer<Color> CreateColorArrayView(int Width, int Height, int wallsCount, Accelerator accelerator)
         {
             this.Width = Width;
             this.Height = Height;
             Size = Width * Height;
-
-            pixels = new Color[Size];
+            WallsCount = wallsCount;
+            return accelerator.Allocate<Color>(Size);
         }
 
-        public void SetPixel(int id, Color pixelColor, double gammaCorrectionScale)
+        public void SetPixel(int id, Color pixelColor, float gammaCorrectionScale, ArrayView<Color> pixels)
         {
             pixelColor.ApplyGammaCorrection(gammaCorrectionScale);
             pixelColor.Clip();

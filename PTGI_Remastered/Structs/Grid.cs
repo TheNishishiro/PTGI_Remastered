@@ -1,4 +1,4 @@
-﻿using Alea;
+﻿using ILGPU.Algorithms;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,10 +15,10 @@ namespace PTGI_Remastered.Structs
         public int StepY;
         public int CurrentTileIDX;
         public int CurrentTileIDY;
-        public double CurrentDeltaX;
-        public double CurrentDeltaY;
-        public double DeltaX;
-        public double DeltaY;
+        public float CurrentDeltaX;
+        public float CurrentDeltaY;
+        public float DeltaX;
+        public float DeltaY;
 
         private void MoveXDirection()
         {
@@ -75,8 +75,8 @@ namespace PTGI_Remastered.Structs
 
         public void Create(Bitmap bitmap, int cellsInRow)
         {
-            CellWidth = (int)Math.Ceiling((double)bitmap.Width / (double)cellsInRow);
-            CellHeight = (int)Math.Ceiling((double)bitmap.Height / (double)cellsInRow);
+            CellWidth = (int)Math.Ceiling((float)bitmap.Width / (float)cellsInRow);
+            CellHeight = (int)Math.Ceiling((float)bitmap.Height / (float)cellsInRow);
             GridSize = cellsInRow * cellsInRow;
             CellsInRow = cellsInRow;
         }
@@ -169,8 +169,8 @@ namespace PTGI_Remastered.Structs
             gridVariables.MoveAlongY = true;
 
             // if dividing by 0 disable moving along that axis
-            double dividerX = DeviceFunction.Abs(EndLocation.X - StartLocation.X);
-            double dividerY = DeviceFunction.Abs(EndLocation.Y - StartLocation.Y);
+            float dividerX = 1;//XMath.Abs(EndLocation.X - StartLocation.X);
+            float dividerY = 1;//XMath.Abs(EndLocation.Y - StartLocation.Y);
             if (dividerX == 0)
                 gridVariables.MoveAlongX = false;
             if (dividerY == 0)
@@ -181,10 +181,10 @@ namespace PTGI_Remastered.Structs
             gridVariables.DeltaY = CellHeight / dividerY;
 
             // Calculate how far the ray is into cell
-            double PositionInsideTile_X = (StartLocation.X % CellWidth) / CellWidth;
-            double DistanceToBoundary_X = DeviceFunction.Abs(gridVariables.StepX - PositionInsideTile_X) % 1;
-            double PositionInsideTile_Y = (StartLocation.Y % CellHeight) / CellHeight;
-            double DistanceToBoundary_Y = DeviceFunction.Abs(gridVariables.StepY - PositionInsideTile_Y) % 1;
+            float PositionInsideTile_X = (StartLocation.X % CellWidth) / CellWidth;
+            float DistanceToBoundary_X = 1;//XMath.Abs(gridVariables.StepX - PositionInsideTile_X) % 1;
+            float PositionInsideTile_Y = (StartLocation.Y % CellHeight) / CellHeight;
+            float DistanceToBoundary_Y = 1;//XMath.Abs(gridVariables.StepY - PositionInsideTile_Y) % 1;
 
             // How far are we into the grid
             gridVariables.CurrentDeltaX = gridVariables.MoveAlongX == true ? gridVariables.DeltaX * DistanceToBoundary_X : 1;
@@ -203,11 +203,11 @@ namespace PTGI_Remastered.Structs
         {
             List<Point> visited = new List<Point>();
 
-            int startTileIDX = (int)Math.Floor(StartLocation.X / CellWidth);
-            int startTileIDY = (int)Math.Floor(StartLocation.Y / CellHeight);
+            int startTileIDX = (int)XMath.Floor(StartLocation.X / CellWidth);
+            int startTileIDY = (int)XMath.Floor(StartLocation.Y / CellHeight);
 
-            int endTileIDX = (int)Math.Floor(EndLocation.X / CellWidth);
-            int endTileIDY = (int)Math.Floor(EndLocation.Y / CellHeight);
+            int endTileIDX = (int)XMath.Floor(EndLocation.X / CellWidth);
+            int endTileIDY = (int)XMath.Floor(EndLocation.Y / CellHeight);
 
             int currentTileIDX = startTileIDX;
             int currentTileIDY = startTileIDY;
@@ -232,20 +232,20 @@ namespace PTGI_Remastered.Structs
             bool moveAlongX = true;
             bool moveAlongY = true;
 
-            double DeltaX = CellWidth / Math.Abs(EndLocation.X - StartLocation.X);
-            double DeltaY = CellHeight / Math.Abs(EndLocation.Y - StartLocation.Y);
-            if (double.IsInfinity(DeltaX))
+            float DeltaX = CellWidth / XMath.Abs(EndLocation.X - StartLocation.X);
+            float DeltaY = CellHeight / XMath.Abs(EndLocation.Y - StartLocation.Y);
+            if (float.IsInfinity(DeltaX))
                 moveAlongX = false;
-            if (double.IsInfinity(DeltaY))
+            if (float.IsInfinity(DeltaY))
                 moveAlongY = false;
 
-            double PositionInsideTile_X = (StartLocation.X % CellWidth) / CellWidth;
-            double DistanceToBoundary_X = Math.Abs(StepX - PositionInsideTile_X) % 1;
-            double PositionInsideTile_Y = (StartLocation.Y % CellHeight) / CellHeight;
-            double DistanceToBoundary_Y = Math.Abs(StepY - PositionInsideTile_Y) % 1;
+            float PositionInsideTile_X = (StartLocation.X % CellWidth) / CellWidth;
+            float DistanceToBoundary_X = XMath.Abs(StepX - PositionInsideTile_X) % 1;
+            float PositionInsideTile_Y = (StartLocation.Y % CellHeight) / CellHeight;
+            float DistanceToBoundary_Y = XMath.Abs(StepY - PositionInsideTile_Y) % 1;
 
-            double CurrentDeltaX = moveAlongX ? DeltaX * DistanceToBoundary_X : 1;
-            double CurrentDeltaY = moveAlongY ? DeltaY * DistanceToBoundary_Y : 1;
+            float CurrentDeltaX = moveAlongX ? DeltaX * DistanceToBoundary_X : 1;
+            float CurrentDeltaY = moveAlongY ? DeltaY * DistanceToBoundary_Y : 1;
 
 
             while ((CurrentDeltaX < 1) || (CurrentDeltaY < 1))
