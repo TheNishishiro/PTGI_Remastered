@@ -1,5 +1,6 @@
 ﻿using MaterialSkin;
 using MaterialSkin.Controls;
+using PTGI_Remastered.Inputs;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -27,7 +28,20 @@ namespace PTGI_UI
             Bitmap bitmap = new Bitmap(RenderWidth, RenderHeight);
             try
             {
-                var pathTraceResult = PathTracer.PathTraceRender(Polygons.ToArray(), RenderWidth, RenderHeight, SamplesPerPixel, BounceLimit, GridDivider, UseCUDA, GpuId);
+                var pathTraceResult = PathTracer.PathTraceRender(
+                    new RenderSpecification()
+                    {
+                        BounceLimit = BounceLimit,
+                        GpuId = GpuId,
+                        gridDivides = GridDivider,
+                        UseCUDARenderer = UseCUDA,
+                        ImageHeight = RenderHeight,
+                        ImageWidth = RenderWidth,
+                        Objects = Polygons.ToArray(),
+                        SampleCount = SamplesPerPixel,
+                        IgnoreEnclosedPixels = RenderFlag_IgnoreObstacleInterior
+                    });
+
                 var pathTracedBitmap = pathTraceResult.bitmap;
                 for (int i = 0; i < pathTracedBitmap.Size; i++)
                 {
@@ -39,7 +53,7 @@ namespace PTGI_UI
                 }
 
                 this.Invoke(new MethodInvoker(delegate () {
-                    ShowPopupMessage($"Render time: {pathTraceResult.RenderTime} ms", 5);
+                    ShowPopupMessage($"Render/Process time: {pathTraceResult.RenderTime}/{pathTraceResult.ProcessTime - pathTraceResult.RenderTime} ms", 5);
                     RenderedPictureBox.Size = new Size(RenderWidth, RenderHeight);
                     RenderedPictureBox.BackgroundImage = bitmap;
                 }));
@@ -90,6 +104,8 @@ namespace PTGI_UI
 
             PathTracer = new PTGI_Remastered.PTGI();
             Polygons = new List<PTGI_Remastered.Structs.Polygon>();
+
+            RenderFlag_IgnoreObstacleInterior = renderFlagIgnoreObstacleInteriors.Checked;
 
             GpuId = null;
             try
@@ -232,6 +248,11 @@ namespace PTGI_UI
         private void minecraftWorldGeneration_Click(object sender, EventArgs e)
         {
             TerrariaWorldGenerator();
+        }
+
+        private void renderFlagsApply_Click(object sender, EventArgs e)
+        {
+            RenderFlag_IgnoreObstacleInterior = renderFlagIgnoreObstacleInteriors.Checked;
         }
     }
 }

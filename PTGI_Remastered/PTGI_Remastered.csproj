@@ -119,6 +119,7 @@
     <Compile Include="Structs\PolygonContainer.cs" />
     <Compile Include="Structs\RayTraceResult.cs" />
     <Compile Include="Structs\RenderResult.cs" />
+    <Compile Include="Inputs\RenderSpecification.cs" />
     <Compile Include="Utilities\PTGI_Enums.cs" />
     <Compile Include="Utilities\PTGI_Math.cs" />
     <Compile Include="Utilities\PTGI_Random.cs" />

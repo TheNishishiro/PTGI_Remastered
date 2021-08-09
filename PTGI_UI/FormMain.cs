@@ -50,6 +50,8 @@ namespace PTGI_UI
         protected float ObjectDensity { get; set; }
         protected string ObjectName { get; set; }
 
+        protected bool RenderFlag_IgnoreObstacleInterior { get; set; }
+
         protected int SelectedPolygon { get; set; }
 
         protected void ShowPopupMessage(string text, int popupTime)

@@ -102,5 +102,25 @@ namespace PTGI_Remastered.Utilities
 
             return nextRay;
         }
+
+        public static void IsRayStartingInPolygon(Point raySource, Polygon[] collisionObjects, int samples, ref Color pixel)
+        {
+            for (int i = 0; i < collisionObjects.Length; i++)
+            {
+                bool isInsideObject = raySource.LiesInObject(collisionObjects[i]);
+                if (isInsideObject)
+                {
+                    if (collisionObjects[i].objectType == PTGI_ObjectTypes.LightSource)
+                    {
+                        pixel.SetColor(collisionObjects[i].Color, collisionObjects[i].EmissionStrength);
+                        pixel.Rescale(255);
+                        pixel.ApplyGammaCorrection(1);
+                        pixel.Clip();
+                    }
+                    pixel.Skip = 1;
+                    break;
+                }
+            }
+        }
     }
 }

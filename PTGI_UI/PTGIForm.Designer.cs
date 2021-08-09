@@ -92,6 +92,10 @@ namespace PTGI_UI
             this.applyDebugSettingsButton = new MaterialSkin.Controls.MaterialButton();
             this.materialDrawer1 = new MaterialSkin.Controls.MaterialDrawer();
             this.timer1 = new System.Windows.Forms.Timer(this.components);
+            this.materialCard7 = new MaterialSkin.Controls.MaterialCard();
+            this.renderFlagsApply = new MaterialSkin.Controls.MaterialButton();
+            this.materialLabel15 = new MaterialSkin.Controls.MaterialLabel();
+            this.renderFlagIgnoreObstacleInteriors = new MaterialSkin.Controls.MaterialSwitch();
             this.panel1.SuspendLayout();
             this.materialTabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
@@ -110,6 +114,7 @@ namespace PTGI_UI
             this.materialCard6.SuspendLayout();
             this.tabPage4.SuspendLayout();
             this.materialCard5.SuspendLayout();
+            this.materialCard7.SuspendLayout();
             this.SuspendLayout();
             // 
             // panel1
@@ -167,7 +172,7 @@ namespace PTGI_UI
             this.renderingButtonsPanel.Controls.Add(this.startRenderButton);
             this.renderingButtonsPanel.Depth = 0;
             this.renderingButtonsPanel.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(222)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))));
-            this.renderingButtonsPanel.Location = new System.Drawing.Point(1047, 772);
+            this.renderingButtonsPanel.Location = new System.Drawing.Point(1046, 779);
             this.renderingButtonsPanel.Margin = new System.Windows.Forms.Padding(14);
             this.renderingButtonsPanel.MouseState = MaterialSkin.MouseState.HOVER;
             this.renderingButtonsPanel.Name = "renderingButtonsPanel";
@@ -304,7 +309,7 @@ namespace PTGI_UI
             this.objectSpecificationCard.MouseState = MaterialSkin.MouseState.HOVER;
             this.objectSpecificationCard.Name = "objectSpecificationCard";
             this.objectSpecificationCard.Padding = new System.Windows.Forms.Padding(14);
-            this.objectSpecificationCard.Size = new System.Drawing.Size(296, 704);
+            this.objectSpecificationCard.Size = new System.Drawing.Size(296, 711);
             this.objectSpecificationCard.TabIndex = 3;
             // 
             // objectEmissionStrengthControl
@@ -479,6 +484,7 @@ namespace PTGI_UI
             // 
             // tabPage2
             // 
+            this.tabPage2.Controls.Add(this.materialCard7);
             this.tabPage2.Controls.Add(this.materialCard2);
             this.tabPage2.Controls.Add(this.materialCard1);
             this.tabPage2.Location = new System.Drawing.Point(4, 22);
@@ -1081,6 +1087,73 @@ namespace PTGI_UI
             this.timer1.Interval = 1000;
             this.timer1.Tick += new System.EventHandler(this.timer1_Tick);
             // 
+            // materialCard7
+            // 
+            this.materialCard7.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
+            this.materialCard7.Controls.Add(this.renderFlagIgnoreObstacleInteriors);
+            this.materialCard7.Controls.Add(this.renderFlagsApply);
+            this.materialCard7.Controls.Add(this.materialLabel15);
+            this.materialCard7.Depth = 0;
+            this.materialCard7.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(222)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))));
+            this.materialCard7.Location = new System.Drawing.Point(893, 17);
+            this.materialCard7.Margin = new System.Windows.Forms.Padding(14);
+            this.materialCard7.MouseState = MaterialSkin.MouseState.HOVER;
+            this.materialCard7.Name = "materialCard7";
+            this.materialCard7.Padding = new System.Windows.Forms.Padding(14);
+            this.materialCard7.Size = new System.Drawing.Size(304, 438);
+            this.materialCard7.TabIndex = 9;
+            // 
+            // renderFlagsApply
+            // 
+            this.renderFlagsApply.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+            this.renderFlagsApply.Depth = 0;
+            this.renderFlagsApply.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.renderFlagsApply.DrawShadows = true;
+            this.renderFlagsApply.HighEmphasis = true;
+            this.renderFlagsApply.Icon = null;
+            this.renderFlagsApply.Location = new System.Drawing.Point(14, 388);
+            this.renderFlagsApply.Margin = new System.Windows.Forms.Padding(4, 6, 4, 6);
+            this.renderFlagsApply.MouseState = MaterialSkin.MouseState.HOVER;
+            this.renderFlagsApply.Name = "renderFlagsApply";
+            this.renderFlagsApply.Size = new System.Drawing.Size(276, 36);
+            this.renderFlagsApply.TabIndex = 7;
+            this.renderFlagsApply.Text = "Apply";
+            this.renderFlagsApply.Type = MaterialSkin.Controls.MaterialButton.MaterialButtonType.Contained;
+            this.renderFlagsApply.UseAccentColor = false;
+            this.renderFlagsApply.UseVisualStyleBackColor = true;
+            this.renderFlagsApply.Click += new System.EventHandler(this.renderFlagsApply_Click);
+            // 
+            // materialLabel15
+            // 
+            this.materialLabel15.AutoSize = true;
+            this.materialLabel15.Depth = 0;
+            this.materialLabel15.Dock = System.Windows.Forms.DockStyle.Top;
+            this.materialLabel15.Font = new System.Drawing.Font("Roboto", 14F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Pixel);
+            this.materialLabel15.Location = new System.Drawing.Point(14, 14);
+            this.materialLabel15.MouseState = MaterialSkin.MouseState.HOVER;
+            this.materialLabel15.Name = "materialLabel15";
+            this.materialLabel15.Size = new System.Drawing.Size(90, 19);
+            this.materialLabel15.TabIndex = 2;
+            this.materialLabel15.Text = "Render flags";
+            // 
+            // renderFlagIgnoreObstacleInteriors
+            // 
+            this.renderFlagIgnoreObstacleInteriors.AutoSize = true;
+            this.renderFlagIgnoreObstacleInteriors.Checked = true;
+            this.renderFlagIgnoreObstacleInteriors.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.renderFlagIgnoreObstacleInteriors.Depth = 0;
+            this.renderFlagIgnoreObstacleInteriors.Dock = System.Windows.Forms.DockStyle.Top;
+            this.renderFlagIgnoreObstacleInteriors.Location = new System.Drawing.Point(14, 33);
+            this.renderFlagIgnoreObstacleInteriors.Margin = new System.Windows.Forms.Padding(0);
+            this.renderFlagIgnoreObstacleInteriors.MouseLocation = new System.Drawing.Point(-1, -1);
+            this.renderFlagIgnoreObstacleInteriors.MouseState = MaterialSkin.MouseState.HOVER;
+            this.renderFlagIgnoreObstacleInteriors.Name = "renderFlagIgnoreObstacleInteriors";
+            this.renderFlagIgnoreObstacleInteriors.Ripple = true;
+            this.renderFlagIgnoreObstacleInteriors.Size = new System.Drawing.Size(276, 37);
+            this.renderFlagIgnoreObstacleInteriors.TabIndex = 13;
+            this.renderFlagIgnoreObstacleInteriors.Text = "Ignore obstacle interiors";
+            this.renderFlagIgnoreObstacleInteriors.UseVisualStyleBackColor = true;
+            // 
             // PTGIForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
@@ -1125,6 +1198,8 @@ namespace PTGI_UI
             this.tabPage4.ResumeLayout(false);
             this.materialCard5.ResumeLayout(false);
             this.materialCard5.PerformLayout();
+            this.materialCard7.ResumeLayout(false);
+            this.materialCard7.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -1193,6 +1268,10 @@ namespace PTGI_UI
         private MaterialSkin.Controls.MaterialCard materialCard6;
         private MaterialSkin.Controls.MaterialButton minecraftWorldGeneration;
         private System.Windows.Forms.PictureBox colorDisplayPictureBox;
+        private MaterialSkin.Controls.MaterialCard materialCard7;
+        private MaterialSkin.Controls.MaterialSwitch renderFlagIgnoreObstacleInteriors;
+        private MaterialSkin.Controls.MaterialButton renderFlagsApply;
+        private MaterialSkin.Controls.MaterialLabel materialLabel15;
     }
 }
 

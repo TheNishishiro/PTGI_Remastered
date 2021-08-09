@@ -2,6 +2,7 @@
 using ILGPU.Runtime;
 using ILGPU.Runtime.CPU;
 using ILGPU.Runtime.Cuda;
+using PTGI_Remastered.Inputs;
 using PTGI_Remastered.Structs;
 using PTGI_Remastered.Utilities;
 using System;
@@ -49,62 +50,36 @@ namespace PTGI_Remastered
         /// <param name="UseCUDARenderer">Specified to use GPU for rendering</param>
         /// <param name="GpuId">GPU to use for rendering</param>
         /// <returns>Rendered result as RenderResult</returns>
-        public RenderResult PathTraceRender(Polygon[] collisionObjects, int imageWidth, int imageHeight, int samples, int bounceLimit, int gridDivides, bool UseCUDARenderer, AcceleratorId GpuId)
+        public RenderResult PathTraceRender(RenderSpecification renderSpecification)
         {
-            var polygons = new List<List<Line>>();
-            int index = 0;
-            foreach (var polygon in collisionObjects)
-            {
-                polygons.Add(new List<Line>());
-                foreach (var wall in polygon.Walls)
-                {
-                    polygons[index].Add(new Line()
-                    {
-                        Coefficient = wall.Coefficient,
-                        Color = polygon.Color,
-                        Density = polygon.Density,
-                        Destination = wall.Destination,
-                        EmissionStrength = polygon.EmissionStrength,
-                        HasValue = wall.HasValue,
-                        ObjectType = (int)polygon.objectType,
-                        ReflectivnessType = (int)polygon.reflectivnessType,
-                        Source = wall.Source,
-                        StructType = (int)PTGI_StructTypes.Line,
-                        WasChecked = wall.WasChecked
-                    });
-                }
-                index++;
-            }
+            Stopwatch processTimeStopwatch = new Stopwatch();
+            processTimeStopwatch.Start();
+            var walls = renderSpecification.GetWalls();
 
             var context = new Context(ContextFlags.Force32BitFloats, ILGPU.IR.Transformations.OptimizationLevel.O2);
-            Accelerator accelerator = null;
-
-            if (GpuId != null)
-                accelerator = Accelerator.Create(context, GpuId);
-            else if (UseCUDARenderer)
-                accelerator = new CudaAccelerator(context);
-            else
-                accelerator = new CPUAccelerator(context);
-
-            RenderResult renderResult = new RenderResult();
-            Bitmap bitmap = new Bitmap();
-            var bitmapPixels = bitmap.CreateColorArrayView(imageWidth, imageHeight, walls.Count, accelerator);
-
-            Random rnd = new Random();
-            int[] randomSeed = new int[bitmap.Size];
+            Accelerator accelerator = renderSpecification.GetAccelerator(context);
+            var renderResult = new RenderResult();
+            var bitmap = new Bitmap();
+            bitmap.SetBitmapSettings(renderSpecification.ImageWidth, renderSpecification.ImageHeight, walls.Length);
+            var pixels = new Color[bitmap.Size];
+            var randomSeed = new int[bitmap.Size];
             Parallel.For(0, bitmap.Size, (i) =>
             {
+                if (renderSpecification.IgnoreEnclosedPixels)
+                {
+                    var point = PTGI_Math.GetRaySourceFromThreadIndex(bitmap, i);
+                    TraceRayUtility.IsRayStartingInPolygon(point, renderSpecification.Objects, renderSpecification.SampleCount, ref pixels[i]);
+                }
                 randomSeed[i] = PTGI_Random.Next();
             });
+            var bitmapPixels = accelerator.Allocate<Color>(pixels);
             var seedArrayView = accelerator.Allocate<int>(randomSeed);
-            var wallArrayView = accelerator.Allocate<Line>(polygons.Select(a => a.ToArray()).ToArray(),);
+            var wallArrayView = accelerator.Allocate<Line>(walls);
 
-            Stopwatch renderTimeStopwatch = new Stopwatch();
+            var renderTimeStopwatch = new Stopwatch();
             renderTimeStopwatch.Start();
-            renderResult.Pixels = StartRender(accelerator, bitmap, bitmapPixels, seedArrayView, wallArrayView, samples, bounceLimit);
+            renderResult.Pixels = StartRender(accelerator, bitmap, bitmapPixels, seedArrayView, wallArrayView, renderSpecification.SampleCount, renderSpecification.BounceLimit);
             renderTimeStopwatch.Stop();
-
-            var isAnyPixelColored = renderResult.Pixels.Any(x => x.B != 0 || x.G != 0 || x.R != 0);
 
             renderResult.RenderTime = renderTimeStopwatch.ElapsedMilliseconds;
             renderResult.bitmap = bitmap;
@@ -113,14 +88,15 @@ namespace PTGI_Remastered
             wallArrayView.Dispose();
             seedArrayView.Dispose();
             bitmapPixels.Dispose();
-            accelerator.ClearCache(ClearCacheMode.Default);
             accelerator.Dispose();
+            renderTimeStopwatch.Stop();
+            renderResult.ProcessTime = processTimeStopwatch.ElapsedMilliseconds;
+            
             return renderResult;
         }
 
         private static Color[] StartRender(Accelerator accelerator, Bitmap bitmap, MemoryBuffer<Color> bitmapPixels, MemoryBuffer<int> randomSeedArray, MemoryBuffer<Line> walls, int samples, int bounceLimit)
         {
-            
             var ptgiKernel = accelerator.LoadAutoGroupedStreamKernel<
                 Index1,
                 Bitmap,
@@ -139,22 +115,22 @@ namespace PTGI_Remastered
                 Console.WriteLine($"{ex.Message}");
             }
             
-            return null;
+            return new Color[bitmapPixels.Length];
         }
 
         private static void CUDA_StartRender(Index1 index, Bitmap bitmap, ArrayView<Color> pixels, ArrayView<int> seedArray, int samples, int bounceLimit, ArrayView<Line> walls)
         {
-            int CUDAThreadId = index;
-            if (CUDAThreadId < pixels.Length)
+            if (index < pixels.Length)
             {
-                Point raySource = PTGI_Math.GetRaySourceFromThreadIndex(bitmap, CUDAThreadId);
+                if (pixels[index].Skip == 1)
+                    return;
+                
+                Point raySource = PTGI_Math.GetRaySourceFromThreadIndex(bitmap, index);
                 Line lightRay = new Line();
                 lightRay.Setup(raySource, new Point());
                 var pixelInformaton = RenderBitmap(index, bitmap, lightRay, seedArray, samples, bounceLimit, walls);
-                //if (pixelInformaton.pixelColor.R != 0 || pixelInformaton.pixelColor.G != 0|| pixelInformaton.pixelColor.B!=0)
-                //    Interop.WriteLine("Color {0}, {1}, {2}", pixelInformaton.pixelColor.R, pixelInformaton.pixelColor.G, pixelInformaton.pixelColor.B);
 
-                bitmap.SetPixel(CUDAThreadId, pixelInformaton.pixelColor, 1.0f / samples, pixels);
+                bitmap.SetPixel(index, pixelInformaton.pixelColor, 1.0f / samples, pixels);
             }
         }
 
