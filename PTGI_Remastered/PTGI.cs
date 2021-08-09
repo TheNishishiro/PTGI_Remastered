@@ -66,22 +66,12 @@ namespace PTGI_Remastered
             var renderResult = new RenderResult();
             var bitmap = new Bitmap();
             bitmap.SetBitmapSettings(renderSpecification.ImageWidth, renderSpecification.ImageHeight, walls.Length);
-            var pixels = new Color[bitmap.Size];
-            var randomSeed = new int[bitmap.Size];
-            Parallel.For(0, bitmap.Size, (i) =>
-            {
-                if (renderSpecification.IgnoreEnclosedPixels)
-                {
-                    var point = PTGI_Math.GetRaySourceFromThreadIndex(bitmap, i);
-                    TraceRayUtility.IsRayStartingInPolygon(point, renderSpecification.Objects, renderSpecification.SampleCount, ref pixels[i]);
-                }
-                randomSeed[i] = PTGI_Random.Next();
-            });
-            
+
+            _cache.WithEnclosureDetection(bitmap, renderSpecification);
             _cache.WithContext();
             _cache.WithAccelerator(renderSpecification.GpuId, renderSpecification.UseCUDARenderer);
-            _cache.SetPixelBuffer(pixels);
-            _cache.SetSeedBuffer(randomSeed);
+            _cache.SetPixelBuffer();
+            _cache.SetSeedBuffer(bitmap.Size);
             _cache.SetWallBuffer(walls);
 
             var renderTimeStopwatch = new Stopwatch();

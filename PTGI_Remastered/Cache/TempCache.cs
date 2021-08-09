@@ -3,7 +3,10 @@ using ILGPU.Backends.OpenCL;
 using ILGPU.Runtime;
 using ILGPU.Runtime.CPU;
 using ILGPU.Runtime.Cuda;
+using PTGI_Remastered.Inputs;
 using PTGI_Remastered.Structs;
+using PTGI_Remastered.Utilities;
+using System.Threading.Tasks;
 
 namespace PTGI_Remastered.Cache
 {
@@ -18,6 +21,10 @@ namespace PTGI_Remastered.Cache
         
         private int _pixelBufferLength;
         private int _wallBufferLength;
+        private int _objectBufferLength;
+        private bool _previouseEnclousureOptionState;
+
+        private Color[] cachePixels;
 
         public void WithContext()
         {
@@ -37,19 +44,54 @@ namespace PTGI_Remastered.Cache
                     Accelerator = new CPUAccelerator(Context);
             }
         }
-        
-        public void SetPixelBuffer(Color[] pixels)
+
+        public void WithEnclosureDetection(Bitmap bitmap, RenderSpecification renderSpecification)
         {
-            if (_pixelBufferLength != pixels.Length || PixelBuffer == null)
-                AllocatePixelBuffer(pixels.Length);
-            PixelBuffer.CopyFrom(pixels, 0, Index1.Zero, pixels.Length);
+            // TODO: add better update logic
+            if (bitmap.Size == _pixelBufferLength && renderSpecification.Objects.Length == _objectBufferLength && _previouseEnclousureOptionState == renderSpecification.IgnoreEnclosedPixels)
+                return;
+
+            cachePixels = new Color[bitmap.Size];
+            _pixelBufferLength = bitmap.Size;
+            _objectBufferLength = renderSpecification.Objects.Length;
+            _previouseEnclousureOptionState = renderSpecification.IgnoreEnclosedPixels;
+
+            if (!renderSpecification.IgnoreEnclosedPixels)
+                return;
+
+            Parallel.For(0, bitmap.Size, (i) =>
+            {
+                var point = PTGI_Math.GetRaySourceFromThreadIndex(bitmap, i);
+                TraceRayUtility.IsRayStartingInPolygon(point, renderSpecification.Objects, renderSpecification.SampleCount, ref cachePixels[i]);
+            });
+        }
+
+
+        public void SetPixelBuffer()
+        {
+            if (_pixelBufferLength != cachePixels.Length || PixelBuffer == null)
+                AllocatePixelBuffer(cachePixels.Length);
+            PixelBuffer.CopyFrom(cachePixels, 0, Index1.Zero, cachePixels.Length);
         }
         
-        public void SetSeedBuffer(int[] seeds)
+        public void SetSeedBuffer(int bitmapSize)
         {
-            if (_pixelBufferLength != seeds.Length || SeedBuffer == null)
-                AllocateSeedBuffer(seeds.Length);
-            SeedBuffer.CopyFrom(seeds, 0, Index1.Zero, seeds.Length);
+            if (_pixelBufferLength != bitmapSize || SeedBuffer == null)
+            {
+                var seed = GenerateRandomSeed(bitmapSize);
+                AllocateSeedBuffer(seed.Length);
+                SeedBuffer.CopyFrom(seed, 0, Index1.Zero, seed.Length);
+            }
+        }
+
+        private int[] GenerateRandomSeed(int bitmapSize)
+        {
+            var randomSeed = new int[bitmapSize];
+            Parallel.For(0, bitmapSize, (i) =>
+            {
+                randomSeed[i] = PTGI_Random.Next();
+            });
+            return randomSeed;
         }
         
         public void SetWallBuffer(Line[] walls)
