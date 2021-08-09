@@ -2,6 +2,17 @@
 
 Current branch is under heavy refactorization, some features are completely removed until migration from Alea to ILGPU is completed
 
+In order to be up to date with Alea implementations:
+- [x] Skip obscured pixels
+- [ ] Grid traversal
+- [ ] Transparent/Semi-transparent materials
+
+Planned so far:
+- [x] Allocation caching
+- [ ] Grid traversal optimizations
+
+Currently even without previous optimizations performance is greatly improved, up to real time rendering
+
 # PTGI_Remastered
 
  Path traced global illumination is used to illuminate the scene by sending multiple rays from pixels and bouncing them around until it hits the light source or it reaches bounce limit. The light is then calculated based on information collected by the bouncing ray.
