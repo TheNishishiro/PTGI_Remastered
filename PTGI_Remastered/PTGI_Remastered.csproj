@@ -105,6 +105,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Cache\TempCache.cs" />
+    <Compile Include="Extensions\PolygonArrayExtension.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="PTGI.cs" />
     <Compile Include="Structs\Bitmap.cs" />

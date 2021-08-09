@@ -22,7 +22,7 @@ namespace PTGI_Remastered.Structs
         public float EmissionStrength;
         public float Density;
 
-        public char[] Name;
+        public string Name;
 
         public bool HasValue;
 

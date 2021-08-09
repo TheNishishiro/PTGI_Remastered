@@ -11,11 +11,19 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using PTGI_Remastered.Cache;
 
 namespace PTGI_Remastered
 {
     public class PTGI
     {
+        private TempCache _cache;
+
+        public PTGI()
+        {
+            _cache = new TempCache();
+        }
+        
         public List<Gpu> GetAvaiableHardwareAccelerators()
         {
             var context = new Context();
@@ -55,9 +63,6 @@ namespace PTGI_Remastered
             Stopwatch processTimeStopwatch = new Stopwatch();
             processTimeStopwatch.Start();
             var walls = renderSpecification.GetWalls();
-
-            var context = new Context(ContextFlags.Force32BitFloats, ILGPU.IR.Transformations.OptimizationLevel.O2);
-            Accelerator accelerator = renderSpecification.GetAccelerator(context);
             var renderResult = new RenderResult();
             var bitmap = new Bitmap();
             bitmap.SetBitmapSettings(renderSpecification.ImageWidth, renderSpecification.ImageHeight, walls.Length);
@@ -72,26 +77,23 @@ namespace PTGI_Remastered
                 }
                 randomSeed[i] = PTGI_Random.Next();
             });
-            var bitmapPixels = accelerator.Allocate<Color>(pixels);
-            var seedArrayView = accelerator.Allocate<int>(randomSeed);
-            var wallArrayView = accelerator.Allocate<Line>(walls);
+            
+            _cache.WithContext();
+            _cache.WithAccelerator(renderSpecification.GpuId, renderSpecification.UseCUDARenderer);
+            _cache.SetPixelBuffer(pixels);
+            _cache.SetSeedBuffer(randomSeed);
+            _cache.SetWallBuffer(walls);
 
             var renderTimeStopwatch = new Stopwatch();
             renderTimeStopwatch.Start();
-            renderResult.Pixels = StartRender(accelerator, bitmap, bitmapPixels, seedArrayView, wallArrayView, renderSpecification.SampleCount, renderSpecification.BounceLimit);
+            renderResult.Pixels = StartRender(_cache.Accelerator, bitmap, _cache.PixelBuffer, _cache.SeedBuffer, _cache.WallBuffer, renderSpecification.SampleCount, renderSpecification.BounceLimit);
             renderTimeStopwatch.Stop();
 
             renderResult.RenderTime = renderTimeStopwatch.ElapsedMilliseconds;
             renderResult.bitmap = bitmap;
-
-            context.Dispose();
-            wallArrayView.Dispose();
-            seedArrayView.Dispose();
-            bitmapPixels.Dispose();
-            accelerator.Dispose();
-            renderTimeStopwatch.Stop();
-            renderResult.ProcessTime = processTimeStopwatch.ElapsedMilliseconds;
+            processTimeStopwatch.Stop();
             
+            renderResult.ProcessTime = processTimeStopwatch.ElapsedMilliseconds;
             return renderResult;
         }
 
