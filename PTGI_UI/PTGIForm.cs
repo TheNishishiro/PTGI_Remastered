@@ -55,6 +55,7 @@ namespace PTGI_UI
             }
             catch(Exception ex)
             {
+                isLiveRender = false;
                 this.Invoke(new MethodInvoker(delegate ()
                 {
                     MessageBox.Show(this, ex.Message, "Render failed");

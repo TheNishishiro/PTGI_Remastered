@@ -22,6 +22,7 @@ namespace PTGI_Remastered.Cache
         private int _pixelBufferLength;
         private int _wallBufferLength;
         private int _objectBufferLength;
+        private bool _updatePixelBuffer;
         private bool _previouseEnclousureOptionState;
 
         private Color[] cachePixels;
@@ -55,6 +56,7 @@ namespace PTGI_Remastered.Cache
             _pixelBufferLength = bitmap.Size;
             _objectBufferLength = renderSpecification.Objects.Length;
             _previouseEnclousureOptionState = renderSpecification.IgnoreEnclosedPixels;
+            _updatePixelBuffer = true;
 
             if (!renderSpecification.IgnoreEnclosedPixels)
                 return;
@@ -69,14 +71,14 @@ namespace PTGI_Remastered.Cache
 
         public void SetPixelBuffer()
         {
-            if (_pixelBufferLength != cachePixels.Length || PixelBuffer == null)
+            if (_pixelBufferLength != cachePixels.Length || PixelBuffer == null || _updatePixelBuffer)
                 AllocatePixelBuffer(cachePixels.Length);
             PixelBuffer.CopyFrom(cachePixels, 0, Index1.Zero, cachePixels.Length);
         }
         
         public void SetSeedBuffer(int bitmapSize)
         {
-            if (_pixelBufferLength != bitmapSize || SeedBuffer == null)
+            if (_pixelBufferLength != bitmapSize || SeedBuffer == null || _updatePixelBuffer)
             {
                 var seed = GenerateRandomSeed(bitmapSize);
                 AllocateSeedBuffer(seed.Length);

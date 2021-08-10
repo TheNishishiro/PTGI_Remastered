@@ -11,7 +11,7 @@ Planned so far:
 - [x] Allocation caching
 - [ ] Grid traversal optimizations
 
-Currently even without previous optimizations performance is greatly improved, up to real time rendering
+Currently even without previous optimizations performance is greatly improved, up to real time rendering on GTX 1050m
 
 # PTGI_Remastered
 
@@ -46,7 +46,7 @@ Solution contains two projects,
 
 It is recommended to run this program on a high end GPU but it should work just fine with low end GPU or even a CPU.
 
-Current iteration is being tested on RTX 3080
+Current iteration is being tested on RTX 3080 and GTX 1050m
 
 ## Features
 
