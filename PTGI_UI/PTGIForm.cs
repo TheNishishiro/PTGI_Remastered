@@ -37,7 +37,7 @@ namespace PTGI_UI
                     {
                         BounceLimit = BounceLimit,
                         GpuId = GpuId,
-                        gridDivides = GridDivider,
+                        GridDivider = GridDivider,
                         UseCUDARenderer = UseCUDA,
                         ImageHeight = RenderHeight,
                         ImageWidth = RenderWidth,
