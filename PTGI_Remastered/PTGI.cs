@@ -105,12 +105,9 @@ namespace PTGI_Remastered
 
             renderResult.RenderTime = renderTimeStopwatch.ElapsedMilliseconds;
             renderResult.bitmap = bitmap;
-
-            context.Dispose();
-            wallArrayView.Dispose();
-            seedArrayView.Dispose();
-            bitmapPixels.Dispose();
-            accelerator.Dispose();
+            processTimeStopwatch.Stop();
+            
+            renderResult.ProcessTime = processTimeStopwatch.ElapsedMilliseconds;
             return renderResult;
         }
 
