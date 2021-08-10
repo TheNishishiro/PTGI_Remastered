@@ -84,6 +84,7 @@ namespace PTGI_Remastered
             processTimeStopwatch.Stop();
             
             renderResult.ProcessTime = processTimeStopwatch.ElapsedMilliseconds;
+            accelerator.Dispose();
             return renderResult;
         }
 
