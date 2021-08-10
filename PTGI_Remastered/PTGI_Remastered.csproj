@@ -105,6 +105,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Cache\TempCache.cs" />
+    <Compile Include="Extensions\PolygonArrayExtension.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="PTGI.cs" />
     <Compile Include="Structs\Bitmap.cs" />
@@ -119,6 +121,7 @@
     <Compile Include="Structs\PolygonContainer.cs" />
     <Compile Include="Structs\RayTraceResult.cs" />
     <Compile Include="Structs\RenderResult.cs" />
+    <Compile Include="Inputs\RenderSpecification.cs" />
     <Compile Include="Utilities\PTGI_Enums.cs" />
     <Compile Include="Utilities\PTGI_Math.cs" />
     <Compile Include="Utilities\PTGI_Random.cs" />

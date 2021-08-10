@@ -1,11 +1,26 @@
+# Notice
+
+Current branch is under heavy refactorization, some features are completely removed until migration from Alea to ILGPU is completed
+
+In order to be up to date with Alea implementations:
+- [x] Skip obscured pixels
+- [ ] Grid traversal
+- [ ] Transparent/Semi-transparent materials
+
+Planned so far:
+- [x] Allocation caching
+- [ ] Grid traversal optimizations
+
+Currently even without previous optimizations performance is greatly improved, up to real time rendering on GTX 1050m
+
 # PTGI_Remastered
 
- Path traced global illumination is used to illuminate the scene by sending multiple rays from pixels and bouncing them around until it hits the light source or it reaches bounce limit. The light is then calculated based on informations collected by the bouncing ray.
+ Path traced global illumination is used to illuminate the scene by sending multiple rays from pixels and bouncing them around until it hits the light source or it reaches bounce limit. The light is then calculated based on information collected by the bouncing ray.
  
  Following project tries to replicate this behaviour in order to light up a 2D environment 
 
 ## Example screenshots
-### Renders (500 sppx)
+### Renders (500 sppx) (Outdated)
 
 <p align="center">
  <img src="https://github.com/TheNishishiro/PTGI_Remastered/blob/main/Images/render1.png?raw=true">
@@ -29,21 +44,9 @@ Solution contains two projects,
 
 ## Requirements 
 
-Since GPU rendering requires CUDA to work you'll need CUDA capable GPU to utilize it.
+It is recommended to run this program on a high end GPU but it should work just fine with low end GPU or even a CPU.
 
-For PTGI_Remastered you will need
-```
- Alea 3.0.4
- FSharp.Core -Version 4.7.1
-```
- 
-For PTGI_UI you will need 
-```
- Alea 3.0.4
- Cyotek.Windows.Forms.ColorPicker -Version 1.7.2
- Control.Draggable -Version 1.0.5049.269
- MaterialSkin.2 -Version 2.1.3
-```
+Current iteration is being tested on RTX 3080 and GTX 1050m
 
 ## Features
 
@@ -56,6 +59,7 @@ For PTGI_UI you will need
  
 ## Improvements from old version
 
- - Improved code readability
- - Structures instead of raw basic data types
- - Renderer and UI seperated
+- Utilizes [ILGPU](https://github.com/m4rs-mt/ILGPU/wiki) for computation
+- Improved code readability
+- Structures instead of raw basic data types
+- Renderer and UI seperated

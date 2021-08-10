@@ -15,6 +15,7 @@ namespace PTGI_Remastered.Structs
         public float R;
         public float G;
         public float B;
+        public byte Skip;
 
         public void SetColor(float R, float G, float B)
         {
@@ -101,13 +102,12 @@ namespace PTGI_Remastered.Structs
         public int Height;
         public int WallsCount;
 
-        public MemoryBuffer<Color> CreateColorArrayView(int Width, int Height, int wallsCount, Accelerator accelerator)
+        public void SetBitmapSettings(int Width, int Height, int wallsCount)
         {
             this.Width = Width;
             this.Height = Height;
             Size = Width * Height;
             WallsCount = wallsCount;
-            return accelerator.Allocate<Color>(Size);
         }
 
         public void SetPixel(int id, Color pixelColor, float gammaCorrectionScale, ArrayView<Color> pixels)

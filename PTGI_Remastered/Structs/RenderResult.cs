@@ -10,6 +10,7 @@ namespace PTGI_Remastered.Structs
     {
         public Bitmap bitmap { get; set; }
         public long RenderTime { get; set; }
+        public long ProcessTime { get; set; }
         public Color[] Pixels { get; set; }
     }
 }
