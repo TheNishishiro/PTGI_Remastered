@@ -135,10 +135,8 @@ namespace PTGI_Remastered.Structs
 
         private bool LiesInRectangle(Polygon obstacle)
         {
-            if (X > obstacle.Walls[0].Source.X && Y > obstacle.Walls[0].Source.Y &&
-                X < obstacle.Walls[1].Destination.X && Y < obstacle.Walls[1].Destination.Y)
-                return true;
-            return false;
+            return X > obstacle.Walls[0].Source.X && Y > obstacle.Walls[0].Source.Y &&
+                   X < obstacle.Walls[1].Destination.X && Y < obstacle.Walls[1].Destination.Y;
         }
         
         private bool LiesInPolygon(Polygon obstacle)

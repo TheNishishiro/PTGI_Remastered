@@ -1,5 +1,7 @@
 ﻿using MaterialSkin;
 using MaterialSkin.Controls;
+using PTGI_Remastered.Inputs;
+using PTGI_Remastered.Structs;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -12,6 +14,8 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using Bitmap = System.Drawing.Bitmap;
+using Color = System.Drawing.Color;
 
 namespace PTGI_UI
 {
@@ -22,35 +26,78 @@ namespace PTGI_UI
             InitializeComponent();
         }
 
+        private bool _isRendering = false;
         public void PathTraceThread()
         {
-            Bitmap bitmap = new Bitmap(RenderWidth, RenderHeight);
             try
             {
-                var pathTraceResult = PathTracer.PathTraceRender(Polygons.ToArray(), RenderWidth, RenderHeight, SamplesPerPixel, BounceLimit, GridDivider, UseCUDA, GpuId);
-                var pathTracedBitmap = pathTraceResult.bitmap;
-                for (int i = 0; i < pathTracedBitmap.Size; i++)
-                {
-                    int row = i % RenderWidth;
-                    int col = i / RenderWidth;
-                    Color c = Color.FromArgb((int)(pathTraceResult.Pixels[i].R * 255.0), (int)(pathTraceResult.Pixels[i].G * 255.0), (int)(pathTraceResult.Pixels[i].B * 255.0));
-
-                    bitmap.SetPixel(row, col, c);
-                }
+                _isRendering = true;
+                var pathTraceResult = PathTracer.PathTraceRender(
+                    new RenderSpecification()
+                    {
+                        BounceLimit = BounceLimit,
+                        GpuId = GpuId,
+                        GridDivider = GridDivider,
+                        UseCUDARenderer = UseCUDA,
+                        ImageHeight = RenderHeight,
+                        ImageWidth = RenderWidth,
+                        Objects = Polygons.ToArray(),
+                        SampleCount = SamplesPerPixel,
+                        IgnoreEnclosedPixels = RenderFlag_IgnoreObstacleInterior
+                    });
+               
 
                 this.Invoke(new MethodInvoker(delegate () {
-                    ShowPopupMessage($"Render time: {pathTraceResult.RenderTime} ms", 5);
+                    ShowPopupMessage($"Render/Process time: {pathTraceResult.RenderTime}/{pathTraceResult.ProcessTime - pathTraceResult.RenderTime} ms", 5);
                     RenderedPictureBox.Size = new Size(RenderWidth, RenderHeight);
-                    RenderedPictureBox.BackgroundImage = bitmap;
+                    RenderedPictureBox.BackgroundImage = ApplyBitmap(pathTraceResult);
                 }));
             }
             catch(Exception ex)
             {
+                isLiveRender = false;
                 this.Invoke(new MethodInvoker(delegate ()
                 {
                     MessageBox.Show(this, ex.Message, "Render failed");
                 }));
             }
+            _isRendering = false;
+        }
+
+        private Bitmap ApplyBitmap(RenderResult pathTraceResult)
+        {
+            Bitmap bmp = new Bitmap(RenderWidth, RenderHeight, PixelFormat.Format24bppRgb);
+            var rect = new Rectangle(0, 0, RenderWidth, RenderHeight);
+            var data = bmp.LockBits(rect, ImageLockMode.ReadWrite, bmp.PixelFormat);
+            var depth = Bitmap.GetPixelFormatSize(data.PixelFormat) / 8; //bytes per pixel
+
+            var buffer = new byte[data.Width * data.Height * depth];
+
+            //copy pixels to buffer
+            Marshal.Copy(data.Scan0, buffer, 0, buffer.Length);
+
+            Parallel.For(0, pathTraceResult.bitmap.Size, (i) =>
+            {
+                int row = i % RenderWidth;
+                int col = i / RenderWidth;
+                Color c = Color.FromArgb((int)(pathTraceResult.Pixels[i].R * 255.0), (int)(pathTraceResult.Pixels[i].G * 255.0), (int)(pathTraceResult.Pixels[i].B * 255.0));
+
+                Process(buffer, row, col, RenderWidth, depth, c);
+            });
+
+            //Copy the buffer back to image
+            Marshal.Copy(buffer, 0, data.Scan0, buffer.Length);
+
+            bmp.UnlockBits(data);
+            return bmp;
+        }
+
+        private void Process(byte[] buffer, int x, int y, int width, int depth, Color c)
+        {
+            var offset = ((y * width) + x) * depth;
+            buffer[offset + 0] = c.B;
+            buffer[offset + 1] = c.G;
+            buffer[offset + 2] = c.R;
         }
 
         private void Form1_Load(object sender, EventArgs e)
@@ -90,6 +137,8 @@ namespace PTGI_UI
 
             PathTracer = new PTGI_Remastered.PTGI();
             Polygons = new List<PTGI_Remastered.Structs.Polygon>();
+
+            RenderFlag_IgnoreObstacleInterior = renderFlagIgnoreObstacleInteriors.Checked;
 
             GpuId = null;
             try
@@ -141,11 +190,13 @@ namespace PTGI_UI
 
         private void startRenderButton_Click(object sender, EventArgs e)
         {
+            if (_isRendering)
+                return;
+
             var renderThread = new Thread(() => PathTraceThread());
             ShowPopupMessage("Render in progress...", int.MaxValue);
             
             renderThread.Start();
-            
         }
 
         private void timer1_Tick(object sender, EventArgs e)
@@ -232,6 +283,63 @@ namespace PTGI_UI
         private void minecraftWorldGeneration_Click(object sender, EventArgs e)
         {
             TerrariaWorldGenerator();
+        }
+
+        private void renderFlagsApply_Click(object sender, EventArgs e)
+        {
+            RenderFlag_IgnoreObstacleInterior = renderFlagIgnoreObstacleInteriors.Checked;
+        }
+
+        private bool isLiveRender = false;
+        private void pictureBox1_MouseMove(object sender, MouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Right)
+                isLiveRender = true;
+            else if (e.Button == MouseButtons.Middle)
+                isLiveRender = false;
+
+            if (isLiveRender)
+            {
+                PTGI_Remastered.Structs.Polygon polygon = new PTGI_Remastered.Structs.Polygon();
+                PTGI_Remastered.Structs.Color color = new PTGI_Remastered.Structs.Color();
+                color.SetColor(ObjectColor.R, ObjectColor.G, ObjectColor.B);
+
+                List<PTGI_Remastered.Structs.Point> Vertices = new List<PTGI_Remastered.Structs.Point>();
+
+                var verticies = new PTGI_Remastered.Structs.Point[]
+                {
+                new PTGI_Remastered.Structs.Point()
+                {
+                    X = e.X,
+                    Y = e.Y,
+                    HasValue = 1
+                },
+                new PTGI_Remastered.Structs.Point()
+                {
+                    X = e.X+5,
+                    Y = e.Y+5,
+                    HasValue = 1
+                }
+                };
+
+                polygon.Name = "MouseCursor";
+                polygon.Setup(verticies,
+                    IsObjectEmittingLight ? PTGI_Remastered.Utilities.PTGI_ObjectTypes.LightSource : PTGI_Remastered.Utilities.PTGI_ObjectTypes.Solid,
+                    (PTGI_Remastered.Utilities.PTGI_MaterialReflectivness)Enum.Parse(typeof(PTGI_Remastered.Utilities.PTGI_MaterialReflectivness), SelectedObjectMaterial),
+                    color,
+                    ObjectEmissionStrength,
+                    ObjectDensity);
+
+                Polygons.Add(polygon);
+                PathTraceThread();
+                Polygons.RemoveAll(x => x.Name == "MouseCursor");
+                RenderedPictureBox.Refresh();
+            }
+        }
+
+        private void resetSceneButton_Click(object sender, EventArgs e)
+        {
+            ClearScene();
         }
     }
 }

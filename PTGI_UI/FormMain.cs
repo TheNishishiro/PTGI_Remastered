@@ -50,6 +50,8 @@ namespace PTGI_UI
         protected float ObjectDensity { get; set; }
         protected string ObjectName { get; set; }
 
+        protected bool RenderFlag_IgnoreObstacleInterior { get; set; }
+
         protected int SelectedPolygon { get; set; }
 
         protected void ShowPopupMessage(string text, int popupTime)
@@ -185,7 +187,7 @@ namespace PTGI_UI
 
                 Vertices.Add(point);
             }
-            polygon.Name = ObjectName.ToArray();
+            polygon.Name = ObjectName;
             polygon.Setup(Vertices.ToArray(),
                 IsObjectEmittingLight ? PTGI_Remastered.Utilities.PTGI_ObjectTypes.LightSource : PTGI_Remastered.Utilities.PTGI_ObjectTypes.Solid,
                 (PTGI_Remastered.Utilities.PTGI_MaterialReflectivness)Enum.Parse(typeof(PTGI_Remastered.Utilities.PTGI_MaterialReflectivness), SelectedObjectMaterial), 
@@ -203,7 +205,7 @@ namespace PTGI_UI
         protected void UpdateObjectList()
         {
             WorldObjectList.Items.Clear();
-            var polygons = Polygons.Select(c => new UIPolygon() { Name = new string(c.Name) }).ToArray();
+            var polygons = Polygons.Select(c => new UIPolygon() { Name = c.Name }).ToArray();
             WorldObjectList.Items.AddRange(polygons);
         }
 
@@ -260,6 +262,12 @@ namespace PTGI_UI
                 MessageBox.Show("Object you are trying to remove no longer exists");
             }
             UpdateObjectList();
+        }
+
+        protected void ClearScene()
+        {
+            Polygons.Clear();
+            RenderedPictureBox.Refresh();
         }
 
         protected void TerrariaWorldGenerator()
