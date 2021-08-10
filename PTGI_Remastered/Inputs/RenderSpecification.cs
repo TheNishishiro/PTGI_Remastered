@@ -19,7 +19,7 @@ namespace PTGI_Remastered.Inputs
         public int ImageHeight { get; set; }
         public int SampleCount { get; set; }
         public int BounceLimit { get; set; } 
-        public int GridDivider { get; set; }
+        public int GridSize { get; set; }
         public bool UseCUDARenderer { get; set; }
         public bool IgnoreEnclosedPixels { get; set; }
         public AcceleratorId GpuId { get; set; }

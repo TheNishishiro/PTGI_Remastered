@@ -1,4 +1,5 @@
 ﻿using ILGPU;
+using ILGPU.Algorithms;
 using PTGI_Remastered.Structs;
 using System;
 using System.Collections.Generic;
@@ -27,6 +28,25 @@ namespace PTGI_Remastered.Utilities
             float result = 1;
             for (int i = 0; i < y; i++)
                 result *= x;
+            return result;
+        }
+
+        public static float Modulo(float x, float y)
+        {
+            if (y == 0.0f ||
+                XMath.IsInfinity(x) ||
+                XMath.IsNaN(x) ||
+                XMath.IsNaN(y))
+                return float.NaN;
+
+            if (XMath.IsInfinity(y))
+                return x;
+
+            var xDivY = XMath.Abs(x * XMath.Rcp(y));
+            var result = (xDivY - XMath.Floor(xDivY)) * XMath.Abs(y);
+
+            if (x < 0.0f)
+                return -result;
             return result;
         }
     }

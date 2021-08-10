@@ -108,6 +108,28 @@ namespace PTGI_UI
                     }
                 }
             }
+
+
+            if (DrawGrid)
+            {
+                PTGI_Remastered.Structs.Bitmap bitmap = new PTGI_Remastered.Structs.Bitmap();
+                bitmap.SetBitmapSettings(RenderWidth, RenderHeight, 0);
+                PTGI_Remastered.Structs.Grid cellGrid = new PTGI_Remastered.Structs.Grid();
+                cellGrid.Create(bitmap, GridDivider);
+                for (int i = 0; i < cellGrid.GridSize; i++)
+                {
+                    int row = (int)Math.Floor(i % (float)GridDivider);
+                    int col = (int)Math.Floor(i / (float)GridDivider);
+
+                    e.Graphics.DrawRectangle(
+                        new Pen(Color.Blue, 1f),
+                        (row * cellGrid.CellWidth),
+                        (col * cellGrid.CellHeight),
+                        cellGrid.CellWidth,
+                        cellGrid.CellHeight);
+                    
+                }
+            }
         }
 
         protected virtual void saveSceneButton_Click(object sender, EventArgs e)

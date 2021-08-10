@@ -7,6 +7,7 @@ using PTGI_Remastered.Inputs;
 using PTGI_Remastered.Structs;
 using PTGI_Remastered.Utilities;
 using System.Threading.Tasks;
+using Grid = PTGI_Remastered.Structs.Grid;
 
 namespace PTGI_Remastered.Cache
 {
@@ -18,14 +19,19 @@ namespace PTGI_Remastered.Cache
         public MemoryBuffer<Color> PixelBuffer { get; set; }
         public MemoryBuffer<int> SeedBuffer { get; set; }
         public MemoryBuffer<Line> WallBuffer { get; set; }
-        
+        public MemoryBuffer3D<int> GridDataBuffer { get; set; }
+        public Grid GridCached { get; set; }
+       
         private int _pixelBufferLength;
         private int _wallBufferLength;
         private int _objectBufferLength;
+        private int _gridDivderBufferSize;
         private bool _updatePixelBuffer;
         private bool _previouseEnclousureOptionState;
+        private bool _isLiveDisplay = true; // TODO: constantly update?
 
-        private Color[] cachePixels;
+        private Color[] cachePixels; 
+        private int[,,] gridLocalData { get; set; }
 
         public void WithContext()
         {
@@ -103,6 +109,20 @@ namespace PTGI_Remastered.Cache
             WallBuffer.CopyFrom(walls, 0, Index1.Zero, walls.Length);
         }
 
+        public void SetGridDataBuffer(Line[] walls, Bitmap bitmap, int gridSize)
+        {
+            if (_isLiveDisplay || _pixelBufferLength != bitmap.Size || GridDataBuffer == null || _updatePixelBuffer || gridLocalData == null || _gridDivderBufferSize != gridSize)
+            {
+                AllocateGridDataBuffer(walls, bitmap, gridSize);
+            }
+            GridDataBuffer.CopyFrom(gridLocalData, LongIndex3.Zero, Index3.Zero, GridDataBuffer.Extent);
+        }
+
+        public void Finalize()
+        {
+            _updatePixelBuffer = false;
+        }
+
         private void AllocatePixelBuffer(int size)
         {
             _pixelBufferLength = size;
@@ -125,6 +145,17 @@ namespace PTGI_Remastered.Cache
             if (WallBuffer != null)
                 WallBuffer.Dispose();
             WallBuffer = Accelerator.Allocate<Line>(size);
+        }
+
+        private void AllocateGridDataBuffer(Line[] walls, Bitmap bitmap, int gridSize)
+        {
+            _gridDivderBufferSize = gridSize;
+            if (GridDataBuffer != null)
+                GridDataBuffer.Dispose();
+
+            GridCached = GridCached.Create(bitmap, gridSize);
+            gridLocalData = GridCached.CPU_FillGrid(walls);
+            GridDataBuffer = Accelerator.Allocate<int>(gridLocalData);
         }
     }
 }
