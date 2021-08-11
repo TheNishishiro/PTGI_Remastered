@@ -1,3 +1,7 @@
+# Notice
+
+As of right now main branch is outdated and no longer works (new version is under development on a seperate branch)
+
 # PTGI_Remastered
 
  Path traced global illumination is used to illuminate the scene by sending multiple rays from pixels and bouncing them around until it hits the light source or it reaches bounce limit. The light is then calculated based on informations collected by the bouncing ray.
