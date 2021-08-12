@@ -2,15 +2,6 @@
 
 Current branch is under heavy refactorization, some features are completely removed until migration from Alea to ILGPU is completed
 
-In order to be up to date with Alea implementations:
-- [x] Skip obscured pixels
-- [ ] Grid traversal
-- [ ] Transparent/Semi-transparent materials
-
-Planned so far:
-- [x] Allocation caching
-- [ ] Grid traversal optimizations
-
 Currently even without previous optimizations performance is greatly improved, up to real time rendering on GTX 1050m
 
 # PTGI_Remastered
@@ -20,15 +11,26 @@ Currently even without previous optimizations performance is greatly improved, u
  Following project tries to replicate this behaviour in order to light up a 2D environment 
 
 ## Example screenshots
-### Renders (500 sppx) (Outdated)
-
+### Sample renders
+#### ~30 fps scene render
 <p align="center">
- <img src="https://github.com/TheNishishiro/PTGI_Remastered/blob/main/Images/render1.png?raw=true">
- <img src="https://github.com/TheNishishiro/PTGI_Remastered/blob/main/Images/color%20bleeding.png?raw=true">
- <img src="https://github.com/TheNishishiro/PTGI_Remastered/blob/main/Images/render2.png?raw=true">
+ <img src="https://github.com/TheNishishiro/PTGI_Remastered/blob/PTGI_ILGPU_Dev/Images/30fps.png?raw=true">
 </p>
 
-### User Interface
+#### 10000 samples (26 seconds render)
+<p align="center">
+ <img src="https://github.com/TheNishishiro/PTGI_Remastered/blob/PTGI_ILGPU_Dev/Images/10000s@26s.png?raw=true">
+</p>
+
+#### Untitled
+<p align="center">
+ <img src="https://github.com/TheNishishiro/PTGI_Remastered/blob/PTGI_ILGPU_Dev/Images/image.png?raw=true">
+ <img src="https://github.com/TheNishishiro/PTGI_Remastered/blob/PTGI_ILGPU_Dev/Images/image2.png?raw=true">
+ <img src="https://github.com/TheNishishiro/PTGI_Remastered/blob/PTGI_ILGPU_Dev/Images/image3.png?raw=true">
+ <img src="https://github.com/TheNishishiro/PTGI_Remastered/blob/PTGI_ILGPU_Dev/Images/image4.png?raw=true">
+</p>
+
+### User Interface (outdated)
 
 <p align="center">
  <img src="https://github.com/TheNishishiro/PTGI_Remastered/blob/main/Images/ui.png?raw=true">
