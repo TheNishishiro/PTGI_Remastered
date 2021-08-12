@@ -22,6 +22,7 @@ namespace PTGI_UI
             SamplesPerPixelControlValue = "20";
             RenderHeightControlValue = "640";
             RenderWidthControlValue = "800";
+            TerrariaWorldCellSizeControlValue = "32";
         }
 
         public void Save()
@@ -68,6 +69,14 @@ namespace PTGI_UI
                 return result;
             }
         }
+        public int TerrariaWorldCellSize
+        { 
+            get
+            {
+                int.TryParse(TerrariaWorldCellSizeControlValue, out int result);
+                return result;
+            }
+        }
         public Color ObjectColor { get; set; }
 
         public string BounceLimitControlValue { get; set; }
@@ -75,5 +84,6 @@ namespace PTGI_UI
         public string SamplesPerPixelControlValue { get; set; }
         public string RenderHeightControlValue { get; set; }
         public string RenderWidthControlValue { get; set; }
+        public string TerrariaWorldCellSizeControlValue { get; set; }
     }
 }

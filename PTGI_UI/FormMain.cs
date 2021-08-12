@@ -281,27 +281,62 @@ namespace PTGI_UI
         protected void TerrariaWorldGenerator()
         {
             Random rnd = new Random();
+            var blockSize = Settings.TerrariaWorldCellSize;
             int maxY = Settings.RenderHeight / 2;
-            for (int x = 0; x <= Settings.RenderWidth; x += 32)
+            var generatorStartingPoints = new List<PTGI_Remastered.Structs.Point>();
+
+            for (int x = 0; x <= Settings.RenderWidth - (blockSize+1); x += blockSize)
             {
-                for(int y = maxY; y <= Settings.RenderHeight; y+=32)
+                for(int y = maxY; y <= Settings.RenderHeight - (blockSize+1); y += blockSize)
                 {
                     PTGI_Remastered.Structs.Point topRight = new PTGI_Remastered.Structs.Point();
                     topRight.SetCoords(x, y);
                     PTGI_Remastered.Structs.Point rightBottom = new PTGI_Remastered.Structs.Point();
-                    rightBottom.SetCoords(x + 32, y + 32);
+                    rightBottom.SetCoords(x + blockSize, y + blockSize);
 
                     PTGI_Remastered.Structs.Polygon block = new PTGI_Remastered.Structs.Polygon();
                     PTGI_Remastered.Structs.Color color = new PTGI_Remastered.Structs.Color();
                     color.SetColor(255, 255, 255);
                     block.Setup(new PTGI_Remastered.Structs.Point[] { topRight, rightBottom }, PTGI_Remastered.Utilities.PTGI_ObjectTypes.Solid, PTGI_Remastered.Utilities.PTGI_MaterialReflectivness.Rough, color, 1, 1);
-
+                    block.Name = $"{x};{y}";
                     Polygons.Add(block);
-                    if (Polygons.Count == 999)
-                        return;
+
+                    if (rnd.NextDouble() < 0.3)
+                    {
+                        generatorStartingPoints.Add(new PTGI_Remastered.Structs.Point()
+                        {
+                            X = x,
+                            Y = y
+                        });
+                    }
                 }
-                int yDirection = rnd.Next(2) == 0 ? -32 : 32;
+                int yDirection = rnd.Next(2) == 0 ? -blockSize : blockSize;
                 maxY += yDirection;
+            }
+
+            for(int x = 0; x < generatorStartingPoints.Count; x++)
+            {
+                var lifetime = rnd.Next(10, 20);
+                for(int i = 0; i < lifetime; i++)
+                {
+                    Polygons.RemoveAll(z => z.Name == $"{generatorStartingPoints[x].X};{generatorStartingPoints[x].Y}");
+
+                    switch (rnd.Next(4))
+                    {
+                        case 0:
+                            generatorStartingPoints[x].SetCoords(generatorStartingPoints[x].X + blockSize, generatorStartingPoints[x].Y);
+                            break;
+                        case 1:
+                            generatorStartingPoints[x].SetCoords(generatorStartingPoints[x].X - blockSize, generatorStartingPoints[x].Y);
+                            break;
+                        case 2:
+                            generatorStartingPoints[x].SetCoords(generatorStartingPoints[x].X, generatorStartingPoints[x].Y + blockSize);
+                            break;
+                        case 3:
+                            generatorStartingPoints[x].SetCoords(generatorStartingPoints[x].X, generatorStartingPoints[x].Y - blockSize);
+                            break;
+                    }
+                }
             }
         }
     }

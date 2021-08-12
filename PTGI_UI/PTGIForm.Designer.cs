@@ -83,6 +83,10 @@ namespace PTGI_UI
             this.materialLabel10 = new MaterialSkin.Controls.MaterialLabel();
             this.deleteVerticie = new MaterialSkin.Controls.MaterialButton();
             this.tabPage5 = new System.Windows.Forms.TabPage();
+            this.materialCard3 = new MaterialSkin.Controls.MaterialCard();
+            this.terrariaBlockSizeTextbox = new MaterialSkin.Controls.MaterialTextBox();
+            this.materialLabel14 = new MaterialSkin.Controls.MaterialLabel();
+            this.materialLabel8 = new MaterialSkin.Controls.MaterialLabel();
             this.materialCard6 = new MaterialSkin.Controls.MaterialCard();
             this.minecraftWorldGeneration = new MaterialSkin.Controls.MaterialButton();
             this.tabPage4 = new System.Windows.Forms.TabPage();
@@ -107,6 +111,7 @@ namespace PTGI_UI
             this.tabPage3.SuspendLayout();
             this.materialCard4.SuspendLayout();
             this.tabPage5.SuspendLayout();
+            this.materialCard3.SuspendLayout();
             this.materialCard6.SuspendLayout();
             this.tabPage4.SuspendLayout();
             this.materialCard5.SuspendLayout();
@@ -921,6 +926,7 @@ namespace PTGI_UI
             // 
             // tabPage5
             // 
+            this.tabPage5.Controls.Add(this.materialCard3);
             this.tabPage5.Controls.Add(this.materialCard6);
             this.tabPage5.Location = new System.Drawing.Point(4, 22);
             this.tabPage5.Name = "tabPage5";
@@ -929,6 +935,62 @@ namespace PTGI_UI
             this.tabPage5.TabIndex = 4;
             this.tabPage5.Text = "Misc";
             this.tabPage5.UseVisualStyleBackColor = true;
+            // 
+            // materialCard3
+            // 
+            this.materialCard3.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
+            this.materialCard3.Controls.Add(this.terrariaBlockSizeTextbox);
+            this.materialCard3.Controls.Add(this.materialLabel14);
+            this.materialCard3.Controls.Add(this.materialLabel8);
+            this.materialCard3.Depth = 0;
+            this.materialCard3.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(222)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))));
+            this.materialCard3.Location = new System.Drawing.Point(338, 17);
+            this.materialCard3.Margin = new System.Windows.Forms.Padding(14);
+            this.materialCard3.MouseState = MaterialSkin.MouseState.HOVER;
+            this.materialCard3.Name = "materialCard3";
+            this.materialCard3.Padding = new System.Windows.Forms.Padding(14);
+            this.materialCard3.Size = new System.Drawing.Size(308, 438);
+            this.materialCard3.TabIndex = 7;
+            // 
+            // terrariaBlockSizeTextbox
+            // 
+            this.terrariaBlockSizeTextbox.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.terrariaBlockSizeTextbox.DataBindings.Add(new System.Windows.Forms.Binding("Text", this.settingsViewBindingSource, "TerrariaWorldCellSizeControlValue", true));
+            this.terrariaBlockSizeTextbox.Depth = 0;
+            this.terrariaBlockSizeTextbox.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F);
+            this.terrariaBlockSizeTextbox.Location = new System.Drawing.Point(33, 87);
+            this.terrariaBlockSizeTextbox.MaxLength = 50;
+            this.terrariaBlockSizeTextbox.MouseState = MaterialSkin.MouseState.OUT;
+            this.terrariaBlockSizeTextbox.Multiline = false;
+            this.terrariaBlockSizeTextbox.Name = "terrariaBlockSizeTextbox";
+            this.terrariaBlockSizeTextbox.Size = new System.Drawing.Size(241, 50);
+            this.terrariaBlockSizeTextbox.TabIndex = 6;
+            this.terrariaBlockSizeTextbox.Text = "800";
+            // 
+            // materialLabel14
+            // 
+            this.materialLabel14.AutoSize = true;
+            this.materialLabel14.Depth = 0;
+            this.materialLabel14.Font = new System.Drawing.Font("Roboto", 14F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Pixel);
+            this.materialLabel14.Location = new System.Drawing.Point(30, 65);
+            this.materialLabel14.MouseState = MaterialSkin.MouseState.HOVER;
+            this.materialLabel14.Name = "materialLabel14";
+            this.materialLabel14.Size = new System.Drawing.Size(130, 19);
+            this.materialLabel14.TabIndex = 7;
+            this.materialLabel14.Text = "Terraria block size";
+            // 
+            // materialLabel8
+            // 
+            this.materialLabel8.AutoSize = true;
+            this.materialLabel8.Depth = 0;
+            this.materialLabel8.Dock = System.Windows.Forms.DockStyle.Top;
+            this.materialLabel8.Font = new System.Drawing.Font("Roboto", 14F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Pixel);
+            this.materialLabel8.Location = new System.Drawing.Point(14, 14);
+            this.materialLabel8.MouseState = MaterialSkin.MouseState.HOVER;
+            this.materialLabel8.Name = "materialLabel8";
+            this.materialLabel8.Size = new System.Drawing.Size(95, 19);
+            this.materialLabel8.TabIndex = 3;
+            this.materialLabel8.Text = "Misc settings";
             // 
             // materialCard6
             // 
@@ -1091,6 +1153,8 @@ namespace PTGI_UI
             this.materialCard4.ResumeLayout(false);
             this.materialCard4.PerformLayout();
             this.tabPage5.ResumeLayout(false);
+            this.materialCard3.ResumeLayout(false);
+            this.materialCard3.PerformLayout();
             this.materialCard6.ResumeLayout(false);
             this.materialCard6.PerformLayout();
             this.tabPage4.ResumeLayout(false);
@@ -1164,6 +1228,10 @@ namespace PTGI_UI
         private MaterialSkin.Controls.MaterialLabel materialLabel15;
         private System.Windows.Forms.BindingSource settingsViewBindingSource;
         private MaterialSkin.Controls.MaterialButton buttonSaveSettings;
+        private MaterialSkin.Controls.MaterialCard materialCard3;
+        private MaterialSkin.Controls.MaterialTextBox terrariaBlockSizeTextbox;
+        private MaterialSkin.Controls.MaterialLabel materialLabel14;
+        private MaterialSkin.Controls.MaterialLabel materialLabel8;
     }
 }
 
