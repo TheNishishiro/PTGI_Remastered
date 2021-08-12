@@ -1,5 +1,6 @@
 ﻿using MaterialSkin;
 using MaterialSkin.Controls;
+using Newtonsoft.Json;
 using PTGI_Remastered.Inputs;
 using PTGI_Remastered.Structs;
 using System;
@@ -8,6 +9,7 @@ using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.Drawing.Imaging;
+using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -24,6 +26,7 @@ namespace PTGI_UI
         public PTGIForm()
         {
             InitializeComponent();
+            Settings = new SettingsView();
         }
 
         private bool _isRendering = false;
@@ -35,21 +38,21 @@ namespace PTGI_UI
                 var pathTraceResult = PathTracer.PathTraceRender(
                     new RenderSpecification()
                     {
-                        BounceLimit = BounceLimit,
+                        BounceLimit = Settings.BounceLimit,
                         GpuId = GpuId,
-                        GridSize = GridDivider,
-                        UseCUDARenderer = UseCUDA,
-                        ImageHeight = RenderHeight,
-                        ImageWidth = RenderWidth,
+                        GridSize = Settings.GridDivider,
+                        UseCUDARenderer = Settings.UseCUDA,
+                        ImageHeight = Settings.RenderHeight,
+                        ImageWidth = Settings.RenderWidth,
                         Objects = Polygons.ToArray(),
-                        SampleCount = SamplesPerPixel,
-                        IgnoreEnclosedPixels = RenderFlag_IgnoreObstacleInterior
+                        SampleCount = Settings.SamplesPerPixel,
+                        IgnoreEnclosedPixels = Settings.RenderFlag_IgnoreObstacleInterior
                     });
                
 
                 this.Invoke(new MethodInvoker(delegate () {
                     ShowPopupMessage($"Render/Process time: {pathTraceResult.RenderTime}/{pathTraceResult.ProcessTime - pathTraceResult.RenderTime} ms", 5);
-                    RenderedPictureBox.Size = new Size(RenderWidth, RenderHeight);
+                    RenderedPictureBox.Size = new Size(Settings.RenderWidth, Settings.RenderHeight);
                     RenderedPictureBox.BackgroundImage = ApplyBitmap(pathTraceResult);
                 }));
             }
@@ -66,8 +69,8 @@ namespace PTGI_UI
 
         private Bitmap ApplyBitmap(RenderResult pathTraceResult)
         {
-            Bitmap bmp = new Bitmap(RenderWidth, RenderHeight, PixelFormat.Format24bppRgb);
-            var rect = new Rectangle(0, 0, RenderWidth, RenderHeight);
+            Bitmap bmp = new Bitmap(Settings.RenderWidth, Settings.RenderHeight, PixelFormat.Format24bppRgb);
+            var rect = new Rectangle(0, 0, Settings.RenderWidth, Settings.RenderHeight);
             var data = bmp.LockBits(rect, ImageLockMode.ReadWrite, bmp.PixelFormat);
             var depth = Bitmap.GetPixelFormatSize(data.PixelFormat) / 8; //bytes per pixel
 
@@ -78,11 +81,11 @@ namespace PTGI_UI
 
             Parallel.For(0, pathTraceResult.bitmap.Size, (i) =>
             {
-                int row = i % RenderWidth;
-                int col = i / RenderWidth;
+                int row = i % Settings.RenderWidth;
+                int col = i / Settings.RenderWidth;
                 Color c = Color.FromArgb((int)(pathTraceResult.Pixels[i].R * 255.0), (int)(pathTraceResult.Pixels[i].G * 255.0), (int)(pathTraceResult.Pixels[i].B * 255.0));
 
-                Process(buffer, row, col, RenderWidth, depth, c);
+                Process(buffer, row, col, Settings.RenderWidth, depth, c);
             });
 
             //Copy the buffer back to image
@@ -102,6 +105,12 @@ namespace PTGI_UI
 
         private void Form1_Load(object sender, EventArgs e)
         {
+            if (File.Exists(@".\settings.json"))
+                Settings = JsonConvert.DeserializeObject<SettingsView>(File.ReadAllText(@".\settings.json"));
+            else
+                Settings.Default();
+            settingsViewBindingSource.DataSource = Settings;
+
             var materialSkinManager = MaterialSkinManager.Instance;
             materialSkinManager.AddFormToManage(this);
             materialSkinManager.Theme = MaterialSkinManager.Themes.DARK;
@@ -121,24 +130,12 @@ namespace PTGI_UI
             WorldObjectList = objectListControl;
             WorldObjectList.DisplayMember = "Name";
 
-            DrawGrid = drawCellGridControl.Checked;
-
             HidePopupMessage();
-
-            RenderWidth = int.Parse(renderResolutionWidth.Text);
-            RenderHeight = int.Parse(renderResolutionHeight.Text);
-            SamplesPerPixel = int.Parse(samplePerPixelControl.Text);
-            UseCUDA = useCudaCheckbox.Checked;
-            BounceLimit = int.Parse(bounceLimitControl.Text);
-            GridDivider = int.Parse(gridDividerControl.Text);
-            DrawObjectsOverline = objectsOverlineControl.Checked;
 
             UpdateObjectSettings(null, null);
 
             PathTracer = new PTGI_Remastered.PTGI();
             Polygons = new List<PTGI_Remastered.Structs.Polygon>();
-
-            RenderFlag_IgnoreObstacleInterior = renderFlagIgnoreObstacleInteriors.Checked;
 
             GpuId = null;
             try
@@ -154,23 +151,6 @@ namespace PTGI_UI
             }
         }
 
-        private void rendererSettingsApply_Click(object sender, EventArgs e)
-        {
-            UseCUDA = useCudaCheckbox.Checked;
-            BounceLimit = int.Parse(bounceLimitControl.Text);
-            GridDivider = int.Parse(gridDividerControl.Text);
-
-            if(UseCUDA && gpuSelectorControl.SelectedIndex >= 0)
-                GpuId = ((PTGI_Remastered.Structs.Gpu)gpuSelectorControl.SelectedItem).Id;
-        }
-
-        private void renderSettingsApply_Click(object sender, EventArgs e)
-        {
-            RenderWidth = int.Parse(renderResolutionWidth.Text);
-            RenderHeight = int.Parse(renderResolutionHeight.Text);
-            SamplesPerPixel = int.Parse(samplePerPixelControl.Text);
-        }
-
         private void UpdateObjectSettings(object sender, EventArgs e)
         {
             IsObjectEmittingLight = emitsLightControl.Checked;
@@ -180,12 +160,6 @@ namespace PTGI_UI
             ObjectDensity = float.Parse(objectDensityControl.Text.Replace('.', ','));
             ObjectName = objectNameControl.Text;
             colorDisplayPictureBox.BackColor = ObjectColor;
-        }
-
-        private void applyDebugSettingsButton_Click(object sender, EventArgs e)
-        {
-            DrawGrid = drawCellGridControl.Checked;
-            DrawObjectsOverline = objectsOverlineControl.Checked;
         }
 
         private void startRenderButton_Click(object sender, EventArgs e)
@@ -285,11 +259,6 @@ namespace PTGI_UI
             TerrariaWorldGenerator();
         }
 
-        private void renderFlagsApply_Click(object sender, EventArgs e)
-        {
-            RenderFlag_IgnoreObstacleInterior = renderFlagIgnoreObstacleInteriors.Checked;
-        }
-
         private bool isLiveRender = false;
         private void pictureBox1_MouseMove(object sender, MouseEventArgs e)
         {
@@ -340,6 +309,11 @@ namespace PTGI_UI
         private void resetSceneButton_Click(object sender, EventArgs e)
         {
             ClearScene();
+        }
+
+        private void buttonSaveSettings_Click(object sender, EventArgs e)
+        {
+            Settings.Save();
         }
     }
 }

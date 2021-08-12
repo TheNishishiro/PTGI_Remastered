@@ -20,20 +20,13 @@ namespace PTGI_UI
     public class FormMain : MaterialForm
     {
         protected PTGI_Remastered.PTGI PathTracer { get; set; }
-        protected bool UseCUDA { get; set; }
-        protected int RenderWidth { get; set; }
-        protected int RenderHeight { get; set; }
-        protected int SamplesPerPixel { get; set; }
-        protected int BounceLimit { get; set; }
-        protected int GridDivider { get; set; }
+        protected SettingsView Settings { get; set; }
         protected AcceleratorId GpuId { get; set; }
         protected int popupTime { get; set; } = 0;
         protected List<PTGI_Remastered.Structs.Polygon> Polygons { get; set; }
 
         protected List<PTGI_Remastered.Structs.Point> DebugRayPoints { get; set; }
         protected List<int> DebugRayVisitedCells { get; set; }
-        protected bool DrawGrid { get; set; }
-        protected bool DrawObjectsOverline { get; set; }
 
         protected MaterialCard PopupMessage { get; set; }
         protected MaterialLabel PopupMessageText { get; set; }
@@ -49,8 +42,6 @@ namespace PTGI_UI
         protected float ObjectEmissionStrength { get; set; }
         protected float ObjectDensity { get; set; }
         protected string ObjectName { get; set; }
-
-        protected bool RenderFlag_IgnoreObstacleInterior { get; set; }
 
         protected int SelectedPolygon { get; set; }
 
@@ -93,7 +84,7 @@ namespace PTGI_UI
                     2);
             }
 
-            if(DrawObjectsOverline)
+            if(Settings.DrawObjectsOverline)
             {
                 foreach(var polygon in Polygons)
                 {
@@ -110,16 +101,16 @@ namespace PTGI_UI
             }
 
 
-            if (DrawGrid)
+            if (Settings.DrawGrid)
             {
                 PTGI_Remastered.Structs.Bitmap bitmap = new PTGI_Remastered.Structs.Bitmap();
-                bitmap.SetBitmapSettings(RenderWidth, RenderHeight, 0);
+                bitmap.SetBitmapSettings(Settings.RenderWidth, Settings.RenderHeight, 0);
                 PTGI_Remastered.Structs.Grid cellGrid = new PTGI_Remastered.Structs.Grid();
-                cellGrid.Create(bitmap, GridDivider);
+                cellGrid.Create(bitmap, Settings.GridDivider);
                 for (int i = 0; i < cellGrid.GridSize; i++)
                 {
-                    int row = (int)Math.Floor(i % (float)GridDivider);
-                    int col = (int)Math.Floor(i / (float)GridDivider);
+                    int row = (int)Math.Floor(i % (float)Settings.GridDivider);
+                    int col = (int)Math.Floor(i / (float)Settings.GridDivider);
 
                     e.Graphics.DrawRectangle(
                         new Pen(Color.Blue, 1f),
@@ -295,10 +286,10 @@ namespace PTGI_UI
         protected void TerrariaWorldGenerator()
         {
             Random rnd = new Random();
-            int maxY = RenderHeight / 2;
-            for (int x = 0; x <= RenderWidth; x += 32)
+            int maxY = Settings.RenderHeight / 2;
+            for (int x = 0; x <= Settings.RenderWidth; x += 32)
             {
-                for(int y = maxY; y <= RenderHeight; y+=32)
+                for(int y = maxY; y <= Settings.RenderHeight; y+=32)
                 {
                     PTGI_Remastered.Structs.Point topRight = new PTGI_Remastered.Structs.Point();
                     topRight.SetCoords(x, y);

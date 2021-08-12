@@ -34,6 +34,7 @@ namespace PTGI_UI
             this.materialTabControl1 = new MaterialSkin.Controls.MaterialTabControl();
             this.tabPage1 = new System.Windows.Forms.TabPage();
             this.renderingButtonsPanel = new MaterialSkin.Controls.MaterialCard();
+            this.resetSceneButton = new MaterialSkin.Controls.MaterialButton();
             this.loadSceneButton = new MaterialSkin.Controls.MaterialButton();
             this.saveSceneButton = new MaterialSkin.Controls.MaterialButton();
             this.saveRenderButton = new MaterialSkin.Controls.MaterialButton();
@@ -56,20 +57,19 @@ namespace PTGI_UI
             this.tabPage2 = new System.Windows.Forms.TabPage();
             this.materialCard7 = new MaterialSkin.Controls.MaterialCard();
             this.renderFlagIgnoreObstacleInteriors = new MaterialSkin.Controls.MaterialSwitch();
-            this.renderFlagsApply = new MaterialSkin.Controls.MaterialButton();
+            this.settingsViewBindingSource = new System.Windows.Forms.BindingSource(this.components);
             this.materialLabel15 = new MaterialSkin.Controls.MaterialLabel();
             this.materialCard2 = new MaterialSkin.Controls.MaterialCard();
             this.materialLabel5 = new MaterialSkin.Controls.MaterialLabel();
-            this.renderSettingsApply = new MaterialSkin.Controls.MaterialButton();
             this.samplePerPixelControl = new MaterialSkin.Controls.MaterialTextBox();
             this.materialLabel2 = new MaterialSkin.Controls.MaterialLabel();
             this.materialLabel3 = new MaterialSkin.Controls.MaterialLabel();
             this.renderResolutionWidth = new MaterialSkin.Controls.MaterialTextBox();
             this.renderResolutionHeight = new MaterialSkin.Controls.MaterialTextBox();
             this.materialCard1 = new MaterialSkin.Controls.MaterialCard();
+            this.buttonSaveSettings = new MaterialSkin.Controls.MaterialButton();
             this.gpuSelectorControl = new MaterialSkin.Controls.MaterialComboBox();
             this.materialLabel7 = new MaterialSkin.Controls.MaterialLabel();
-            this.rendererSettingsApply = new MaterialSkin.Controls.MaterialButton();
             this.gridDividerControl = new MaterialSkin.Controls.MaterialTextBox();
             this.materialLabel6 = new MaterialSkin.Controls.MaterialLabel();
             this.bounceLimitControl = new MaterialSkin.Controls.MaterialTextBox();
@@ -83,7 +83,7 @@ namespace PTGI_UI
             this.materialButton1 = new MaterialSkin.Controls.MaterialButton();
             this.materialCard4 = new MaterialSkin.Controls.MaterialCard();
             this.verticiesListControl = new MaterialSkin.Controls.MaterialListView();
-            this.columnHeader = new System.Windows.Forms.ColumnHeader();
+            this.columnHeader = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.materialLabel10 = new MaterialSkin.Controls.MaterialLabel();
             this.deleteVerticie = new MaterialSkin.Controls.MaterialButton();
             this.tabPage5 = new System.Windows.Forms.TabPage();
@@ -93,20 +93,19 @@ namespace PTGI_UI
             this.materialCard5 = new MaterialSkin.Controls.MaterialCard();
             this.objectsOverlineControl = new MaterialSkin.Controls.MaterialSwitch();
             this.drawCellGridControl = new MaterialSkin.Controls.MaterialSwitch();
-            this.applyDebugSettingsButton = new MaterialSkin.Controls.MaterialButton();
             this.materialDrawer1 = new MaterialSkin.Controls.MaterialDrawer();
             this.timer1 = new System.Windows.Forms.Timer(this.components);
-            this.resetSceneButton = new MaterialSkin.Controls.MaterialButton();
             this.panel1.SuspendLayout();
             this.materialTabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
             this.renderingButtonsPanel.SuspendLayout();
             this.renderReportBox.SuspendLayout();
             this.objectSpecificationCard.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize) (this.colorDisplayPictureBox)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize) (this.pictureBox1)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.colorDisplayPictureBox)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.tabPage2.SuspendLayout();
             this.materialCard7.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.settingsViewBindingSource)).BeginInit();
             this.materialCard2.SuspendLayout();
             this.materialCard1.SuspendLayout();
             this.tabPage3.SuspendLayout();
@@ -120,7 +119,9 @@ namespace PTGI_UI
             // 
             // panel1
             // 
-            this.panel1.Anchor = ((System.Windows.Forms.AnchorStyles) ((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) | System.Windows.Forms.AnchorStyles.Left) | System.Windows.Forms.AnchorStyles.Right)));
+            this.panel1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.panel1.Controls.Add(this.materialTabControl1);
             this.panel1.Controls.Add(this.materialDrawer1);
             this.panel1.Location = new System.Drawing.Point(0, 63);
@@ -163,16 +164,16 @@ namespace PTGI_UI
             // 
             // renderingButtonsPanel
             // 
-            this.renderingButtonsPanel.Anchor = ((System.Windows.Forms.AnchorStyles) ((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.renderingButtonsPanel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.renderingButtonsPanel.AutoScroll = true;
-            this.renderingButtonsPanel.BackColor = System.Drawing.Color.FromArgb(((int) (((byte) (255)))), ((int) (((byte) (255)))), ((int) (((byte) (255)))));
+            this.renderingButtonsPanel.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
             this.renderingButtonsPanel.Controls.Add(this.resetSceneButton);
             this.renderingButtonsPanel.Controls.Add(this.loadSceneButton);
             this.renderingButtonsPanel.Controls.Add(this.saveSceneButton);
             this.renderingButtonsPanel.Controls.Add(this.saveRenderButton);
             this.renderingButtonsPanel.Controls.Add(this.startRenderButton);
             this.renderingButtonsPanel.Depth = 0;
-            this.renderingButtonsPanel.ForeColor = System.Drawing.Color.FromArgb(((int) (((byte) (222)))), ((int) (((byte) (0)))), ((int) (((byte) (0)))), ((int) (((byte) (0)))));
+            this.renderingButtonsPanel.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(222)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))));
             this.renderingButtonsPanel.Location = new System.Drawing.Point(1046, 779);
             this.renderingButtonsPanel.Margin = new System.Windows.Forms.Padding(14);
             this.renderingButtonsPanel.MouseState = MaterialSkin.MouseState.HOVER;
@@ -180,6 +181,26 @@ namespace PTGI_UI
             this.renderingButtonsPanel.Padding = new System.Windows.Forms.Padding(14);
             this.renderingButtonsPanel.Size = new System.Drawing.Size(297, 175);
             this.renderingButtonsPanel.TabIndex = 6;
+            // 
+            // resetSceneButton
+            // 
+            this.resetSceneButton.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+            this.resetSceneButton.Depth = 0;
+            this.resetSceneButton.Dock = System.Windows.Forms.DockStyle.Top;
+            this.resetSceneButton.DrawShadows = true;
+            this.resetSceneButton.HighEmphasis = true;
+            this.resetSceneButton.Icon = null;
+            this.resetSceneButton.Location = new System.Drawing.Point(14, 158);
+            this.resetSceneButton.Margin = new System.Windows.Forms.Padding(4, 60, 4, 6);
+            this.resetSceneButton.MouseState = MaterialSkin.MouseState.HOVER;
+            this.resetSceneButton.Name = "resetSceneButton";
+            this.resetSceneButton.Size = new System.Drawing.Size(252, 36);
+            this.resetSceneButton.TabIndex = 8;
+            this.resetSceneButton.Text = "Reset";
+            this.resetSceneButton.Type = MaterialSkin.Controls.MaterialButton.MaterialButtonType.Contained;
+            this.resetSceneButton.UseAccentColor = false;
+            this.resetSceneButton.UseVisualStyleBackColor = true;
+            this.resetSceneButton.Click += new System.EventHandler(this.resetSceneButton_Click);
             // 
             // loadSceneButton
             // 
@@ -263,11 +284,11 @@ namespace PTGI_UI
             // 
             // renderReportBox
             // 
-            this.renderReportBox.Anchor = ((System.Windows.Forms.AnchorStyles) ((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.renderReportBox.BackColor = System.Drawing.Color.FromArgb(((int) (((byte) (255)))), ((int) (((byte) (255)))), ((int) (((byte) (255)))));
+            this.renderReportBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.renderReportBox.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
             this.renderReportBox.Controls.Add(this.renderReportTime);
             this.renderReportBox.Depth = 0;
-            this.renderReportBox.ForeColor = System.Drawing.Color.FromArgb(((int) (((byte) (222)))), ((int) (((byte) (0)))), ((int) (((byte) (0)))), ((int) (((byte) (0)))));
+            this.renderReportBox.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(222)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))));
             this.renderReportBox.Location = new System.Drawing.Point(1047, 3);
             this.renderReportBox.Margin = new System.Windows.Forms.Padding(14);
             this.renderReportBox.MouseState = MaterialSkin.MouseState.HOVER;
@@ -290,9 +311,9 @@ namespace PTGI_UI
             // 
             // objectSpecificationCard
             // 
-            this.objectSpecificationCard.Anchor = ((System.Windows.Forms.AnchorStyles) ((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.objectSpecificationCard.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.objectSpecificationCard.AutoScroll = true;
-            this.objectSpecificationCard.BackColor = System.Drawing.Color.FromArgb(((int) (((byte) (255)))), ((int) (((byte) (255)))), ((int) (((byte) (255)))));
+            this.objectSpecificationCard.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
             this.objectSpecificationCard.Controls.Add(this.objectEmissionStrengthControl);
             this.objectSpecificationCard.Controls.Add(this.materialLabel12);
             this.objectSpecificationCard.Controls.Add(this.objectDensityControl);
@@ -305,7 +326,7 @@ namespace PTGI_UI
             this.objectSpecificationCard.Controls.Add(this.objectNameControl);
             this.objectSpecificationCard.Controls.Add(this.materialLabel13);
             this.objectSpecificationCard.Depth = 0;
-            this.objectSpecificationCard.ForeColor = System.Drawing.Color.FromArgb(((int) (((byte) (222)))), ((int) (((byte) (0)))), ((int) (((byte) (0)))), ((int) (((byte) (0)))));
+            this.objectSpecificationCard.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(222)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))));
             this.objectSpecificationCard.Location = new System.Drawing.Point(1047, 62);
             this.objectSpecificationCard.Margin = new System.Windows.Forms.Padding(14);
             this.objectSpecificationCard.MouseState = MaterialSkin.MouseState.HOVER;
@@ -372,7 +393,7 @@ namespace PTGI_UI
             // 
             // colorEditor1
             // 
-            this.colorEditor1.Color = System.Drawing.Color.FromArgb(((int) (((byte) (192)))), ((int) (((byte) (192)))), ((int) (((byte) (255)))));
+            this.colorEditor1.Color = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(192)))), ((int)(((byte)(255)))));
             this.colorEditor1.Dock = System.Windows.Forms.DockStyle.Top;
             this.colorEditor1.Location = new System.Drawing.Point(14, 238);
             this.colorEditor1.Margin = new System.Windows.Forms.Padding(4);
@@ -393,7 +414,7 @@ namespace PTGI_UI
             // objectMaterialControl
             // 
             this.objectMaterialControl.AutoResize = false;
-            this.objectMaterialControl.BackColor = System.Drawing.Color.FromArgb(((int) (((byte) (255)))), ((int) (((byte) (255)))), ((int) (((byte) (255)))));
+            this.objectMaterialControl.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
             this.objectMaterialControl.Depth = 0;
             this.objectMaterialControl.Dock = System.Windows.Forms.DockStyle.Top;
             this.objectMaterialControl.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawVariable;
@@ -401,7 +422,7 @@ namespace PTGI_UI
             this.objectMaterialControl.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.objectMaterialControl.DropDownWidth = 121;
             this.objectMaterialControl.Font = new System.Drawing.Font("Microsoft Sans Serif", 14F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Pixel);
-            this.objectMaterialControl.ForeColor = System.Drawing.Color.FromArgb(((int) (((byte) (222)))), ((int) (((byte) (0)))), ((int) (((byte) (0)))), ((int) (((byte) (0)))));
+            this.objectMaterialControl.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(222)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))));
             this.objectMaterialControl.FormattingEnabled = true;
             this.objectMaterialControl.IntegralHeight = false;
             this.objectMaterialControl.ItemHeight = 43;
@@ -500,12 +521,11 @@ namespace PTGI_UI
             // 
             // materialCard7
             // 
-            this.materialCard7.BackColor = System.Drawing.Color.FromArgb(((int) (((byte) (255)))), ((int) (((byte) (255)))), ((int) (((byte) (255)))));
+            this.materialCard7.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
             this.materialCard7.Controls.Add(this.renderFlagIgnoreObstacleInteriors);
-            this.materialCard7.Controls.Add(this.renderFlagsApply);
             this.materialCard7.Controls.Add(this.materialLabel15);
             this.materialCard7.Depth = 0;
-            this.materialCard7.ForeColor = System.Drawing.Color.FromArgb(((int) (((byte) (222)))), ((int) (((byte) (0)))), ((int) (((byte) (0)))), ((int) (((byte) (0)))));
+            this.materialCard7.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(222)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))));
             this.materialCard7.Location = new System.Drawing.Point(893, 17);
             this.materialCard7.Margin = new System.Windows.Forms.Padding(14);
             this.materialCard7.MouseState = MaterialSkin.MouseState.HOVER;
@@ -519,6 +539,7 @@ namespace PTGI_UI
             this.renderFlagIgnoreObstacleInteriors.AutoSize = true;
             this.renderFlagIgnoreObstacleInteriors.Checked = true;
             this.renderFlagIgnoreObstacleInteriors.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.renderFlagIgnoreObstacleInteriors.DataBindings.Add(new System.Windows.Forms.Binding("Checked", this.settingsViewBindingSource, "RenderFlag_IgnoreObstacleInterior", true));
             this.renderFlagIgnoreObstacleInteriors.Depth = 0;
             this.renderFlagIgnoreObstacleInteriors.Dock = System.Windows.Forms.DockStyle.Top;
             this.renderFlagIgnoreObstacleInteriors.Location = new System.Drawing.Point(14, 33);
@@ -532,25 +553,9 @@ namespace PTGI_UI
             this.renderFlagIgnoreObstacleInteriors.Text = "Ignore obstacle interiors";
             this.renderFlagIgnoreObstacleInteriors.UseVisualStyleBackColor = true;
             // 
-            // renderFlagsApply
+            // settingsViewBindingSource
             // 
-            this.renderFlagsApply.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this.renderFlagsApply.Depth = 0;
-            this.renderFlagsApply.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.renderFlagsApply.DrawShadows = true;
-            this.renderFlagsApply.HighEmphasis = true;
-            this.renderFlagsApply.Icon = null;
-            this.renderFlagsApply.Location = new System.Drawing.Point(14, 388);
-            this.renderFlagsApply.Margin = new System.Windows.Forms.Padding(4, 6, 4, 6);
-            this.renderFlagsApply.MouseState = MaterialSkin.MouseState.HOVER;
-            this.renderFlagsApply.Name = "renderFlagsApply";
-            this.renderFlagsApply.Size = new System.Drawing.Size(276, 36);
-            this.renderFlagsApply.TabIndex = 7;
-            this.renderFlagsApply.Text = "Apply";
-            this.renderFlagsApply.Type = MaterialSkin.Controls.MaterialButton.MaterialButtonType.Contained;
-            this.renderFlagsApply.UseAccentColor = false;
-            this.renderFlagsApply.UseVisualStyleBackColor = true;
-            this.renderFlagsApply.Click += new System.EventHandler(this.renderFlagsApply_Click);
+            this.settingsViewBindingSource.DataSource = typeof(PTGI_UI.SettingsView);
             // 
             // materialLabel15
             // 
@@ -567,16 +572,15 @@ namespace PTGI_UI
             // 
             // materialCard2
             // 
-            this.materialCard2.BackColor = System.Drawing.Color.FromArgb(((int) (((byte) (255)))), ((int) (((byte) (255)))), ((int) (((byte) (255)))));
+            this.materialCard2.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
             this.materialCard2.Controls.Add(this.materialLabel5);
-            this.materialCard2.Controls.Add(this.renderSettingsApply);
             this.materialCard2.Controls.Add(this.samplePerPixelControl);
             this.materialCard2.Controls.Add(this.materialLabel2);
             this.materialCard2.Controls.Add(this.materialLabel3);
             this.materialCard2.Controls.Add(this.renderResolutionWidth);
             this.materialCard2.Controls.Add(this.renderResolutionHeight);
             this.materialCard2.Depth = 0;
-            this.materialCard2.ForeColor = System.Drawing.Color.FromArgb(((int) (((byte) (222)))), ((int) (((byte) (0)))), ((int) (((byte) (0)))), ((int) (((byte) (0)))));
+            this.materialCard2.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(222)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))));
             this.materialCard2.Location = new System.Drawing.Point(329, 17);
             this.materialCard2.Margin = new System.Windows.Forms.Padding(14);
             this.materialCard2.MouseState = MaterialSkin.MouseState.HOVER;
@@ -597,29 +601,10 @@ namespace PTGI_UI
             this.materialLabel5.TabIndex = 7;
             this.materialLabel5.Text = "Samples per pixel";
             // 
-            // renderSettingsApply
-            // 
-            this.renderSettingsApply.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this.renderSettingsApply.Depth = 0;
-            this.renderSettingsApply.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.renderSettingsApply.DrawShadows = true;
-            this.renderSettingsApply.HighEmphasis = true;
-            this.renderSettingsApply.Icon = null;
-            this.renderSettingsApply.Location = new System.Drawing.Point(14, 388);
-            this.renderSettingsApply.Margin = new System.Windows.Forms.Padding(4, 6, 4, 6);
-            this.renderSettingsApply.MouseState = MaterialSkin.MouseState.HOVER;
-            this.renderSettingsApply.Name = "renderSettingsApply";
-            this.renderSettingsApply.Size = new System.Drawing.Size(520, 36);
-            this.renderSettingsApply.TabIndex = 7;
-            this.renderSettingsApply.Text = "Apply";
-            this.renderSettingsApply.Type = MaterialSkin.Controls.MaterialButton.MaterialButtonType.Contained;
-            this.renderSettingsApply.UseAccentColor = false;
-            this.renderSettingsApply.UseVisualStyleBackColor = true;
-            this.renderSettingsApply.Click += new System.EventHandler(this.renderSettingsApply_Click);
-            // 
             // samplePerPixelControl
             // 
             this.samplePerPixelControl.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.samplePerPixelControl.DataBindings.Add(new System.Windows.Forms.Binding("Text", this.settingsViewBindingSource, "SamplesPerPixelControlValue", true));
             this.samplePerPixelControl.Depth = 0;
             this.samplePerPixelControl.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F);
             this.samplePerPixelControl.Location = new System.Drawing.Point(58, 162);
@@ -658,6 +643,7 @@ namespace PTGI_UI
             // renderResolutionWidth
             // 
             this.renderResolutionWidth.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.renderResolutionWidth.DataBindings.Add(new System.Windows.Forms.Binding("Text", this.settingsViewBindingSource, "RenderWidthControlValue", true));
             this.renderResolutionWidth.Depth = 0;
             this.renderResolutionWidth.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F);
             this.renderResolutionWidth.Location = new System.Drawing.Point(58, 74);
@@ -672,6 +658,7 @@ namespace PTGI_UI
             // renderResolutionHeight
             // 
             this.renderResolutionHeight.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.renderResolutionHeight.DataBindings.Add(new System.Windows.Forms.Binding("Text", this.settingsViewBindingSource, "RenderHeightControlValue", true));
             this.renderResolutionHeight.Depth = 0;
             this.renderResolutionHeight.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F);
             this.renderResolutionHeight.Location = new System.Drawing.Point(297, 74);
@@ -685,10 +672,10 @@ namespace PTGI_UI
             // 
             // materialCard1
             // 
-            this.materialCard1.BackColor = System.Drawing.Color.FromArgb(((int) (((byte) (255)))), ((int) (((byte) (255)))), ((int) (((byte) (255)))));
+            this.materialCard1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
+            this.materialCard1.Controls.Add(this.buttonSaveSettings);
             this.materialCard1.Controls.Add(this.gpuSelectorControl);
             this.materialCard1.Controls.Add(this.materialLabel7);
-            this.materialCard1.Controls.Add(this.rendererSettingsApply);
             this.materialCard1.Controls.Add(this.gridDividerControl);
             this.materialCard1.Controls.Add(this.materialLabel6);
             this.materialCard1.Controls.Add(this.bounceLimitControl);
@@ -696,7 +683,7 @@ namespace PTGI_UI
             this.materialCard1.Controls.Add(this.useCudaCheckbox);
             this.materialCard1.Controls.Add(this.materialLabel1);
             this.materialCard1.Depth = 0;
-            this.materialCard1.ForeColor = System.Drawing.Color.FromArgb(((int) (((byte) (222)))), ((int) (((byte) (0)))), ((int) (((byte) (0)))), ((int) (((byte) (0)))));
+            this.materialCard1.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(222)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))));
             this.materialCard1.Location = new System.Drawing.Point(13, 17);
             this.materialCard1.Margin = new System.Windows.Forms.Padding(14);
             this.materialCard1.MouseState = MaterialSkin.MouseState.HOVER;
@@ -705,10 +692,30 @@ namespace PTGI_UI
             this.materialCard1.Size = new System.Drawing.Size(297, 438);
             this.materialCard1.TabIndex = 1;
             // 
+            // buttonSaveSettings
+            // 
+            this.buttonSaveSettings.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+            this.buttonSaveSettings.Depth = 0;
+            this.buttonSaveSettings.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.buttonSaveSettings.DrawShadows = true;
+            this.buttonSaveSettings.HighEmphasis = true;
+            this.buttonSaveSettings.Icon = null;
+            this.buttonSaveSettings.Location = new System.Drawing.Point(14, 388);
+            this.buttonSaveSettings.Margin = new System.Windows.Forms.Padding(4, 6, 4, 6);
+            this.buttonSaveSettings.MouseState = MaterialSkin.MouseState.HOVER;
+            this.buttonSaveSettings.Name = "buttonSaveSettings";
+            this.buttonSaveSettings.Size = new System.Drawing.Size(269, 36);
+            this.buttonSaveSettings.TabIndex = 11;
+            this.buttonSaveSettings.Text = "Save settings";
+            this.buttonSaveSettings.Type = MaterialSkin.Controls.MaterialButton.MaterialButtonType.Contained;
+            this.buttonSaveSettings.UseAccentColor = false;
+            this.buttonSaveSettings.UseVisualStyleBackColor = true;
+            this.buttonSaveSettings.Click += new System.EventHandler(this.buttonSaveSettings_Click);
+            // 
             // gpuSelectorControl
             // 
             this.gpuSelectorControl.AutoResize = false;
-            this.gpuSelectorControl.BackColor = System.Drawing.Color.FromArgb(((int) (((byte) (255)))), ((int) (((byte) (255)))), ((int) (((byte) (255)))));
+            this.gpuSelectorControl.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
             this.gpuSelectorControl.Depth = 0;
             this.gpuSelectorControl.Dock = System.Windows.Forms.DockStyle.Top;
             this.gpuSelectorControl.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawVariable;
@@ -716,7 +723,7 @@ namespace PTGI_UI
             this.gpuSelectorControl.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.gpuSelectorControl.DropDownWidth = 121;
             this.gpuSelectorControl.Font = new System.Drawing.Font("Microsoft Sans Serif", 14F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Pixel);
-            this.gpuSelectorControl.ForeColor = System.Drawing.Color.FromArgb(((int) (((byte) (222)))), ((int) (((byte) (0)))), ((int) (((byte) (0)))), ((int) (((byte) (0)))));
+            this.gpuSelectorControl.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(222)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))));
             this.gpuSelectorControl.FormattingEnabled = true;
             this.gpuSelectorControl.IntegralHeight = false;
             this.gpuSelectorControl.ItemHeight = 43;
@@ -740,29 +747,10 @@ namespace PTGI_UI
             this.materialLabel7.TabIndex = 10;
             this.materialLabel7.Text = "GPU";
             // 
-            // rendererSettingsApply
-            // 
-            this.rendererSettingsApply.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this.rendererSettingsApply.Depth = 0;
-            this.rendererSettingsApply.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.rendererSettingsApply.DrawShadows = true;
-            this.rendererSettingsApply.HighEmphasis = true;
-            this.rendererSettingsApply.Icon = null;
-            this.rendererSettingsApply.Location = new System.Drawing.Point(14, 388);
-            this.rendererSettingsApply.Margin = new System.Windows.Forms.Padding(4, 6, 4, 6);
-            this.rendererSettingsApply.MouseState = MaterialSkin.MouseState.HOVER;
-            this.rendererSettingsApply.Name = "rendererSettingsApply";
-            this.rendererSettingsApply.Size = new System.Drawing.Size(269, 36);
-            this.rendererSettingsApply.TabIndex = 6;
-            this.rendererSettingsApply.Text = "Apply";
-            this.rendererSettingsApply.Type = MaterialSkin.Controls.MaterialButton.MaterialButtonType.Contained;
-            this.rendererSettingsApply.UseAccentColor = false;
-            this.rendererSettingsApply.UseVisualStyleBackColor = true;
-            this.rendererSettingsApply.Click += new System.EventHandler(this.rendererSettingsApply_Click);
-            // 
             // gridDividerControl
             // 
             this.gridDividerControl.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.gridDividerControl.DataBindings.Add(new System.Windows.Forms.Binding("Text", this.settingsViewBindingSource, "GridDividerControlValue", true));
             this.gridDividerControl.Depth = 0;
             this.gridDividerControl.Dock = System.Windows.Forms.DockStyle.Top;
             this.gridDividerControl.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F);
@@ -791,6 +779,7 @@ namespace PTGI_UI
             // bounceLimitControl
             // 
             this.bounceLimitControl.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.bounceLimitControl.DataBindings.Add(new System.Windows.Forms.Binding("Text", this.settingsViewBindingSource, "BounceLimitControlValue", true));
             this.bounceLimitControl.Depth = 0;
             this.bounceLimitControl.Dock = System.Windows.Forms.DockStyle.Top;
             this.bounceLimitControl.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F);
@@ -821,6 +810,7 @@ namespace PTGI_UI
             this.useCudaCheckbox.AutoSize = true;
             this.useCudaCheckbox.Checked = true;
             this.useCudaCheckbox.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.useCudaCheckbox.DataBindings.Add(new System.Windows.Forms.Binding("Checked", this.settingsViewBindingSource, "UseCUDA", true));
             this.useCudaCheckbox.Depth = 0;
             this.useCudaCheckbox.Dock = System.Windows.Forms.DockStyle.Top;
             this.useCudaCheckbox.Location = new System.Drawing.Point(14, 33);
@@ -861,12 +851,12 @@ namespace PTGI_UI
             // 
             // materialCard3
             // 
-            this.materialCard3.BackColor = System.Drawing.Color.FromArgb(((int) (((byte) (255)))), ((int) (((byte) (255)))), ((int) (((byte) (255)))));
+            this.materialCard3.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
             this.materialCard3.Controls.Add(this.objectListControl);
             this.materialCard3.Controls.Add(this.materialLabel8);
             this.materialCard3.Controls.Add(this.materialButton1);
             this.materialCard3.Depth = 0;
-            this.materialCard3.ForeColor = System.Drawing.Color.FromArgb(((int) (((byte) (222)))), ((int) (((byte) (0)))), ((int) (((byte) (0)))), ((int) (((byte) (0)))));
+            this.materialCard3.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(222)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))));
             this.materialCard3.Location = new System.Drawing.Point(338, 14);
             this.materialCard3.Margin = new System.Windows.Forms.Padding(14);
             this.materialCard3.MouseState = MaterialSkin.MouseState.HOVER;
@@ -878,7 +868,7 @@ namespace PTGI_UI
             // objectListControl
             // 
             this.objectListControl.AutoResize = false;
-            this.objectListControl.BackColor = System.Drawing.Color.FromArgb(((int) (((byte) (255)))), ((int) (((byte) (255)))), ((int) (((byte) (255)))));
+            this.objectListControl.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
             this.objectListControl.Depth = 0;
             this.objectListControl.Dock = System.Windows.Forms.DockStyle.Top;
             this.objectListControl.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawVariable;
@@ -886,7 +876,7 @@ namespace PTGI_UI
             this.objectListControl.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.objectListControl.DropDownWidth = 121;
             this.objectListControl.Font = new System.Drawing.Font("Microsoft Sans Serif", 14F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Pixel);
-            this.objectListControl.ForeColor = System.Drawing.Color.FromArgb(((int) (((byte) (222)))), ((int) (((byte) (0)))), ((int) (((byte) (0)))), ((int) (((byte) (0)))));
+            this.objectListControl.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(222)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))));
             this.objectListControl.FormattingEnabled = true;
             this.objectListControl.IntegralHeight = false;
             this.objectListControl.ItemHeight = 43;
@@ -932,12 +922,12 @@ namespace PTGI_UI
             // 
             // materialCard4
             // 
-            this.materialCard4.BackColor = System.Drawing.Color.FromArgb(((int) (((byte) (255)))), ((int) (((byte) (255)))), ((int) (((byte) (255)))));
+            this.materialCard4.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
             this.materialCard4.Controls.Add(this.verticiesListControl);
             this.materialCard4.Controls.Add(this.materialLabel10);
             this.materialCard4.Controls.Add(this.deleteVerticie);
             this.materialCard4.Depth = 0;
-            this.materialCard4.ForeColor = System.Drawing.Color.FromArgb(((int) (((byte) (222)))), ((int) (((byte) (0)))), ((int) (((byte) (0)))), ((int) (((byte) (0)))));
+            this.materialCard4.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(222)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))));
             this.materialCard4.Location = new System.Drawing.Point(13, 14);
             this.materialCard4.Margin = new System.Windows.Forms.Padding(14);
             this.materialCard4.MouseState = MaterialSkin.MouseState.HOVER;
@@ -949,9 +939,10 @@ namespace PTGI_UI
             // verticiesListControl
             // 
             this.verticiesListControl.AutoSizeTable = false;
-            this.verticiesListControl.BackColor = System.Drawing.Color.FromArgb(((int) (((byte) (255)))), ((int) (((byte) (255)))), ((int) (((byte) (255)))));
+            this.verticiesListControl.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
             this.verticiesListControl.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this.verticiesListControl.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {this.columnHeader});
+            this.verticiesListControl.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
+            this.columnHeader});
             this.verticiesListControl.Depth = 0;
             this.verticiesListControl.Dock = System.Windows.Forms.DockStyle.Fill;
             this.verticiesListControl.FullRowSelect = true;
@@ -1018,10 +1009,10 @@ namespace PTGI_UI
             // 
             // materialCard6
             // 
-            this.materialCard6.BackColor = System.Drawing.Color.FromArgb(((int) (((byte) (255)))), ((int) (((byte) (255)))), ((int) (((byte) (255)))));
+            this.materialCard6.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
             this.materialCard6.Controls.Add(this.minecraftWorldGeneration);
             this.materialCard6.Depth = 0;
-            this.materialCard6.ForeColor = System.Drawing.Color.FromArgb(((int) (((byte) (222)))), ((int) (((byte) (0)))), ((int) (((byte) (0)))), ((int) (((byte) (0)))));
+            this.materialCard6.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(222)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))));
             this.materialCard6.Location = new System.Drawing.Point(13, 14);
             this.materialCard6.Margin = new System.Windows.Forms.Padding(14);
             this.materialCard6.MouseState = MaterialSkin.MouseState.HOVER;
@@ -1063,12 +1054,11 @@ namespace PTGI_UI
             // 
             // materialCard5
             // 
-            this.materialCard5.BackColor = System.Drawing.Color.FromArgb(((int) (((byte) (255)))), ((int) (((byte) (255)))), ((int) (((byte) (255)))));
+            this.materialCard5.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
             this.materialCard5.Controls.Add(this.objectsOverlineControl);
             this.materialCard5.Controls.Add(this.drawCellGridControl);
-            this.materialCard5.Controls.Add(this.applyDebugSettingsButton);
             this.materialCard5.Depth = 0;
-            this.materialCard5.ForeColor = System.Drawing.Color.FromArgb(((int) (((byte) (222)))), ((int) (((byte) (0)))), ((int) (((byte) (0)))), ((int) (((byte) (0)))));
+            this.materialCard5.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(222)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))));
             this.materialCard5.Location = new System.Drawing.Point(13, 14);
             this.materialCard5.Margin = new System.Windows.Forms.Padding(14);
             this.materialCard5.MouseState = MaterialSkin.MouseState.HOVER;
@@ -1082,6 +1072,7 @@ namespace PTGI_UI
             this.objectsOverlineControl.AutoSize = true;
             this.objectsOverlineControl.Checked = true;
             this.objectsOverlineControl.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.objectsOverlineControl.DataBindings.Add(new System.Windows.Forms.Binding("Checked", this.settingsViewBindingSource, "DrawObjectsOverline", true));
             this.objectsOverlineControl.Depth = 0;
             this.objectsOverlineControl.Dock = System.Windows.Forms.DockStyle.Top;
             this.objectsOverlineControl.Location = new System.Drawing.Point(14, 51);
@@ -1098,6 +1089,7 @@ namespace PTGI_UI
             // drawCellGridControl
             // 
             this.drawCellGridControl.AutoSize = true;
+            this.drawCellGridControl.DataBindings.Add(new System.Windows.Forms.Binding("Checked", this.settingsViewBindingSource, "DrawGrid", true));
             this.drawCellGridControl.Depth = 0;
             this.drawCellGridControl.Dock = System.Windows.Forms.DockStyle.Top;
             this.drawCellGridControl.Location = new System.Drawing.Point(14, 14);
@@ -1110,26 +1102,6 @@ namespace PTGI_UI
             this.drawCellGridControl.TabIndex = 8;
             this.drawCellGridControl.Text = "Draw cell grid";
             this.drawCellGridControl.UseVisualStyleBackColor = true;
-            // 
-            // applyDebugSettingsButton
-            // 
-            this.applyDebugSettingsButton.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this.applyDebugSettingsButton.Depth = 0;
-            this.applyDebugSettingsButton.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.applyDebugSettingsButton.DrawShadows = true;
-            this.applyDebugSettingsButton.HighEmphasis = true;
-            this.applyDebugSettingsButton.Icon = null;
-            this.applyDebugSettingsButton.Location = new System.Drawing.Point(14, 388);
-            this.applyDebugSettingsButton.Margin = new System.Windows.Forms.Padding(4, 6, 4, 6);
-            this.applyDebugSettingsButton.MouseState = MaterialSkin.MouseState.HOVER;
-            this.applyDebugSettingsButton.Name = "applyDebugSettingsButton";
-            this.applyDebugSettingsButton.Size = new System.Drawing.Size(269, 36);
-            this.applyDebugSettingsButton.TabIndex = 6;
-            this.applyDebugSettingsButton.Text = "Apply";
-            this.applyDebugSettingsButton.Type = MaterialSkin.Controls.MaterialButton.MaterialButtonType.Contained;
-            this.applyDebugSettingsButton.UseAccentColor = false;
-            this.applyDebugSettingsButton.UseVisualStyleBackColor = true;
-            this.applyDebugSettingsButton.Click += new System.EventHandler(this.applyDebugSettingsButton_Click);
             // 
             // materialDrawer1
             // 
@@ -1155,26 +1127,6 @@ namespace PTGI_UI
             this.timer1.Enabled = true;
             this.timer1.Interval = 1000;
             this.timer1.Tick += new System.EventHandler(this.timer1_Tick);
-            // 
-            // resetSceneButton
-            // 
-            this.resetSceneButton.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this.resetSceneButton.Depth = 0;
-            this.resetSceneButton.Dock = System.Windows.Forms.DockStyle.Top;
-            this.resetSceneButton.DrawShadows = true;
-            this.resetSceneButton.HighEmphasis = true;
-            this.resetSceneButton.Icon = null;
-            this.resetSceneButton.Location = new System.Drawing.Point(14, 158);
-            this.resetSceneButton.Margin = new System.Windows.Forms.Padding(4, 60, 4, 6);
-            this.resetSceneButton.MouseState = MaterialSkin.MouseState.HOVER;
-            this.resetSceneButton.Name = "resetSceneButton";
-            this.resetSceneButton.Size = new System.Drawing.Size(252, 36);
-            this.resetSceneButton.TabIndex = 8;
-            this.resetSceneButton.Text = "Reset";
-            this.resetSceneButton.Type = MaterialSkin.Controls.MaterialButton.MaterialButtonType.Contained;
-            this.resetSceneButton.UseAccentColor = false;
-            this.resetSceneButton.UseVisualStyleBackColor = true;
-            this.resetSceneButton.Click += new System.EventHandler(this.resetSceneButton_Click);
             // 
             // PTGIForm
             // 
@@ -1202,11 +1154,12 @@ namespace PTGI_UI
             this.renderReportBox.PerformLayout();
             this.objectSpecificationCard.ResumeLayout(false);
             this.objectSpecificationCard.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize) (this.colorDisplayPictureBox)).EndInit();
-            ((System.ComponentModel.ISupportInitialize) (this.pictureBox1)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.colorDisplayPictureBox)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
             this.tabPage2.ResumeLayout(false);
             this.materialCard7.ResumeLayout(false);
             this.materialCard7.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.settingsViewBindingSource)).EndInit();
             this.materialCard2.ResumeLayout(false);
             this.materialCard2.PerformLayout();
             this.materialCard1.ResumeLayout(false);
@@ -1223,6 +1176,7 @@ namespace PTGI_UI
             this.materialCard5.ResumeLayout(false);
             this.materialCard5.PerformLayout();
             this.ResumeLayout(false);
+
         }
 
         private MaterialSkin.Controls.MaterialButton resetSceneButton;
@@ -1243,11 +1197,9 @@ namespace PTGI_UI
         private MaterialSkin.Controls.MaterialTextBox renderResolutionWidth;
         private MaterialSkin.Controls.MaterialLabel materialLabel1;
         private MaterialSkin.Controls.MaterialLabel materialLabel3;
-        private MaterialSkin.Controls.MaterialButton rendererSettingsApply;
         private MaterialSkin.Controls.MaterialButton startRenderButton;
         private MaterialSkin.Controls.MaterialLabel materialLabel4;
         private MaterialSkin.Controls.MaterialTextBox bounceLimitControl;
-        private MaterialSkin.Controls.MaterialButton renderSettingsApply;
         private MaterialSkin.Controls.MaterialLabel materialLabel5;
         private MaterialSkin.Controls.MaterialTextBox samplePerPixelControl;
         private MaterialSkin.Controls.MaterialLabel materialLabel6;
@@ -1270,7 +1222,6 @@ namespace PTGI_UI
         private MaterialSkin.Controls.MaterialSwitch emitsLightControl;
         private MaterialSkin.Controls.MaterialCard materialCard5;
         private MaterialSkin.Controls.MaterialSwitch drawCellGridControl;
-        private MaterialSkin.Controls.MaterialButton applyDebugSettingsButton;
         private Cyotek.Windows.Forms.ColorEditor colorEditor1;
         private MaterialSkin.Controls.MaterialTextBox objectEmissionStrengthControl;
         private MaterialSkin.Controls.MaterialLabel materialLabel12;
@@ -1293,8 +1244,9 @@ namespace PTGI_UI
         private System.Windows.Forms.PictureBox colorDisplayPictureBox;
         private MaterialSkin.Controls.MaterialCard materialCard7;
         private MaterialSkin.Controls.MaterialSwitch renderFlagIgnoreObstacleInteriors;
-        private MaterialSkin.Controls.MaterialButton renderFlagsApply;
         private MaterialSkin.Controls.MaterialLabel materialLabel15;
+        private System.Windows.Forms.BindingSource settingsViewBindingSource;
+        private MaterialSkin.Controls.MaterialButton buttonSaveSettings;
     }
 }
 
