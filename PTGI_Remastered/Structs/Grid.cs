@@ -1,4 +1,5 @@
-﻿using ILGPU.Algorithms;
+﻿using ILGPU;
+using ILGPU.Algorithms;
 using PTGI_Remastered.Utilities;
 using System;
 using System.Collections.Generic;
@@ -52,6 +53,15 @@ namespace PTGI_Remastered.Structs
         }
     }
 
+    public struct GridTraversalResult
+    {
+        public Point IntersectionPoint;
+        public Line IntesectedWall;
+        public bool IsClosestIntersectionLight;
+
+        public bool IsIntersectionPointFound() => IntersectionPoint.HasValue == 1;
+    }
+
     public struct Grid
     {
         public int CellsInRow;
@@ -97,74 +107,6 @@ namespace PTGI_Remastered.Structs
             }
 
             return cells;
-        }
-
-        public bool CUDAIsOutsideGrid(GridVariables gridVariables)
-        {
-            return (gridVariables.CurrentTileIDY < 0 || gridVariables.CurrentTileIDY >= CellsInRow || gridVariables.CurrentTileIDX < 0 || gridVariables.CurrentTileIDX >= CellsInRow);
-        }
-
-        public int CUDAGetCellIndex(GridVariables gridVariables)
-        {
-            return gridVariables.CurrentTileIDY * CellsInRow + gridVariables.CurrentTileIDX;
-        }
-
-        public GridVariables CUDAGetGridTraversalVariables(Line line)
-        {
-            return CUDAGetGridTraversalVariables(line.Source, line.Destination);
-        }
-
-        public GridVariables CUDAGetGridTraversalVariables(Point StartLocation, Point EndLocation)
-        {
-            GridVariables gridVariables = new GridVariables();
-
-            // Calculate starting cell index based on begining of a ray
-            int startTileIDX = (int)XMath.Floor(StartLocation.X / CellWidth);
-            int startTileIDY = (int)XMath.Floor(StartLocation.Y / CellHeight);
-
-            gridVariables.CurrentTileIDX = startTileIDX;
-            gridVariables.CurrentTileIDY = startTileIDY;
-
-            // Determine step (direction) in which cells will be traversed
-            gridVariables.StepX = EndLocation.X > StartLocation.X ? 1 : -1;
-            if (EndLocation.X == StartLocation.X)
-                gridVariables.StepX = 0;
-            gridVariables.StepY = EndLocation.Y > StartLocation.Y ? 1 : -1;
-            if (EndLocation.Y == StartLocation.Y)
-                gridVariables.StepY = 0;
-
-            gridVariables.MoveAlongX = 1;
-            gridVariables.MoveAlongY = 1;
-
-            // if dividing by 0 disable moving along that axis
-            float dividerX = XMath.Abs(EndLocation.X - StartLocation.X);
-            float dividerY = XMath.Abs(EndLocation.Y - StartLocation.Y);
-            if (dividerX == 0)
-                gridVariables.MoveAlongX = 0;
-            if (dividerY == 0)
-                gridVariables.MoveAlongY = 0;
-
-            // Calculate how much to add each step to reach end of a ray
-            gridVariables.DeltaX = CellWidth / dividerX;
-            gridVariables.DeltaY = CellHeight / dividerY;
-
-            // Calculate how far the ray is into cell
-            float PositionInsideTile_X = PTGI_Math.Modulo(StartLocation.X, CellWidth) / CellWidth;
-            float DistanceToBoundary_X = PTGI_Math.Modulo(XMath.Abs(gridVariables.StepX - PositionInsideTile_X), 1);
-            float PositionInsideTile_Y = PTGI_Math.Modulo(StartLocation.Y, CellHeight) / CellHeight;
-            float DistanceToBoundary_Y = PTGI_Math.Modulo(XMath.Abs(gridVariables.StepY - PositionInsideTile_Y), 1);
-
-            // How far are we into the grid
-            gridVariables.CurrentDeltaX = gridVariables.MoveAlongX == 1 ? gridVariables.DeltaX * DistanceToBoundary_X : 1;
-            gridVariables.CurrentDeltaY = gridVariables.MoveAlongY == 1 ? gridVariables.DeltaY * DistanceToBoundary_Y : 1;
-
-            // Correct delta for cases when ray starts on the edge of a cell and is assigned to a different one than algorith assumes
-            if (gridVariables.CurrentDeltaX == 0 && gridVariables.StepX == 1)
-                gridVariables.CurrentDeltaX += gridVariables.DeltaX;
-            if (gridVariables.CurrentDeltaY == 0 && gridVariables.StepY == 1)
-                gridVariables.CurrentDeltaY += gridVariables.DeltaY;
-
-            return gridVariables;
         }
 
         private List<Point> GetVisitedCells(Point StartLocation, Point EndLocation)
@@ -250,6 +192,116 @@ namespace PTGI_Remastered.Structs
             }
 
             return visited;
+        }
+
+        public bool IsOutsideGrid(GridVariables gridVariables)
+        {
+            return (gridVariables.CurrentTileIDY < 0 || gridVariables.CurrentTileIDY >= CellsInRow || gridVariables.CurrentTileIDX < 0 || gridVariables.CurrentTileIDX >= CellsInRow);
+        }
+        public int GetCellIndex(GridVariables gridVariables)
+        {
+            return gridVariables.CurrentTileIDY * CellsInRow + gridVariables.CurrentTileIDX;
+        }
+        public GridVariables GetGridTraversalVariables(Line line)
+        {
+            return GetGridTraversalVariables(line.Source, line.Destination);
+        }
+        public GridVariables GetGridTraversalVariables(Point StartLocation, Point EndLocation)
+        {
+            GridVariables gridVariables = new GridVariables();
+
+            // Calculate starting cell index based on begining of a ray
+            int startTileIDX = (int)XMath.Floor(StartLocation.X / CellWidth);
+            int startTileIDY = (int)XMath.Floor(StartLocation.Y / CellHeight);
+
+            gridVariables.CurrentTileIDX = startTileIDX;
+            gridVariables.CurrentTileIDY = startTileIDY;
+
+            // Determine step (direction) in which cells will be traversed
+            gridVariables.StepX = EndLocation.X > StartLocation.X ? 1 : -1;
+            if (EndLocation.X == StartLocation.X)
+                gridVariables.StepX = 0;
+            gridVariables.StepY = EndLocation.Y > StartLocation.Y ? 1 : -1;
+            if (EndLocation.Y == StartLocation.Y)
+                gridVariables.StepY = 0;
+
+            gridVariables.MoveAlongX = 1;
+            gridVariables.MoveAlongY = 1;
+
+            // if dividing by 0 disable moving along that axis
+            float dividerX = XMath.Abs(EndLocation.X - StartLocation.X);
+            float dividerY = XMath.Abs(EndLocation.Y - StartLocation.Y);
+            if (dividerX == 0)
+                gridVariables.MoveAlongX = 0;
+            if (dividerY == 0)
+                gridVariables.MoveAlongY = 0;
+
+            // Calculate how much to add each step to reach end of a ray
+            gridVariables.DeltaX = CellWidth / dividerX;
+            gridVariables.DeltaY = CellHeight / dividerY;
+
+            // Calculate how far the ray is into cell
+            float PositionInsideTile_X = PTGI_Math.Modulo(StartLocation.X, CellWidth) / CellWidth;
+            float DistanceToBoundary_X = PTGI_Math.Modulo(XMath.Abs(gridVariables.StepX - PositionInsideTile_X), 1);
+            float PositionInsideTile_Y = PTGI_Math.Modulo(StartLocation.Y, CellHeight) / CellHeight;
+            float DistanceToBoundary_Y = PTGI_Math.Modulo(XMath.Abs(gridVariables.StepY - PositionInsideTile_Y), 1);
+
+            // How far are we into the grid
+            gridVariables.CurrentDeltaX = gridVariables.MoveAlongX == 1 ? gridVariables.DeltaX * DistanceToBoundary_X : 1;
+            gridVariables.CurrentDeltaY = gridVariables.MoveAlongY == 1 ? gridVariables.DeltaY * DistanceToBoundary_Y : 1;
+
+            // Correct delta for cases when ray starts on the edge of a cell and is assigned to a different one than algorithm assumes
+            if (gridVariables.CurrentDeltaX == 0 && gridVariables.StepX == 1)
+                gridVariables.CurrentDeltaX += gridVariables.DeltaX;
+            if (gridVariables.CurrentDeltaY == 0 && gridVariables.StepY == 1)
+                gridVariables.CurrentDeltaY += gridVariables.DeltaY;
+
+            return gridVariables;
+        }
+        public GridTraversalResult TraverseGrid(Line lightRay, int wallsCount, ArrayView3D<int> gridData, ArrayView<Line> walls, Line ignoredWall)
+        {
+            float closestDistance = float.MaxValue;
+            var gridVariables = GetGridTraversalVariables(lightRay);
+            var gridTraversalResult = new GridTraversalResult();
+            while (true)
+            {
+                if (IsOutsideGrid(gridVariables))
+                    break;
+
+                for (int cellObjectId = 0; cellObjectId < wallsCount; cellObjectId++)
+                {
+                    var collisionObjectIds = gridData[gridVariables.CurrentTileIDX, gridVariables.CurrentTileIDY, cellObjectId];
+                    if (collisionObjectIds == 0)
+                        break;
+
+                    collisionObjectIds--;
+                    var rayWallIntersection = walls[collisionObjectIds].GetIntersection(lightRay, ignoredWall);
+                    if (rayWallIntersection.HasValue == 1)
+                    {
+                        var raySourceToWallIntersectionDistance = lightRay.Source.GetDistance(rayWallIntersection);
+                        if (raySourceToWallIntersectionDistance < closestDistance)
+                        {
+                            gridTraversalResult.IntersectionPoint = rayWallIntersection;
+                            closestDistance = raySourceToWallIntersectionDistance;
+                            gridTraversalResult.IsClosestIntersectionLight = walls[collisionObjectIds].ObjectType == 2;
+                            gridTraversalResult.IntesectedWall = walls[collisionObjectIds];
+                            gridTraversalResult.IntesectedWall.HasValue = 1;
+                        }
+                    }
+                }
+
+                if (gridTraversalResult.IsIntersectionPointFound())
+                {
+                    var intersectionTileIdX = (int)XMath.Floor(gridTraversalResult.IntersectionPoint.X / CellWidth);
+                    var intersectionTileIdY = (int)XMath.Floor(gridTraversalResult.IntersectionPoint.Y / CellHeight);
+                    if (intersectionTileIdX == gridVariables.CurrentTileIDX && intersectionTileIdY == gridVariables.CurrentTileIDY)
+                        break;
+                }
+
+                gridVariables.TraverseToNextCell();
+            }
+
+            return gridTraversalResult;
         }
     }
 }

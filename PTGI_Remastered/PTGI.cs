@@ -81,13 +81,21 @@ namespace PTGI_Remastered
 
             var renderTimeStopwatch = new Stopwatch();
             renderTimeStopwatch.Start();
-            renderResult.Pixels = StartRender(_cache.Accelerator, bitmap, _cache.PixelBuffer, _cache.SeedBuffer, _cache.WallBuffer, renderSpecification.SampleCount, renderSpecification.BounceLimit, _cache.GridDataBuffer, _cache.GridCached);
+            renderResult.Pixels = StartRender(
+                _cache.Accelerator, 
+                bitmap, 
+                _cache.PixelBuffer, 
+                _cache.SeedBuffer, 
+                _cache.WallBuffer, 
+                renderSpecification.SampleCount, 
+                renderSpecification.BounceLimit,
+                _cache.GridDataBuffer,
+                _cache.GridCached);
             renderTimeStopwatch.Stop();
 
             renderResult.RenderTime = renderTimeStopwatch.ElapsedMilliseconds;
             renderResult.bitmap = bitmap;
             processTimeStopwatch.Stop();
-
             renderResult.ProcessTime = processTimeStopwatch.ElapsedMilliseconds;
             return renderResult;
         }
@@ -147,6 +155,7 @@ namespace PTGI_Remastered
                 rayDirection.Multiply(10000);
 
                 lightRay.Destination.Add(rayDirection);
+
                 Line wallToIgnore = new Line();
                 var rayTraceResult = CUDA_TraceRay(index, seedArray, bitmap, bounceLimit, false, walls, lightRay, wallToIgnore, gridData, grid);
 
@@ -165,78 +174,40 @@ namespace PTGI_Remastered
             float reflectionAreaSize = 10;
             for (int bounceIndex = 0; bounceIndex < bounceLimit; bounceIndex++)
             {
-                float closestDistance = float.MaxValue;
-                Point intersectionPoint = new Point();
-                bool isClosestIntersectionLight = false;
-                var wallCollidedWith = new Line();
-
-                var gridVariables = grid.CUDAGetGridTraversalVariables(lightRay);
-                while(true)
-                {
-                    if (grid.CUDAIsOutsideGrid(gridVariables))
-                        break;
-
-                    for (int cellObjectId = 0; cellObjectId < bitmap.WallsCount; cellObjectId++)
-                    {
-                        var collisionObjectIds = gridData[gridVariables.CurrentTileIDX, gridVariables.CurrentTileIDY, cellObjectId];
-                        if (collisionObjectIds <= 0 || collisionObjectIds > bitmap.WallsCount)
-                            break;
-
-                        collisionObjectIds--;
-                        var rayWallIntersection = walls[collisionObjectIds].GetIntersection(lightRay, wallToIgnore);
-                        if (rayWallIntersection.HasValue == 1)
-                        {
-                            var raySourceToWallIntersectionDistance = lightRay.Source.GetDistance(rayWallIntersection);
-                            if (raySourceToWallIntersectionDistance < closestDistance)
-                            {
-                                intersectionPoint = rayWallIntersection;
-                                closestDistance = raySourceToWallIntersectionDistance;
-                                isClosestIntersectionLight = walls[collisionObjectIds].ObjectType == 2 ? true : false;
-                                wallCollidedWith = walls[collisionObjectIds];
-                                wallCollidedWith.HasValue = 1;
-                            }
-                        }
-                    }
-
-                    if (intersectionPoint.HasValue == 1)
-                        break;
-
-                    gridVariables.TraverseToNextCell();
-                }
-
-                if (wallCollidedWith.HasValue != 1)
+                var gridTraversalResult = grid.TraverseGrid(lightRay, bitmap.WallsCount, gridData, walls, wallToIgnore);
+                if (gridTraversalResult.IntesectedWall.HasValue != 1)
                 {
                     rayTraceResult.pixelColor.SetColor(0, 0, 0);
                     return rayTraceResult;
                 }
-                else if(isClosestIntersectionLight)
+                else if(gridTraversalResult.IsClosestIntersectionLight)
                 {
-                    rayTraceResult.pixelColor.TintWith(wallCollidedWith.Color, wallCollidedWith.EmissionStrength);
+                    rayTraceResult.pixelColor.TintWith(gridTraversalResult.IntesectedWall.Color, gridTraversalResult.IntesectedWall.EmissionStrength);
                     rayTraceResult.pixelColor.Rescale(255);
                     return rayTraceResult;
                 }
                 else
                 {
-                    if(lightRay.Source.IsEqualTo(intersectionPoint))
+                    if(lightRay.Source.IsEqualTo(gridTraversalResult.IntersectionPoint))
                     {
                         rayTraceResult.pixelColor.SetColor(0, 0, 0);
                         return rayTraceResult;
                     }
-                    wallToIgnore = wallCollidedWith;
+                    wallToIgnore = gridTraversalResult.IntesectedWall;
 
-                    var nextRayDirection = TraceRayUtility.NextRayDirection(index, seedArray, wallCollidedWith, wallToIgnore, lightRay.Source, intersectionPoint, reflectionAreaSize, originDensitySwap);
+                    var nextRayDirection = TraceRayUtility.NextRayDirection(index, seedArray, gridTraversalResult.IntesectedWall, wallToIgnore, lightRay.Source, gridTraversalResult.IntersectionPoint, reflectionAreaSize, originDensitySwap);
                     originDensitySwap = nextRayDirection.SwapDensity;
 
-                    if(wallCollidedWith.ReflectivnessType == 4)
+                    if(gridTraversalResult.IntesectedWall.ReflectivnessType == 4)
                     {
-                        rayTraceResult.pixelColor.Multiply(wallCollidedWith.Color.GetRescaled(255));
+                        rayTraceResult.pixelColor.Multiply(gridTraversalResult.IntesectedWall.Color.GetRescaled(255));
                     }
                     else
                     {
-                        rayTraceResult.pixelColor.Multiply(wallCollidedWith.Color.GetRescaled(255).GetRescaled(3.14159265359f));
+                        rayTraceResult.pixelColor.Multiply(gridTraversalResult.IntesectedWall.Color.GetRescaled(255).GetRescaled(XMath.PI));
                     }
 
-                    lightRay.Source = intersectionPoint;
+                    lightRay.Source = gridTraversalResult.IntersectionPoint;
                     lightRay.Destination = nextRayDirection.Destination;
                 }
             }
