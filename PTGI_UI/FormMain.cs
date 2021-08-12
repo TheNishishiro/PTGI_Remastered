@@ -25,13 +25,8 @@ namespace PTGI_UI
         protected int popupTime { get; set; } = 0;
         protected List<PTGI_Remastered.Structs.Polygon> Polygons { get; set; }
 
-        protected List<PTGI_Remastered.Structs.Point> DebugRayPoints { get; set; }
-        protected List<int> DebugRayVisitedCells { get; set; }
-
         protected MaterialCard PopupMessage { get; set; }
         protected MaterialLabel PopupMessageText { get; set; }
-
-        protected MaterialComboBox WorldObjectList { get; set; }
 
         protected MaterialListView QueuedVerticiesList { get; set; }
         protected PictureBox RenderedPictureBox { get; set; }
@@ -86,6 +81,7 @@ namespace PTGI_UI
 
             if(Settings.DrawObjectsOverline)
             {
+                int polygonId = 0;
                 foreach(var polygon in Polygons)
                 {
                     for(int i = 0; i < polygon.Walls.Length; i++)
@@ -97,9 +93,23 @@ namespace PTGI_UI
                             (int)(polygon.Walls[i].Destination.X),
                             (int)(polygon.Walls[i].Destination.Y));
                     }
+                    polygonId++;
                 }
             }
 
+            if (SelectedPolygon != -1 && Polygons.Count > 0)
+            {
+                var polygon = Polygons[SelectedPolygon];
+                foreach (var wall in polygon.Walls)
+                {
+                    e.Graphics.DrawLine(
+                            new Pen(Color.Red, 1f),
+                            (int)(wall.Source.X),
+                            (int)(wall.Source.Y),
+                            (int)(wall.Destination.X),
+                            (int)(wall.Destination.Y));
+                }
+            }
 
             if (Settings.DrawGrid)
             {
@@ -166,8 +176,6 @@ namespace PTGI_UI
                         {
                             var aSerializer = new XmlSerializer(typeof(List<PTGI_Remastered.Structs.Polygon>));
                             Polygons = (List<PTGI_Remastered.Structs.Polygon>)aSerializer.Deserialize(streamReader);
-
-                            UpdateObjectList();
                             RenderedPictureBox.Refresh();
                         }
                     }
@@ -210,21 +218,11 @@ namespace PTGI_UI
 
             Polygons.Add(polygon);
             QueuedVerticiesList.Items.Clear();
-
-
-            UpdateObjectList();
-        }
-
-        protected void UpdateObjectList()
-        {
-            WorldObjectList.Items.Clear();
-            var polygons = Polygons.Select(c => new UIPolygon() { Name = c.Name }).ToArray();
-            WorldObjectList.Items.AddRange(polygons);
         }
 
         protected void SelectObject(Point mouseLocation)
         {
-            if (WorldObjectList.Items.Count <= 0)
+            if (Polygons.Count <= 0)
                 return;
 
             var mousePoint = new PTGI_Remastered.Structs.Point();
@@ -238,8 +236,6 @@ namespace PTGI_UI
                     break;
                 }
             }
-
-            WorldObjectList.SelectedIndex = SelectedPolygon;
         }
 
         protected void SaveRender()
@@ -262,7 +258,7 @@ namespace PTGI_UI
 
         protected void DeleteObject()
         {
-            if (WorldObjectList.Items.Count <= 0 && SelectedPolygon < 0)
+            if (Polygons.Count <= 0 && SelectedPolygon < 0)
                 return;
 
             try
@@ -274,7 +270,6 @@ namespace PTGI_UI
             {
                 MessageBox.Show("Object you are trying to remove no longer exists");
             }
-            UpdateObjectList();
         }
 
         protected void ClearScene()
@@ -303,16 +298,11 @@ namespace PTGI_UI
 
                     Polygons.Add(block);
                     if (Polygons.Count == 999)
-                    {
-                        UpdateObjectList();
                         return;
-                    }
                 }
                 int yDirection = rnd.Next(2) == 0 ? -32 : 32;
                 maxY += yDirection;
             }
-
-            UpdateObjectList();
         }
     }
 }

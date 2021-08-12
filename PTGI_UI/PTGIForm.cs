@@ -127,8 +127,6 @@ namespace PTGI_UI
             PopupMessageText = renderReportTime;
             RenderedPictureBox = pictureBox1;
             QueuedVerticiesList = verticiesListControl;
-            WorldObjectList = objectListControl;
-            WorldObjectList.DisplayMember = "Name";
 
             HidePopupMessage();
 
@@ -136,6 +134,7 @@ namespace PTGI_UI
 
             PathTracer = new PTGI_Remastered.PTGI();
             Polygons = new List<PTGI_Remastered.Structs.Polygon>();
+
 
             GpuId = null;
             try
@@ -262,11 +261,6 @@ namespace PTGI_UI
         private bool isLiveRender = false;
         private void pictureBox1_MouseMove(object sender, MouseEventArgs e)
         {
-            if (e.Button == MouseButtons.Right)
-                isLiveRender = true;
-            else if (e.Button == MouseButtons.Middle)
-                isLiveRender = false;
-
             if (isLiveRender)
             {
                 PTGI_Remastered.Structs.Polygon polygon = new PTGI_Remastered.Structs.Polygon();
