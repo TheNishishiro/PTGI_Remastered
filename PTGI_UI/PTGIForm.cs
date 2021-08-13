@@ -58,7 +58,7 @@ namespace PTGI_UI
             }
             catch(Exception ex)
             {
-                isLiveRender = false;
+                Settings.IsLivePreview = false;
                 this.Invoke(new MethodInvoker(delegate ()
                 {
                     MessageBox.Show(this, ex.Message, "Render failed");
@@ -258,10 +258,9 @@ namespace PTGI_UI
             TerrariaWorldGenerator();
         }
 
-        private bool isLiveRender = false;
         private void pictureBox1_MouseMove(object sender, MouseEventArgs e)
         {
-            if (isLiveRender)
+            if (Settings.IsLivePreview)
             {
                 PTGI_Remastered.Structs.Polygon polygon = new PTGI_Remastered.Structs.Polygon();
                 PTGI_Remastered.Structs.Color color = new PTGI_Remastered.Structs.Color();

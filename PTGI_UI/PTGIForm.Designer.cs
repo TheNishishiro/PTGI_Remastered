@@ -67,6 +67,7 @@ namespace PTGI_UI
             this.renderResolutionWidth = new MaterialSkin.Controls.MaterialTextBox();
             this.renderResolutionHeight = new MaterialSkin.Controls.MaterialTextBox();
             this.materialCard1 = new MaterialSkin.Controls.MaterialCard();
+            this.isLiveRenderSwitch = new MaterialSkin.Controls.MaterialSwitch();
             this.buttonSaveSettings = new MaterialSkin.Controls.MaterialButton();
             this.gpuSelectorControl = new MaterialSkin.Controls.MaterialComboBox();
             this.materialLabel7 = new MaterialSkin.Controls.MaterialLabel();
@@ -673,6 +674,7 @@ namespace PTGI_UI
             // materialCard1
             // 
             this.materialCard1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
+            this.materialCard1.Controls.Add(this.isLiveRenderSwitch);
             this.materialCard1.Controls.Add(this.buttonSaveSettings);
             this.materialCard1.Controls.Add(this.gpuSelectorControl);
             this.materialCard1.Controls.Add(this.materialLabel7);
@@ -691,6 +693,25 @@ namespace PTGI_UI
             this.materialCard1.Padding = new System.Windows.Forms.Padding(14);
             this.materialCard1.Size = new System.Drawing.Size(297, 438);
             this.materialCard1.TabIndex = 1;
+            // 
+            // isLiveRenderSwitch
+            // 
+            this.isLiveRenderSwitch.AutoSize = true;
+            this.isLiveRenderSwitch.Checked = true;
+            this.isLiveRenderSwitch.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.isLiveRenderSwitch.DataBindings.Add(new System.Windows.Forms.Binding("Checked", this.settingsViewBindingSource, "IsLivePreview", true));
+            this.isLiveRenderSwitch.Depth = 0;
+            this.isLiveRenderSwitch.Dock = System.Windows.Forms.DockStyle.Top;
+            this.isLiveRenderSwitch.Location = new System.Drawing.Point(14, 276);
+            this.isLiveRenderSwitch.Margin = new System.Windows.Forms.Padding(0);
+            this.isLiveRenderSwitch.MouseLocation = new System.Drawing.Point(-1, -1);
+            this.isLiveRenderSwitch.MouseState = MaterialSkin.MouseState.HOVER;
+            this.isLiveRenderSwitch.Name = "isLiveRenderSwitch";
+            this.isLiveRenderSwitch.Ripple = true;
+            this.isLiveRenderSwitch.Size = new System.Drawing.Size(269, 37);
+            this.isLiveRenderSwitch.TabIndex = 12;
+            this.isLiveRenderSwitch.Text = "Live render";
+            this.isLiveRenderSwitch.UseVisualStyleBackColor = true;
             // 
             // buttonSaveSettings
             // 
@@ -1232,6 +1253,7 @@ namespace PTGI_UI
         private MaterialSkin.Controls.MaterialTextBox terrariaBlockSizeTextbox;
         private MaterialSkin.Controls.MaterialLabel materialLabel14;
         private MaterialSkin.Controls.MaterialLabel materialLabel8;
+        private MaterialSkin.Controls.MaterialSwitch isLiveRenderSwitch;
     }
 }
 

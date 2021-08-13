@@ -17,6 +17,7 @@ namespace PTGI_UI
             DrawGrid = false;
             DrawObjectsOverline = true;
             RenderFlag_IgnoreObstacleInterior = true;
+            IsLivePreview = false;
             BounceLimitControlValue = "7";
             GridDividerControlValue = "16";
             SamplesPerPixelControlValue = "20";
@@ -33,6 +34,8 @@ namespace PTGI_UI
         public bool UseCUDA { get; set; }
         public bool DrawGrid { get; set; }
         public bool DrawObjectsOverline { get; set; }
+        [JsonIgnore]
+        public bool IsLivePreview { get; set; }
         public bool RenderFlag_IgnoreObstacleInterior { get; set; }
         public int RenderWidth { 
             get 
