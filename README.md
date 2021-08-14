@@ -18,9 +18,9 @@ Currently even without previous optimizations performance is greatly improved, u
 </p>
 
 #### ~30 fps scene render (median denoiser, 9x9 kernel)
+You can observe some light leaking through objects due to large kernel
 <p align="center">
  <img src="https://github.com/TheNishishiro/PTGI_Remastered/blob/PTGI_ILGPU_Dev/Images/30fps_denoised.png?raw=true">
- You can observe some light leaking through objects due to large kernel
 </p>
 
 #### 10000 samples (26 seconds render)
