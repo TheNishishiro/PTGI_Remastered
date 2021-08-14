@@ -12,6 +12,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using PTGI_Remastered.Cache;
+using ILGPU.Algorithms;
+using Grid = PTGI_Remastered.Structs.Grid;
 
 namespace PTGI_Remastered
 {
@@ -46,18 +48,6 @@ namespace PTGI_Remastered
             return gpus;
         }
 
-        /// <summary>
-        /// Prepares data and initiates path tracer 
-        /// </summary>
-        /// <param name="collisionObjects">World objects that light interacts with</param>
-        /// <param name="imageWidth">Render width</param>
-        /// <param name="imageHeight">Render height</param>
-        /// <param name="samples">Number of light samples per pixel</param>
-        /// <param name="bounceLimit">Max number of light bounces</param>
-        /// <param name="gridDivides">Number of columns</param>
-        /// <param name="UseCUDARenderer">Specified to use GPU for rendering</param>
-        /// <param name="GpuId">GPU to use for rendering</param>
-        /// <returns>Rendered result as RenderResult</returns>
         public RenderResult PathTraceRender(RenderSpecification renderSpecification)
         {
             Stopwatch processTimeStopwatch = new Stopwatch();
@@ -65,6 +55,7 @@ namespace PTGI_Remastered
             var walls = renderSpecification.GetWalls();
             var renderResult = new RenderResult();
             var bitmap = new Bitmap();
+            bitmap.GridSize = renderSpecification.GridSize;
             bitmap.SetBitmapSettings(renderSpecification.ImageWidth, renderSpecification.ImageHeight, walls.Length);
 
             _cache.WithEnclosureDetection(bitmap, renderSpecification);
@@ -73,32 +64,46 @@ namespace PTGI_Remastered
             _cache.SetPixelBuffer();
             _cache.SetSeedBuffer(bitmap.Size);
             _cache.SetWallBuffer(walls);
+            _cache.SetGridDataBuffer(walls, bitmap, renderSpecification.GridSize);
+            _cache.Finalize();
 
             var renderTimeStopwatch = new Stopwatch();
             renderTimeStopwatch.Start();
-            renderResult.Pixels = StartRender(_cache.Accelerator, bitmap, _cache.PixelBuffer, _cache.SeedBuffer, _cache.WallBuffer, renderSpecification.SampleCount, renderSpecification.BounceLimit);
+            renderResult.Pixels = StartRender(
+                _cache.Accelerator, 
+                bitmap, 
+                _cache.PixelBuffer, 
+                _cache.SeedBuffer, 
+                _cache.WallBuffer, 
+                renderSpecification.SampleCount, 
+                renderSpecification.BounceLimit,
+                _cache.GridDataBuffer,
+                _cache.GridCached);
             renderTimeStopwatch.Stop();
 
             renderResult.RenderTime = renderTimeStopwatch.ElapsedMilliseconds;
             renderResult.bitmap = bitmap;
             processTimeStopwatch.Stop();
-            
             renderResult.ProcessTime = processTimeStopwatch.ElapsedMilliseconds;
             return renderResult;
         }
 
-        private static Color[] StartRender(Accelerator accelerator, Bitmap bitmap, MemoryBuffer<Color> bitmapPixels, MemoryBuffer<int> randomSeedArray, MemoryBuffer<Line> walls, int samples, int bounceLimit)
+        private static Color[] StartRender(Accelerator accelerator, Bitmap bitmap, MemoryBuffer<Color> bitmapPixels, MemoryBuffer<int> randomSeedArray, MemoryBuffer<Line> walls, int samples, int bounceLimit, MemoryBuffer3D<int> gridData, Grid grid)
         {
             var ptgiKernel = accelerator.LoadAutoGroupedStreamKernel<
                 Index1,
                 Bitmap,
                 ArrayView<Color>,
                 ArrayView<int>,
-                int, int, ArrayView<Line>>(CUDA_StartRender);
+                int, 
+                int, 
+                ArrayView<Line>,
+                ArrayView3D<int>,
+                Grid>(CUDA_StartRender);
 
             try
             {
-                ptgiKernel(bitmapPixels.Length, bitmap, bitmapPixels.View, randomSeedArray.View, samples, bounceLimit, walls.View);
+                ptgiKernel(bitmapPixels.Length, bitmap, bitmapPixels.View, randomSeedArray.View, samples, bounceLimit, walls.View, gridData.View, grid);
                 accelerator.Synchronize();
                 return bitmapPixels.GetAsArray();
             }
@@ -110,23 +115,23 @@ namespace PTGI_Remastered
             return new Color[bitmapPixels.Length];
         }
 
-        private static void CUDA_StartRender(Index1 index, Bitmap bitmap, ArrayView<Color> pixels, ArrayView<int> seedArray, int samples, int bounceLimit, ArrayView<Line> walls)
+        private static void CUDA_StartRender(Index1 index, Bitmap bitmap, ArrayView<Color> pixels, ArrayView<int> seedArray, int samples, int bounceLimit, ArrayView<Line> walls, ArrayView3D<int> gridData, Grid grid)
         {
             if (index < pixels.Length)
             {
                 if (pixels[index].Skip == 1)
                     return;
                 
-                Point raySource = PTGI_Math.GetRaySourceFromThreadIndex(bitmap, index);
+                Point raySource = PTGI_Math.Convert1dIndexTo2d(bitmap, index);
                 Line lightRay = new Line();
                 lightRay.Setup(raySource, new Point());
-                var pixelInformaton = RenderBitmap(index, bitmap, lightRay, seedArray, samples, bounceLimit, walls);
+                var pixelInformaton = RenderBitmap(index, bitmap, lightRay, seedArray, samples, bounceLimit, walls, gridData, grid);
 
                 bitmap.SetPixel(index, pixelInformaton.pixelColor, 1.0f / samples, pixels);
             }
         }
 
-        private static PixelInformaton RenderBitmap(Index1 index, Bitmap bitmap, Line lightRay, ArrayView<int> seedArray, int samples, int bounceLimit, ArrayView<Line> walls)
+        private static PixelInformaton RenderBitmap(Index1 index, Bitmap bitmap, Line lightRay, ArrayView<int> seedArray, int samples, int bounceLimit, ArrayView<Line> walls, ArrayView3D<int> gridData, Grid grid)
         {
             var pixelInformation = new PixelInformaton(); 
             for (int sampleId = 0; sampleId < samples; sampleId++)
@@ -138,8 +143,9 @@ namespace PTGI_Remastered
                 rayDirection.Multiply(10000);
 
                 lightRay.Destination.Add(rayDirection);
+
                 Line wallToIgnore = new Line();
-                var rayTraceResult = CUDA_TraceRay(index, seedArray, bitmap, bounceLimit, false, walls, lightRay, wallToIgnore);
+                var rayTraceResult = CUDA_TraceRay(index, seedArray, bitmap, bounceLimit, false, walls, lightRay, wallToIgnore, gridData, grid);
 
                 pixelInformation.pixelColor.Add(rayTraceResult.pixelColor);
             }
@@ -147,7 +153,7 @@ namespace PTGI_Remastered
         }
 
         private static RayTraceResult CUDA_TraceRay(Index1 index, ArrayView<int> seedArray, Bitmap bitmap, int bounceLimit, bool originDensitySwap,
-            ArrayView<Line> walls, Line lightRay, Line wallToIgnore)
+            ArrayView<Line> walls, Line lightRay, Line wallToIgnore, ArrayView3D<int> gridData, Grid grid)
         {
             var rayTraceResult = new RayTraceResult();
             rayTraceResult.pixelColor = new Color();
@@ -156,62 +162,40 @@ namespace PTGI_Remastered
             float reflectionAreaSize = 10;
             for (int bounceIndex = 0; bounceIndex < bounceLimit; bounceIndex++)
             {
-                float closestDistance = float.MaxValue;
-                Point intersectionPoint = new Point();
-                bool isClosestIntersectionLight = false;
-                var closestIntersectionObjectId = int.MaxValue;
-                var wallCollidedWith = new Line();
-
-                for(int i = 0; i < bitmap.WallsCount; i++)
-                {
-                    var rayWallIntersection = walls[i].GetIntersection(lightRay, wallToIgnore);
-                    if (rayWallIntersection.HasValue == 1)
-                    {
-                        var raySourceToWallIntersectionDistance = lightRay.Source.GetDistance(rayWallIntersection);
-                        if (raySourceToWallIntersectionDistance < closestDistance)
-                        {
-                            intersectionPoint = rayWallIntersection;
-                            closestDistance = raySourceToWallIntersectionDistance;
-                            isClosestIntersectionLight = walls[i].ObjectType == 2 ? true : false;
-                            wallCollidedWith = walls[i];
-                            wallCollidedWith.HasValue = 1;
-                        }
-                    }
-                }
-
-                if(wallCollidedWith.HasValue != 1)
+                var gridTraversalResult = grid.TraverseGrid(lightRay, bitmap.WallsCount, gridData, walls, wallToIgnore);
+                if (gridTraversalResult.IntesectedWall.HasValue != 1)
                 {
                     rayTraceResult.pixelColor.SetColor(0, 0, 0);
                     return rayTraceResult;
                 }
-                else if(isClosestIntersectionLight)
+                else if(gridTraversalResult.IsClosestIntersectionLight)
                 {
-                    rayTraceResult.pixelColor.TintWith(wallCollidedWith.Color, wallCollidedWith.EmissionStrength);
+                    rayTraceResult.pixelColor.TintWith(gridTraversalResult.IntesectedWall.Color, gridTraversalResult.IntesectedWall.EmissionStrength);
                     rayTraceResult.pixelColor.Rescale(255);
                     return rayTraceResult;
                 }
                 else
                 {
-                    if(lightRay.Source.IsEqualTo(intersectionPoint))
+                    if(lightRay.Source.IsEqualTo(gridTraversalResult.IntersectionPoint))
                     {
                         rayTraceResult.pixelColor.SetColor(0, 0, 0);
                         return rayTraceResult;
                     }
-                    wallToIgnore = wallCollidedWith;
+                    wallToIgnore = gridTraversalResult.IntesectedWall;
 
-                    var nextRayDirection = TraceRayUtility.NextRayDirection(index, seedArray, wallCollidedWith, wallToIgnore, lightRay.Source, intersectionPoint, reflectionAreaSize, originDensitySwap);
+                    var nextRayDirection = TraceRayUtility.NextRayDirection(index, seedArray, gridTraversalResult.IntesectedWall, wallToIgnore, lightRay.Source, gridTraversalResult.IntersectionPoint, reflectionAreaSize, originDensitySwap);
                     originDensitySwap = nextRayDirection.SwapDensity;
 
-                    if(wallCollidedWith.ReflectivnessType == 4)
+                    if(gridTraversalResult.IntesectedWall.ReflectivnessType == 4)
                     {
-                        rayTraceResult.pixelColor.Multiply(wallCollidedWith.Color.GetRescaled(255));
+                        rayTraceResult.pixelColor.Multiply(gridTraversalResult.IntesectedWall.Color.GetRescaled(255));
                     }
                     else
                     {
-                        rayTraceResult.pixelColor.Multiply(wallCollidedWith.Color.GetRescaled(255).GetRescaled(3.14159265359f));
+                        rayTraceResult.pixelColor.Multiply(gridTraversalResult.IntesectedWall.Color.GetRescaled(255).GetRescaled(XMath.PI));
                     }
 
-                    lightRay.Source = intersectionPoint;
+                    lightRay.Source = gridTraversalResult.IntersectionPoint;
                     lightRay.Destination = nextRayDirection.Destination;
                 }
             }

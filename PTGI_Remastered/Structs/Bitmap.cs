@@ -101,6 +101,7 @@ namespace PTGI_Remastered.Structs
         public int Width;
         public int Height;
         public int WallsCount;
+        public int GridSize;
 
         public void SetBitmapSettings(int Width, int Height, int wallsCount)
         {

@@ -22,12 +22,13 @@ namespace PTGI_Remastered.Structs
         public float EmissionStrength;
         public float Density;
 
-        public void Setup(Point Source, Point Destination)
+        public Line Setup(Point Source, Point Destination)
         {
             this.Source = Source;
             this.Destination = Destination;
             GetCoefficients();
             HasValue = 1;
+            return this;
         }
 
         private LineCoefficient GetCoefficients()
