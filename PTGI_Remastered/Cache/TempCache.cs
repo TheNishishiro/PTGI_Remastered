@@ -69,7 +69,7 @@ namespace PTGI_Remastered.Cache
 
             Parallel.For(0, bitmap.Size, (i) =>
             {
-                var point = PTGI_Math.GetRaySourceFromThreadIndex(bitmap, i);
+                var point = PTGI_Math.Convert1dIndexTo2d(bitmap, i);
                 TraceRayUtility.IsRayStartingInPolygon(point, renderSpecification.Objects, renderSpecification.SampleCount, ref cachePixels[i]);
             });
         }

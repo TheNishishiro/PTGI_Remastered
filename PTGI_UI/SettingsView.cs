@@ -14,6 +14,7 @@ namespace PTGI_UI
         public void Default()
         {
             UseCUDA = true;
+            UseDenoiser = false;
             DrawGrid = false;
             DrawObjectsOverline = true;
             RenderFlag_IgnoreObstacleInterior = true;
@@ -24,6 +25,7 @@ namespace PTGI_UI
             RenderHeightControlValue = "640";
             RenderWidthControlValue = "800";
             TerrariaWorldCellSizeControlValue = "32";
+            DenoiserKernelSizeControlValue = "9";
         }
 
         public void Save()
@@ -34,6 +36,7 @@ namespace PTGI_UI
         public bool UseCUDA { get; set; }
         public bool DrawGrid { get; set; }
         public bool DrawObjectsOverline { get; set; }
+        public bool UseDenoiser { get; set; }
         [JsonIgnore]
         public bool IsLivePreview { get; set; }
         public bool RenderFlag_IgnoreObstacleInterior { get; set; }
@@ -80,6 +83,14 @@ namespace PTGI_UI
                 return result;
             }
         }
+        public int DenoiserKernelSize
+        { 
+            get
+            {
+                int.TryParse(DenoiserKernelSizeControlValue, out int result);
+                return result;
+            }
+        }
         public Color ObjectColor { get; set; }
 
         public string BounceLimitControlValue { get; set; }
@@ -88,5 +99,6 @@ namespace PTGI_UI
         public string RenderHeightControlValue { get; set; }
         public string RenderWidthControlValue { get; set; }
         public string TerrariaWorldCellSizeControlValue { get; set; }
+        public string DenoiserKernelSizeControlValue { get; set; }
     }
 }

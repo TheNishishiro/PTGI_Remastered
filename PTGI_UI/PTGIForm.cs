@@ -1,5 +1,4 @@
-﻿using MaterialSkin;
-using MaterialSkin.Controls;
+﻿using MaterialSkin2DotNet;
 using Newtonsoft.Json;
 using PTGI_Remastered.Inputs;
 using PTGI_Remastered.Structs;
@@ -27,80 +26,7 @@ namespace PTGI_UI
         {
             InitializeComponent();
             Settings = new SettingsView();
-        }
-
-        private bool _isRendering = false;
-        public void PathTraceThread()
-        {
-            try
-            {
-                _isRendering = true;
-                var pathTraceResult = PathTracer.PathTraceRender(
-                    new RenderSpecification()
-                    {
-                        BounceLimit = Settings.BounceLimit,
-                        GpuId = GpuId,
-                        GridSize = Settings.GridDivider,
-                        UseCUDARenderer = Settings.UseCUDA,
-                        ImageHeight = Settings.RenderHeight,
-                        ImageWidth = Settings.RenderWidth,
-                        Objects = Polygons.ToArray(),
-                        SampleCount = Settings.SamplesPerPixel,
-                        IgnoreEnclosedPixels = Settings.RenderFlag_IgnoreObstacleInterior
-                    });
-               
-
-                this.Invoke(new MethodInvoker(delegate () {
-                    ShowPopupMessage($"Render/Process time: {pathTraceResult.RenderTime}/{pathTraceResult.ProcessTime - pathTraceResult.RenderTime} ms", 5);
-                    RenderedPictureBox.Size = new Size(Settings.RenderWidth, Settings.RenderHeight);
-                    RenderedPictureBox.BackgroundImage = ApplyBitmap(pathTraceResult);
-                }));
-            }
-            catch(Exception ex)
-            {
-                Settings.IsLivePreview = false;
-                this.Invoke(new MethodInvoker(delegate ()
-                {
-                    MessageBox.Show(this, ex.Message, "Render failed");
-                }));
-            }
-            _isRendering = false;
-        }
-
-        private Bitmap ApplyBitmap(RenderResult pathTraceResult)
-        {
-            Bitmap bmp = new Bitmap(Settings.RenderWidth, Settings.RenderHeight, PixelFormat.Format24bppRgb);
-            var rect = new Rectangle(0, 0, Settings.RenderWidth, Settings.RenderHeight);
-            var data = bmp.LockBits(rect, ImageLockMode.ReadWrite, bmp.PixelFormat);
-            var depth = Bitmap.GetPixelFormatSize(data.PixelFormat) / 8; //bytes per pixel
-
-            var buffer = new byte[data.Width * data.Height * depth];
-
-            //copy pixels to buffer
-            Marshal.Copy(data.Scan0, buffer, 0, buffer.Length);
-
-            Parallel.For(0, pathTraceResult.bitmap.Size, (i) =>
-            {
-                int row = i % Settings.RenderWidth;
-                int col = i / Settings.RenderWidth;
-                Color c = Color.FromArgb((int)(pathTraceResult.Pixels[i].R * 255.0), (int)(pathTraceResult.Pixels[i].G * 255.0), (int)(pathTraceResult.Pixels[i].B * 255.0));
-
-                Process(buffer, row, col, Settings.RenderWidth, depth, c);
-            });
-
-            //Copy the buffer back to image
-            Marshal.Copy(buffer, 0, data.Scan0, buffer.Length);
-
-            bmp.UnlockBits(data);
-            return bmp;
-        }
-
-        private void Process(byte[] buffer, int x, int y, int width, int depth, Color c)
-        {
-            var offset = ((y * width) + x) * depth;
-            buffer[offset + 0] = c.B;
-            buffer[offset + 1] = c.G;
-            buffer[offset + 2] = c.R;
+            pictureBox1.MouseWheel += pictureBox1_MouseWheel;
         }
 
         private void Form1_Load(object sender, EventArgs e)
@@ -116,15 +42,14 @@ namespace PTGI_UI
             materialSkinManager.Theme = MaterialSkinManager.Themes.DARK;
             materialSkinManager.ColorScheme = new ColorScheme(Primary.BlueGrey800, Primary.BlueGrey900, Primary.BlueGrey500, Accent.LightBlue200, TextShade.WHITE);
 
-            ControlExtension.Draggable(renderReportBox, true);
-            ControlExtension.Draggable(objectSpecificationCard, true);
-            ControlExtension.Draggable(renderingButtonsPanel, true);
-
             objectMaterialControl.Items.AddRange(Enum.GetNames(typeof(PTGI_Remastered.Utilities.PTGI_MaterialReflectivness)));
             objectMaterialControl.SelectedIndex = 0;
 
             PopupMessage = renderReportBox;
-            PopupMessageText = renderReportTime;
+            RenderTimeMessageText = renderReportTime;
+            ProcessTimeMessageText = processReportTime;
+            DenoiserTimeMessageText = denoiserReportTime;
+            TotalTimeMessageText = totalReportTime;
             RenderedPictureBox = pictureBox1;
             QueuedVerticiesList = verticiesListControl;
 
@@ -133,21 +58,15 @@ namespace PTGI_UI
             UpdateObjectSettings(null, null);
 
             PathTracer = new PTGI_Remastered.PTGI();
+            Denoiser = new PTGI_Denoiser.Denoiser();
             Polygons = new List<PTGI_Remastered.Structs.Polygon>();
-
+            ResetZoom();
 
             GpuId = null;
-            try
-            {
-                var gpus = PathTracer.GetAvaiableHardwareAccelerators().ToArray();
-                gpuSelectorControl.Items.AddRange(gpus);
-                gpuSelectorControl.DisplayMember = "Name";
-                gpuSelectorControl.ValueMember = "Id";
-            }
-            catch(Exception ex)
-            {
-
-            }
+            var gpus = PathTracer.GetAvaiableHardwareAccelerators().ToArray();
+            gpuSelectorControl.Items.AddRange(gpus);
+            gpuSelectorControl.DisplayMember = "Name";
+            gpuSelectorControl.ValueMember = "Id";
         }
 
         private void UpdateObjectSettings(object sender, EventArgs e)
@@ -163,7 +82,7 @@ namespace PTGI_UI
 
         private void startRenderButton_Click(object sender, EventArgs e)
         {
-            if (_isRendering)
+            if (IsRenderingInProgress)
                 return;
 
             var renderThread = new Thread(() => PathTraceThread());
@@ -194,7 +113,7 @@ namespace PTGI_UI
             if(mouseEvent.Button == MouseButtons.Left)
             {
                 var clickCoordinates = mouseEvent.Location;
-                QueuedVerticiesList.Items.Add($"{clickCoordinates.X};{clickCoordinates.Y}");
+                QueuedVerticiesList.Items.Add($"{clickCoordinates.X};{clickCoordinates.Y};{ZoomFactor}");
                 Refresh();
             }
             else if(mouseEvent.Button == MouseButtons.Right)
@@ -207,6 +126,13 @@ namespace PTGI_UI
         protected override void pictureBox1_Paint(object sender, PaintEventArgs e)
         {
             base.pictureBox1_Paint(sender, e);
+        }
+
+        private void pictureBox1_MouseWheel(object sender, MouseEventArgs e)
+        {
+            CurrentZoomDelta += e.Delta;
+            ZoomFactor = CurrentZoomDelta / (float)DefaultZoomDelta;
+            ZoomImage();
         }
 
         private void PTGIForm_KeyUp(object sender, KeyEventArgs e)
@@ -223,6 +149,12 @@ namespace PTGI_UI
             else if(e.KeyCode == Keys.Delete)
             {
                 DeleteObject();
+                Refresh();
+            }
+            else if(e.KeyCode == Keys.Space)
+            {
+                ResetZoom();
+                ZoomImage();
                 Refresh();
             }
         }
@@ -261,42 +193,7 @@ namespace PTGI_UI
         private void pictureBox1_MouseMove(object sender, MouseEventArgs e)
         {
             if (Settings.IsLivePreview)
-            {
-                PTGI_Remastered.Structs.Polygon polygon = new PTGI_Remastered.Structs.Polygon();
-                PTGI_Remastered.Structs.Color color = new PTGI_Remastered.Structs.Color();
-                color.SetColor(ObjectColor.R, ObjectColor.G, ObjectColor.B);
-
-                List<PTGI_Remastered.Structs.Point> Vertices = new List<PTGI_Remastered.Structs.Point>();
-
-                var verticies = new PTGI_Remastered.Structs.Point[]
-                {
-                new PTGI_Remastered.Structs.Point()
-                {
-                    X = e.X,
-                    Y = e.Y,
-                    HasValue = 1
-                },
-                new PTGI_Remastered.Structs.Point()
-                {
-                    X = e.X+5,
-                    Y = e.Y+5,
-                    HasValue = 1
-                }
-                };
-
-                polygon.Name = "MouseCursor";
-                polygon.Setup(verticies,
-                    IsObjectEmittingLight ? PTGI_Remastered.Utilities.PTGI_ObjectTypes.LightSource : PTGI_Remastered.Utilities.PTGI_ObjectTypes.Solid,
-                    (PTGI_Remastered.Utilities.PTGI_MaterialReflectivness)Enum.Parse(typeof(PTGI_Remastered.Utilities.PTGI_MaterialReflectivness), SelectedObjectMaterial),
-                    color,
-                    ObjectEmissionStrength,
-                    ObjectDensity);
-
-                Polygons.Add(polygon);
-                PathTraceThread();
-                Polygons.RemoveAll(x => x.Name == "MouseCursor");
-                RenderedPictureBox.Refresh();
-            }
+                RenderImageWithMouseAsLight(e.X, e.Y);
         }
 
         private void resetSceneButton_Click(object sender, EventArgs e)
@@ -307,6 +204,11 @@ namespace PTGI_UI
         private void buttonSaveSettings_Click(object sender, EventArgs e)
         {
             Settings.Save();
+        }
+
+        private void pictureBox1_MouseHover(object sender, EventArgs e)
+        {
+            pictureBox1.Focus();
         }
     }
 }

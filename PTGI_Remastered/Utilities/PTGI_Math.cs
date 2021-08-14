@@ -11,16 +11,20 @@ namespace PTGI_Remastered.Utilities
 {
     public class PTGI_Math
     {
-        public static Point GetRaySourceFromThreadIndex(Bitmap bitmap, int threadId)
+        public static Point Convert1dIndexTo2d(Bitmap bitmap, int threadId)
         {
-            // Convert 1D index to 2D index
-            int row = threadId % bitmap.Width;
             int col = threadId / bitmap.Width;
+            int row = threadId % bitmap.Width;
 
             
             Point raySource = new Point();
             raySource.SetCoords(row, col);
             return raySource;
+        }
+
+        public static int Convert2dIndexTo1d(float x, float y, Bitmap bitmap)
+        {
+            return (int)y * bitmap.Width + (int)x;
         }
 
         public static float Pow(float x, float y)

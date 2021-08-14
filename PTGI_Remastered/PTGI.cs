@@ -48,18 +48,6 @@ namespace PTGI_Remastered
             return gpus;
         }
 
-        /// <summary>
-        /// Prepares data and initiates path tracer 
-        /// </summary>
-        /// <param name="collisionObjects">World objects that light interacts with</param>
-        /// <param name="imageWidth">Render width</param>
-        /// <param name="imageHeight">Render height</param>
-        /// <param name="samples">Number of light samples per pixel</param>
-        /// <param name="bounceLimit">Max number of light bounces</param>
-        /// <param name="gridDivides">Number of columns</param>
-        /// <param name="UseCUDARenderer">Specified to use GPU for rendering</param>
-        /// <param name="GpuId">GPU to use for rendering</param>
-        /// <returns>Rendered result as RenderResult</returns>
         public RenderResult PathTraceRender(RenderSpecification renderSpecification)
         {
             Stopwatch processTimeStopwatch = new Stopwatch();
@@ -134,7 +122,7 @@ namespace PTGI_Remastered
                 if (pixels[index].Skip == 1)
                     return;
                 
-                Point raySource = PTGI_Math.GetRaySourceFromThreadIndex(bitmap, index);
+                Point raySource = PTGI_Math.Convert1dIndexTo2d(bitmap, index);
                 Line lightRay = new Line();
                 lightRay.Setup(raySource, new Point());
                 var pixelInformaton = RenderBitmap(index, bitmap, lightRay, seedArray, samples, bounceLimit, walls, gridData, grid);
