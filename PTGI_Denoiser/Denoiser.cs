@@ -1,4 +1,5 @@
 ﻿using ILGPU;
+using ILGPU.Algorithms;
 using ILGPU.Runtime;
 using PTGI_Denoiser.Cache;
 using PTGI_Remastered.Structs;
@@ -30,56 +31,60 @@ namespace PTGI_Denoiser
             _denoiserCache.WithAccelerator(denoiseRequest.GpuId, true);
             _denoiserCache.SetPixelBuffer(denoiseRequest.Pixels);
 
-            denoiseResult.Pixels = RunDenoiser(_denoiserCache.Accelerator, denoiseRequest.bitmap, _denoiserCache.PixelBuffer, denoiseRequest.KernelSize);
+            denoiseResult.Pixels = RunDenoiser(_denoiserCache.Accelerator, denoiseRequest.bitmap, _denoiserCache.PixelBuffer, denoiseRequest.KernelSize, denoiseRequest.IterationCount);
             denoiserTime.Stop();
             denoiseResult.DenoiseTime = denoiserTime.ElapsedMilliseconds;
 
             return denoiseResult;
         }
 
-        private Color[] RunDenoiser(Accelerator accelerator, Bitmap bitmap, MemoryBuffer<Color> pixels, int kernelSize)
+        private Color[] RunDenoiser(Accelerator accelerator, Bitmap bitmap, MemoryBuffer<Color> pixels, int kernelSize, int iterationCount)
         {
-            var denoiseKernel = accelerator.LoadAutoGroupedStreamKernel<
-                Index1, 
-                Bitmap, 
+            var meanDenoiseKernel = accelerator.LoadAutoGroupedStreamKernel<
+                Index1,
+                Bitmap,
                 ArrayView<Color>,
-                int>(DenoiseKernel);
+                int, int>(MeanDenoiseKernel);
 
-            denoiseKernel(pixels.Length, bitmap, pixels, kernelSize);
+
+            meanDenoiseKernel(pixels.Length, bitmap, pixels, kernelSize, iterationCount);
             accelerator.Synchronize();
+            
             return pixels.GetAsArray();
         }
 
-        private static void DenoiseKernel(Index1 index, Bitmap bitmap, ArrayView<Color> pixels, int kernelSize)
+        private static void MeanDenoiseKernel(Index1 index, Bitmap bitmap, ArrayView<Color> pixels, int kernelSize, int iterationCount)
         {
-            if (pixels[index].Skip == 1)
-                return;
-
-            var pixel2dCoords = PTGI_Math.Convert1dIndexTo2d(bitmap, index);
-            //if (pixel2dCoords.X - kernelSize < 0 || pixel2dCoords.Y - kernelSize < 0 || pixel2dCoords.X + kernelSize >= bitmap.Width || pixel2dCoords.Y + kernelSize >= bitmap.Height)
-            //    return;
-
-            var color = new Color();
-            color.SetColor(pixels[index], 1.0f);
-
-            float pixelsGathered = 1;
-            for(int x = -kernelSize; x <= kernelSize; x++)
+            for (int i = 0; i < iterationCount; i++)
             {
-                for(int y = -kernelSize; y <= kernelSize; y++)
+                if (pixels[index].Skip == 1)
+                    return;
+
+                var array = new List<int>();
+
+                var pixel2dCoords = PTGI_Math.Convert1dIndexTo2d(bitmap, index);
+                var color = new Color();
+                color.SetColor(pixels[index], 1.0f);
+
+                float pixelsGathered = 1;
+                for (int x = -kernelSize; x <= kernelSize; x++)
                 {
-                    if (x == 0 && y == 0)
-                        continue;
-                    if (pixel2dCoords.X + x < 0 || pixel2dCoords.Y + y < 0 || pixel2dCoords.X + x >= bitmap.Width || pixel2dCoords.Y + y >= bitmap.Height)
-                        continue;
-                    var pixel = pixels[PTGI_Math.Convert2dIndexTo1d(pixel2dCoords.X + x, pixel2dCoords.Y + y, bitmap)];
-                    if (pixel.Skip == 1)
-                        continue;
-                    color.Add(pixel);
-                    pixelsGathered++;
+                    for (int y = -kernelSize; y <= kernelSize; y++)
+                    {
+                        if (x == 0 && y == 0)
+                            continue;
+                        if (pixel2dCoords.X + x < 0 || pixel2dCoords.Y + y < 0 || pixel2dCoords.X + x >= bitmap.Width || pixel2dCoords.Y + y >= bitmap.Height)
+                            continue;
+                        var pixel = pixels[PTGI_Math.Convert2dIndexTo1d(pixel2dCoords.X + x, pixel2dCoords.Y + y, bitmap)];
+                        if (pixel.Skip == 1)
+                            continue;
+                        color.Add(pixel);
+                        pixelsGathered++;
+                    }
                 }
+                color.Rescale(pixelsGathered);
+                pixels[index].SetColor(color, 1.0f);
             }
-            color.Rescale(pixelsGathered);
-            pixels[index].SetColor(color, 1.0f);
         }
     }
 }

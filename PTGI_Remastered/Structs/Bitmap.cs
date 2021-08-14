@@ -1,6 +1,7 @@
 ﻿using ILGPU;
 using ILGPU.Algorithms;
 using ILGPU.Runtime;
+using PTGI_Remastered.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -89,6 +90,42 @@ namespace PTGI_Remastered.Structs
             R += color.R;
             G += color.G;
             B += color.B;
+        }
+
+        public float GetSimpleLuminance()
+        {
+            return XMath.Sqrt(0.299f * PTGI_Math.Pow(R, 2) + 0.587f * PTGI_Math.Pow(G, 2) + 0.114f * PTGI_Math.Pow(B, 2));
+        }
+
+        public float GetPerceivedLightness()
+        {
+            var luminance = GetLuminance();
+
+            if (luminance <= (216 / 24389))
+            {     
+                return luminance * (24389 / 27); 
+            }
+            else
+            {
+                return PTGI_Math.PowFloat(luminance, (1 / 3)) * 116 - 16;
+            }
+        }
+
+        public float GetLuminance()
+        {
+            return 0.2126f * SrgbToLin(R) + 0.7152f * SrgbToLin(G) + 0.0722f * SrgbToLin(B);
+        }
+
+        public float SrgbToLin(float colorChannel)
+        {
+            if (colorChannel <= 0.04045f)
+            {
+                return colorChannel / 12.92f;
+            }
+            else
+            {
+                return PTGI_Math.PowFloat(((colorChannel + 0.055f) / 1.055f), 2.4f);
+            }
         }
     }
 

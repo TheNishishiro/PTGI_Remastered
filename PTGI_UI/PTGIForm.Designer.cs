@@ -61,8 +61,10 @@ namespace PTGI_UI
             this.renderReportTime = new MaterialSkin2DotNet.Controls.MaterialLabel();
             this.tabPage2 = new System.Windows.Forms.TabPage();
             this.materialCard7 = new MaterialSkin2DotNet.Controls.MaterialCard();
-            this.denoiserKernelSize = new MaterialSkin2DotNet.Controls.MaterialTextBox();
+            this.materialTextBox1 = new MaterialSkin2DotNet.Controls.MaterialTextBox();
             this.settingsViewBindingSource = new System.Windows.Forms.BindingSource(this.components);
+            this.materialLabel17 = new MaterialSkin2DotNet.Controls.MaterialLabel();
+            this.denoiserKernelSize = new MaterialSkin2DotNet.Controls.MaterialTextBox();
             this.materialLabel16 = new MaterialSkin2DotNet.Controls.MaterialLabel();
             this.useDenoiserSwitch = new MaterialSkin2DotNet.Controls.MaterialSwitch();
             this.materialLabel15 = new MaterialSkin2DotNet.Controls.MaterialLabel();
@@ -606,6 +608,8 @@ namespace PTGI_UI
             // materialCard7
             // 
             this.materialCard7.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
+            this.materialCard7.Controls.Add(this.materialTextBox1);
+            this.materialCard7.Controls.Add(this.materialLabel17);
             this.materialCard7.Controls.Add(this.denoiserKernelSize);
             this.materialCard7.Controls.Add(this.materialLabel16);
             this.materialCard7.Controls.Add(this.useDenoiserSwitch);
@@ -619,6 +623,41 @@ namespace PTGI_UI
             this.materialCard7.Padding = new System.Windows.Forms.Padding(14);
             this.materialCard7.Size = new System.Drawing.Size(338, 933);
             this.materialCard7.TabIndex = 9;
+            // 
+            // materialTextBox1
+            // 
+            this.materialTextBox1.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.materialTextBox1.DataBindings.Add(new System.Windows.Forms.Binding("Text", this.settingsViewBindingSource, "DenoiserIterationCountControlValue", true));
+            this.materialTextBox1.Depth = 0;
+            this.materialTextBox1.Dock = System.Windows.Forms.DockStyle.Top;
+            this.materialTextBox1.Font = new System.Drawing.Font("Roboto", 16F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Pixel);
+            this.materialTextBox1.LeadingIcon = null;
+            this.materialTextBox1.Location = new System.Drawing.Point(14, 158);
+            this.materialTextBox1.MaxLength = 50;
+            this.materialTextBox1.MouseState = MaterialSkin2DotNet.MouseState.OUT;
+            this.materialTextBox1.Multiline = false;
+            this.materialTextBox1.Name = "materialTextBox1";
+            this.materialTextBox1.Size = new System.Drawing.Size(310, 50);
+            this.materialTextBox1.TabIndex = 17;
+            this.materialTextBox1.Text = "16";
+            this.materialTextBox1.TrailingIcon = null;
+            // 
+            // settingsViewBindingSource
+            // 
+            this.settingsViewBindingSource.DataSource = typeof(PTGI_UI.SettingsView);
+            // 
+            // materialLabel17
+            // 
+            this.materialLabel17.AutoSize = true;
+            this.materialLabel17.Depth = 0;
+            this.materialLabel17.Dock = System.Windows.Forms.DockStyle.Top;
+            this.materialLabel17.Font = new System.Drawing.Font("Roboto", 14F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Pixel);
+            this.materialLabel17.Location = new System.Drawing.Point(14, 139);
+            this.materialLabel17.MouseState = MaterialSkin2DotNet.MouseState.HOVER;
+            this.materialLabel17.Name = "materialLabel17";
+            this.materialLabel17.Size = new System.Drawing.Size(117, 19);
+            this.materialLabel17.TabIndex = 16;
+            this.materialLabel17.Text = "Denoiser passes";
             // 
             // denoiserKernelSize
             // 
@@ -637,10 +676,6 @@ namespace PTGI_UI
             this.denoiserKernelSize.TabIndex = 15;
             this.denoiserKernelSize.Text = "16";
             this.denoiserKernelSize.TrailingIcon = null;
-            // 
-            // settingsViewBindingSource
-            // 
-            this.settingsViewBindingSource.DataSource = typeof(PTGI_UI.SettingsView);
             // 
             // materialLabel16
             // 
@@ -1414,6 +1449,8 @@ namespace PTGI_UI
         private MaterialSkin2DotNet.Controls.MaterialLabel denoiserReportTime;
         private MaterialSkin2DotNet.Controls.MaterialLabel processReportTime;
         private MaterialSkin2DotNet.Controls.MaterialLabel totalReportTime;
+        private MaterialSkin2DotNet.Controls.MaterialTextBox materialTextBox1;
+        private MaterialSkin2DotNet.Controls.MaterialLabel materialLabel17;
     }
 }
 

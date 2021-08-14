@@ -115,7 +115,6 @@ namespace PTGI_Remastered.Structs
 
             if ((ignoredLine.HasValue == 1 && ignoredLine.IsEqualTo(this)) || WasChecked == 1)
                 return intersectionPoint;
-            //MarkAsCheckedForIntersection();
             float delta = (Source.X - Destination.X) * (intersectingLine.Source.Y - intersectingLine.Destination.Y) - (Source.Y - Destination.Y) * (intersectingLine.Source.X - intersectingLine.Destination.X);
             if(delta == 0)
                 return intersectionPoint;

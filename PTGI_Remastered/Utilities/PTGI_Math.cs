@@ -35,6 +35,11 @@ namespace PTGI_Remastered.Utilities
             return result;
         }
 
+        public static float PowFloat(float x, float y)
+        {
+            return XMath.Exp(y * XMath.Log(x, 10));
+        }
+
         public static float Modulo(float x, float y)
         {
             if (y == 0.0f ||

@@ -79,7 +79,8 @@ namespace PTGI_UI
                         bitmap = pathTraceResult.bitmap,
                         GpuId = GpuId,
                         Pixels = pathTraceResult.Pixels,
-                        KernelSize = Settings.DenoiserKernelSize
+                        KernelSize = Settings.DenoiserKernelSize,
+                        IterationCount = Settings.DenoiserIterationCount
                     });
                     pixels = denoiseResult.Pixels;
                 }
@@ -98,7 +99,12 @@ namespace PTGI_UI
                 Settings.IsLivePreview = false;
                 this.Invoke(new MethodInvoker(delegate ()
                 {
-                    MessageBox.Show(this, ex.Message, "Render failed");
+                    if (ex.InnerException == null)
+                        MessageBox.Show(this, ex.Message, "Render failed");
+                    else if (ex.InnerException.InnerException == null)
+                        MessageBox.Show(this, ex.InnerException.Message, "Render failed");
+                    else
+                        MessageBox.Show(this, ex.InnerException.InnerException.Message, "Render failed");
                 }));
             }
             IsRenderingInProgress = false;

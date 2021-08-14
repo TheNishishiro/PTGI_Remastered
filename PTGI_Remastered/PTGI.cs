@@ -117,18 +117,15 @@ namespace PTGI_Remastered
 
         private static void CUDA_StartRender(Index1 index, Bitmap bitmap, ArrayView<Color> pixels, ArrayView<int> seedArray, int samples, int bounceLimit, ArrayView<Line> walls, ArrayView3D<int> gridData, Grid grid)
         {
-            if (index < pixels.Length)
-            {
-                if (pixels[index].Skip == 1)
-                    return;
-                
-                Point raySource = PTGI_Math.Convert1dIndexTo2d(bitmap, index);
-                Line lightRay = new Line();
-                lightRay.Setup(raySource, new Point());
-                var pixelInformaton = RenderBitmap(index, bitmap, lightRay, seedArray, samples, bounceLimit, walls, gridData, grid);
+            if (pixels[index].Skip == 1)
+                return;
+            
+            Point raySource = PTGI_Math.Convert1dIndexTo2d(bitmap, index);
+            Line lightRay = new Line();
+            lightRay.Setup(raySource, new Point());
+            var pixelInformaton = RenderBitmap(index, bitmap, lightRay, seedArray, samples, bounceLimit, walls, gridData, grid);
 
-                bitmap.SetPixel(index, pixelInformaton.pixelColor, 1.0f / samples, pixels);
-            }
+            bitmap.SetPixel(index, pixelInformaton.pixelColor, 1.0f / samples, pixels);
         }
 
         private static PixelInformaton RenderBitmap(Index1 index, Bitmap bitmap, Line lightRay, ArrayView<int> seedArray, int samples, int bounceLimit, ArrayView<Line> walls, ArrayView3D<int> gridData, Grid grid)
