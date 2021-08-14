@@ -56,20 +56,21 @@ namespace PTGI_Denoiser
                 return;
 
             var pixel2dCoords = PTGI_Math.Convert1dIndexTo2d(bitmap, index);
-            if (pixel2dCoords.X - kernelSize < 0 || pixel2dCoords.Y - kernelSize < 0 || pixel2dCoords.X + kernelSize >= bitmap.Width || pixel2dCoords.Y + kernelSize >= bitmap.Height)
-                return;
+            //if (pixel2dCoords.X - kernelSize < 0 || pixel2dCoords.Y - kernelSize < 0 || pixel2dCoords.X + kernelSize >= bitmap.Width || pixel2dCoords.Y + kernelSize >= bitmap.Height)
+            //    return;
 
             var color = new Color();
             color.SetColor(pixels[index], 1.0f);
 
-            float pixelsGathered = 0;
+            float pixelsGathered = 1;
             for(int x = -kernelSize; x <= kernelSize; x++)
             {
                 for(int y = -kernelSize; y <= kernelSize; y++)
                 {
                     if (x == 0 && y == 0)
                         continue;
-
+                    if (pixel2dCoords.X + x < 0 || pixel2dCoords.Y + y < 0 || pixel2dCoords.X + x >= bitmap.Width || pixel2dCoords.Y + y >= bitmap.Height)
+                        continue;
                     var pixel = pixels[PTGI_Math.Convert2dIndexTo1d(pixel2dCoords.X + x, pixel2dCoords.Y + y, bitmap)];
                     if (pixel.Skip == 1)
                         continue;
@@ -77,7 +78,7 @@ namespace PTGI_Denoiser
                     pixelsGathered++;
                 }
             }
-            color.Rescale(++pixelsGathered);
+            color.Rescale(pixelsGathered);
             pixels[index].SetColor(color, 1.0f);
         }
     }
