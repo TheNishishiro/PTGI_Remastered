@@ -70,7 +70,7 @@ namespace PTGI_Remastered.Cache
             Parallel.For(0, bitmap.Size, (i) =>
             {
                 var point = PTGI_Math.Convert1dIndexTo2d(bitmap, i);
-                TraceRayUtility.IsRayStartingInPolygon(point, renderSpecification.Objects, renderSpecification.SampleCount, ref cachePixels[i]);
+                TraceRayUtility.IsRayStartingInPolygon(point, renderSpecification.Objects, ref cachePixels[i]);
             });
         }
 
@@ -117,7 +117,7 @@ namespace PTGI_Remastered.Cache
             }
             GridDataBuffer.CopyFrom(gridLocalData, LongIndex3.Zero, Index3.Zero, GridDataBuffer.Extent);
         }
-
+        
         public void Finalize()
         {
             _updatePixelBuffer = false;
@@ -126,32 +126,28 @@ namespace PTGI_Remastered.Cache
         private void AllocatePixelBuffer(int size)
         {
             _pixelBufferLength = size;
-            if (PixelBuffer != null)
-                PixelBuffer.Dispose();
+            PixelBuffer?.Dispose();
             PixelBuffer = Accelerator.Allocate<Color>(size);
         }
 
         private void AllocateSeedBuffer(int size)
         {
             _pixelBufferLength = size;
-            if (SeedBuffer != null)
-                SeedBuffer.Dispose();
+            SeedBuffer?.Dispose();
             SeedBuffer = Accelerator.Allocate<int>(size);
         }
 
         private void AllocateWallBuffer(int size)
         {
             _wallBufferLength = size;
-            if (WallBuffer != null)
-                WallBuffer.Dispose();
+            WallBuffer?.Dispose();
             WallBuffer = Accelerator.Allocate<Line>(size);
         }
 
         private void AllocateGridDataBuffer(Line[] walls, Bitmap bitmap, int gridSize)
         {
             _gridDivderBufferSize = gridSize;
-            if (GridDataBuffer != null)
-                GridDataBuffer.Dispose();
+            GridDataBuffer?.Dispose();
 
             GridCached = GridCached.Create(bitmap, gridSize);
             gridLocalData = GridCached.CPU_FillGrid(walls);

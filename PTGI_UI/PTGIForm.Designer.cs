@@ -37,6 +37,7 @@ namespace PTGI_UI
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
             this.panel3 = new System.Windows.Forms.Panel();
             this.renderingButtonsPanel = new MaterialSkin2DotNet.Controls.MaterialCard();
+            this.materialButton1 = new MaterialSkin2DotNet.Controls.MaterialButton();
             this.resetSceneButton = new MaterialSkin2DotNet.Controls.MaterialButton();
             this.loadSceneButton = new MaterialSkin2DotNet.Controls.MaterialButton();
             this.saveSceneButton = new MaterialSkin2DotNet.Controls.MaterialButton();
@@ -99,6 +100,7 @@ namespace PTGI_UI
             this.materialLabel14 = new MaterialSkin2DotNet.Controls.MaterialLabel();
             this.materialLabel8 = new MaterialSkin2DotNet.Controls.MaterialLabel();
             this.materialCard6 = new MaterialSkin2DotNet.Controls.MaterialCard();
+            this.generateRandomSceneButton = new MaterialSkin2DotNet.Controls.MaterialButton();
             this.minecraftWorldGeneration = new MaterialSkin2DotNet.Controls.MaterialButton();
             this.tabPage4 = new System.Windows.Forms.TabPage();
             this.materialCard5 = new MaterialSkin2DotNet.Controls.MaterialCard();
@@ -213,6 +215,7 @@ namespace PTGI_UI
             // 
             this.renderingButtonsPanel.AutoScroll = true;
             this.renderingButtonsPanel.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
+            this.renderingButtonsPanel.Controls.Add(this.materialButton1);
             this.renderingButtonsPanel.Controls.Add(this.resetSceneButton);
             this.renderingButtonsPanel.Controls.Add(this.loadSceneButton);
             this.renderingButtonsPanel.Controls.Add(this.saveSceneButton);
@@ -241,7 +244,7 @@ namespace PTGI_UI
             this.resetSceneButton.Margin = new System.Windows.Forms.Padding(4, 60, 4, 6);
             this.resetSceneButton.MouseState = MaterialSkin2DotNet.MouseState.HOVER;
             this.resetSceneButton.Name = "resetSceneButton";
-            this.resetSceneButton.Size = new System.Drawing.Size(285, 36);
+            this.resetSceneButton.Size = new System.Drawing.Size(268, 36);
             this.resetSceneButton.TabIndex = 8;
             this.resetSceneButton.Text = "Clear scene";
             this.resetSceneButton.Type = MaterialSkin2DotNet.Controls.MaterialButton.MaterialButtonType.Contained;
@@ -261,7 +264,7 @@ namespace PTGI_UI
             this.loadSceneButton.Margin = new System.Windows.Forms.Padding(4, 60, 4, 6);
             this.loadSceneButton.MouseState = MaterialSkin2DotNet.MouseState.HOVER;
             this.loadSceneButton.Name = "loadSceneButton";
-            this.loadSceneButton.Size = new System.Drawing.Size(285, 36);
+            this.loadSceneButton.Size = new System.Drawing.Size(268, 36);
             this.loadSceneButton.TabIndex = 7;
             this.loadSceneButton.Text = "Load scene";
             this.loadSceneButton.Type = MaterialSkin2DotNet.Controls.MaterialButton.MaterialButtonType.Contained;
@@ -281,7 +284,7 @@ namespace PTGI_UI
             this.saveSceneButton.Margin = new System.Windows.Forms.Padding(4, 60, 4, 6);
             this.saveSceneButton.MouseState = MaterialSkin2DotNet.MouseState.HOVER;
             this.saveSceneButton.Name = "saveSceneButton";
-            this.saveSceneButton.Size = new System.Drawing.Size(285, 36);
+            this.saveSceneButton.Size = new System.Drawing.Size(268, 36);
             this.saveSceneButton.TabIndex = 6;
             this.saveSceneButton.Text = "Save scene";
             this.saveSceneButton.Type = MaterialSkin2DotNet.Controls.MaterialButton.MaterialButtonType.Contained;
@@ -301,7 +304,7 @@ namespace PTGI_UI
             this.saveRenderButton.Margin = new System.Windows.Forms.Padding(4, 60, 4, 6);
             this.saveRenderButton.MouseState = MaterialSkin2DotNet.MouseState.HOVER;
             this.saveRenderButton.Name = "saveRenderButton";
-            this.saveRenderButton.Size = new System.Drawing.Size(285, 36);
+            this.saveRenderButton.Size = new System.Drawing.Size(268, 36);
             this.saveRenderButton.TabIndex = 5;
             this.saveRenderButton.Text = "Save rendered image";
             this.saveRenderButton.Type = MaterialSkin2DotNet.Controls.MaterialButton.MaterialButtonType.Contained;
@@ -321,7 +324,7 @@ namespace PTGI_UI
             this.startRenderButton.Margin = new System.Windows.Forms.Padding(4, 6, 4, 60);
             this.startRenderButton.MouseState = MaterialSkin2DotNet.MouseState.HOVER;
             this.startRenderButton.Name = "startRenderButton";
-            this.startRenderButton.Size = new System.Drawing.Size(285, 36);
+            this.startRenderButton.Size = new System.Drawing.Size(268, 36);
             this.startRenderButton.TabIndex = 4;
             this.startRenderButton.Text = "Render";
             this.startRenderButton.Type = MaterialSkin2DotNet.Controls.MaterialButton.MaterialButtonType.Contained;
@@ -1123,7 +1126,7 @@ namespace PTGI_UI
             this.deleteVerticie.Type = MaterialSkin2DotNet.Controls.MaterialButton.MaterialButtonType.Contained;
             this.deleteVerticie.UseAccentColor = true;
             this.deleteVerticie.UseVisualStyleBackColor = true;
-            this.deleteVerticie.Click += new System.EventHandler(this.deleteVerticie_Click);
+            this.deleteVerticie.Click += new System.EventHandler(this.deleteVertices_Click);
             // 
             // tabPage5
             // 
@@ -1198,6 +1201,7 @@ namespace PTGI_UI
             // materialCard6
             // 
             this.materialCard6.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
+            this.materialCard6.Controls.Add(this.generateRandomSceneButton);
             this.materialCard6.Controls.Add(this.minecraftWorldGeneration);
             this.materialCard6.Depth = 0;
             this.materialCard6.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(222)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))));
@@ -1209,19 +1213,38 @@ namespace PTGI_UI
             this.materialCard6.Size = new System.Drawing.Size(297, 438);
             this.materialCard6.TabIndex = 4;
             // 
+            // generateRandomSceneButton
+            // 
+            this.generateRandomSceneButton.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+            this.generateRandomSceneButton.Density = MaterialSkin2DotNet.Controls.MaterialButton.MaterialButtonDensity.Default;
+            this.generateRandomSceneButton.Depth = 0;
+            this.generateRandomSceneButton.HighEmphasis = true;
+            this.generateRandomSceneButton.Icon = null;
+            this.generateRandomSceneButton.Location = new System.Drawing.Point(36, 69);
+            this.generateRandomSceneButton.Margin = new System.Windows.Forms.Padding(4, 6, 4, 6);
+            this.generateRandomSceneButton.MouseState = MaterialSkin2DotNet.MouseState.HOVER;
+            this.generateRandomSceneButton.Name = "generateRandomSceneButton";
+            this.generateRandomSceneButton.Size = new System.Drawing.Size(210, 36);
+            this.generateRandomSceneButton.TabIndex = 7;
+            this.generateRandomSceneButton.Text = "Generate random scene";
+            this.generateRandomSceneButton.Type = MaterialSkin2DotNet.Controls.MaterialButton.MaterialButtonType.Contained;
+            this.generateRandomSceneButton.UseAccentColor = false;
+            this.generateRandomSceneButton.UseVisualStyleBackColor = true;
+            this.generateRandomSceneButton.Click += new System.EventHandler(this.generateRandomSceneButton_Click);
+            // 
             // minecraftWorldGeneration
             // 
             this.minecraftWorldGeneration.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
             this.minecraftWorldGeneration.Density = MaterialSkin2DotNet.Controls.MaterialButton.MaterialButtonDensity.Default;
             this.minecraftWorldGeneration.Depth = 0;
-            this.minecraftWorldGeneration.Dock = System.Windows.Forms.DockStyle.Top;
             this.minecraftWorldGeneration.HighEmphasis = true;
             this.minecraftWorldGeneration.Icon = null;
-            this.minecraftWorldGeneration.Location = new System.Drawing.Point(14, 14);
-            this.minecraftWorldGeneration.Margin = new System.Windows.Forms.Padding(4, 6, 4, 6);
+            this.minecraftWorldGeneration.Location = new System.Drawing.Point(36, 17);
+            this.minecraftWorldGeneration.Margin = new System.Windows.Forms.Padding(4, 6, 4, 10);
             this.minecraftWorldGeneration.MouseState = MaterialSkin2DotNet.MouseState.HOVER;
             this.minecraftWorldGeneration.Name = "minecraftWorldGeneration";
-            this.minecraftWorldGeneration.Size = new System.Drawing.Size(269, 36);
+            this.minecraftWorldGeneration.Padding = new System.Windows.Forms.Padding(5);
+            this.minecraftWorldGeneration.Size = new System.Drawing.Size(221, 36);
             this.minecraftWorldGeneration.TabIndex = 6;
             this.minecraftWorldGeneration.Text = "Generate terraria world";
             this.minecraftWorldGeneration.Type = MaterialSkin2DotNet.Controls.MaterialButton.MaterialButtonType.Contained;
@@ -1451,6 +1474,8 @@ namespace PTGI_UI
         private MaterialSkin2DotNet.Controls.MaterialLabel totalReportTime;
         private MaterialSkin2DotNet.Controls.MaterialTextBox materialTextBox1;
         private MaterialSkin2DotNet.Controls.MaterialLabel materialLabel17;
+        private MaterialSkin2DotNet.Controls.MaterialButton generateRandomSceneButton;
+        private MaterialSkin2DotNet.Controls.MaterialButton materialButton1;
     }
 }
 

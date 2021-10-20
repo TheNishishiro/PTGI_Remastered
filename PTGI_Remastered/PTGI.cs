@@ -50,7 +50,7 @@ namespace PTGI_Remastered
 
         public RenderResult PathTraceRender(RenderSpecification renderSpecification)
         {
-            Stopwatch processTimeStopwatch = new Stopwatch();
+            var processTimeStopwatch = new Stopwatch();
             processTimeStopwatch.Start();
             var walls = renderSpecification.GetWalls();
             var renderResult = new RenderResult();
@@ -156,8 +156,8 @@ namespace PTGI_Remastered
             rayTraceResult.pixelColor = new Color();
             rayTraceResult.pixelColor.SetColor(1, 1, 1);
 
-            float reflectionAreaSize = 10;
-            for (int bounceIndex = 0; bounceIndex < bounceLimit; bounceIndex++)
+            const float reflectionAreaSize = 10;
+            for (var bounceIndex = 0; bounceIndex < bounceLimit; bounceIndex++)
             {
                 var gridTraversalResult = grid.TraverseGrid(lightRay, bitmap.WallsCount, gridData, walls, wallToIgnore);
                 if (gridTraversalResult.IntesectedWall.HasValue != 1)
@@ -190,6 +190,12 @@ namespace PTGI_Remastered
                     else
                     {
                         rayTraceResult.pixelColor.Multiply(gridTraversalResult.IntesectedWall.Color.GetRescaled(255).GetRescaled(XMath.PI));
+                    }
+
+                    if (rayTraceResult.pixelColor.IsDim())
+                    {
+                        rayTraceResult.pixelColor.SetColor(0, 0, 0);
+                        return rayTraceResult;
                     }
 
                     lightRay.Source = gridTraversalResult.IntersectionPoint;

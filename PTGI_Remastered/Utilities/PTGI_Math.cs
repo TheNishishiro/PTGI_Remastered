@@ -13,11 +13,10 @@ namespace PTGI_Remastered.Utilities
     {
         public static Point Convert1dIndexTo2d(Bitmap bitmap, int threadId)
         {
-            int col = threadId / bitmap.Width;
-            int row = threadId % bitmap.Width;
+            var col = threadId / bitmap.Width;
+            var row = threadId % bitmap.Width;
 
-            
-            Point raySource = new Point();
+            var raySource = new Point();
             raySource.SetCoords(row, col);
             return raySource;
         }
@@ -26,11 +25,11 @@ namespace PTGI_Remastered.Utilities
         {
             return (int)y * bitmap.Width + (int)x;
         }
-
+        
         public static float Pow(float x, float y)
         {
             float result = 1;
-            for (int i = 0; i < y; i++)
+            for (var i = 0; i < y; i++)
                 result *= x;
             return result;
         }

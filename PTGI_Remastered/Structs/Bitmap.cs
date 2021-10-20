@@ -16,6 +16,7 @@ namespace PTGI_Remastered.Structs
         public float R;
         public float G;
         public float B;
+        public float Luminocity;
         public byte Skip;
 
         public void SetColor(float R, float G, float B)
@@ -30,6 +31,7 @@ namespace PTGI_Remastered.Structs
             R = color.R * mixFactor;
             G = color.G * mixFactor;
             B = color.B * mixFactor;
+            Luminocity = color.Luminocity;
         }
 
         public void TintWith(Color color, float mixFactor)
@@ -92,9 +94,14 @@ namespace PTGI_Remastered.Structs
             B += color.B;
         }
 
-        public float GetSimpleLuminance()
+        public bool Compare(Color color)
         {
-            return XMath.Sqrt(0.299f * PTGI_Math.Pow(R, 2) + 0.587f * PTGI_Math.Pow(G, 2) + 0.114f * PTGI_Math.Pow(B, 2));
+            return R <= color.R && G <= color.G && B <= color.B;
+        }
+
+        public void CalculateSimpleLuminance()
+        {
+            Luminocity = XMath.Sqrt(0.299f * PTGI_Math.Pow(R, 2) + 0.587f * PTGI_Math.Pow(G, 2) + 0.114f * PTGI_Math.Pow(B, 2));
         }
 
         public float GetPerceivedLightness()
@@ -126,6 +133,11 @@ namespace PTGI_Remastered.Structs
             {
                 return PTGI_Math.PowFloat(((colorChannel + 0.055f) / 1.055f), 2.4f);
             }
+        }
+
+        public bool IsDim()
+        {
+            return R < 0.01f && B < 0.01f && G < 0.01f;
         }
     }
 
