@@ -50,26 +50,26 @@ namespace PTGI_Remastered.Utilities
         {
             const int a = 1103515245;
             const int c = 12345;
-            var m = (int)PTGI_Math.Pow(2, 31);
+            var m = (int)MathF.Pow(2, 31);
 
             seed[index] = (a * xn + c) % m;
 
-            return XMath.Abs((float)seed[index] / (float)m);
+            return IntrinsicMath.Abs((float)seed[index] / (float)m);
         }
 
         public static float GetRandomBetween(Index1D index, ArrayView1D<int, Stride1D.Dense> seed, float minimum, float maximum)
         {
-            var random = GetRandom(index, seed, seed[index]);
+            var random =  GetRandom(index, seed, seed[index]);
             return random * (maximum - minimum) + minimum;
         }
 
         public static Point GetPointInRadius(Index1D index, ArrayView1D<int, Stride1D.Dense> seed, float radius)
         {
-            var distance = GetRandomBetween(index, seed, 0, XMath.Floor(radius));
+            var distance = GetRandomBetween(index, seed, 0, MathF.Floor(radius));
             var angleInRadians = GetRandomBetween(index, seed, 0, 360) / (2 * 3.14f);
 
             var pointInRadius = new Point();
-            pointInRadius.SetCoords(distance * XMath.Cos(angleInRadians), distance * XMath.Sin(angleInRadians));
+            pointInRadius.SetCoords(distance * MathF.Cos(angleInRadians), distance * MathF.Sin(angleInRadians));
 
             return pointInRadius;
         }

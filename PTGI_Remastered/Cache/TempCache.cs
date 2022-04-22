@@ -4,6 +4,7 @@ using ILGPU.Backends.OpenCL;
 using ILGPU.Runtime;
 using ILGPU.Runtime.CPU;
 using ILGPU.Runtime.Cuda;
+using ILGPU.Algorithms;
 using PTGI_Remastered.Inputs;
 using PTGI_Remastered.Structs;
 using PTGI_Remastered.Utilities;
@@ -36,7 +37,8 @@ namespace PTGI_Remastered.Cache
 
         public void WithContext()
         {
-            Context ??= Context.Create().Optimize(OptimizationLevel.O2).Cuda().ToContext();
+            // TODO: Bring back CPU support
+            Context ??= Context.Create().EnableAlgorithms().Math(MathMode.Fast32BitOnly).Optimize(OptimizationLevel.O2).Cuda().ToContext();
         }
 
         public void WithAccelerator(int deviceId, bool useCudaRenderer)
