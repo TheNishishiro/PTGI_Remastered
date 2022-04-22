@@ -50,7 +50,7 @@ namespace PTGI_UI
             Polygons = new List<PTGI_Remastered.Structs.Polygon>();
             ResetZoom();
 
-            GpuId = null;
+            GpuId = 0;
             var gpus = PathTracer.GetAvaiableHardwareAccelerators().ToArray();
             gpuSelectorControl.Items.AddRange(gpus);
             gpuSelectorControl.DisplayMember = "Name";

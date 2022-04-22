@@ -29,7 +29,7 @@ namespace PTGI_Denoiser
             var denoiseResult = new DenoiseResult();
 
             _denoiserCache.WithContext();
-            _denoiserCache.WithAccelerator(denoiseRequest.GpuId, true);
+            _denoiserCache.WithAccelerator(denoiseRequest.DeviceId, true);
             _denoiserCache.SetPixelBuffer(denoiseRequest.Pixels);
 
             denoiseResult.Pixels = RunDenoiser(_denoiserCache.Accelerator, denoiseRequest.bitmap, _denoiserCache.PixelBuffer, denoiseRequest.KernelSize, denoiseRequest.IterationCount);
@@ -39,18 +39,18 @@ namespace PTGI_Denoiser
             return denoiseResult;
         }
 
-        private Color[] RunDenoiser(Accelerator accelerator, Bitmap bitmap, MemoryBuffer<Color> pixels, int kernelSize, int iterationCount)
+        private Color[] RunDenoiser(Accelerator accelerator, Bitmap bitmap, MemoryBuffer1D<Color, Stride1D.Dense> pixels, int kernelSize, int iterationCount)
         {
             var denoiseKernel = accelerator.LoadAutoGroupedStreamKernel<
-                Index1,
+                Index1D,
                 Bitmap,
-                ArrayView<Color>,
+                ArrayView1D<Color, Stride1D.Dense>,
                 int, int>(MeanDenoiser.MeanDenoiseKernel);
 
-            denoiseKernel(pixels.Length, bitmap, pixels, kernelSize, iterationCount);
+            denoiseKernel((int)pixels.Length, bitmap, pixels.View, kernelSize, iterationCount);
             accelerator.Synchronize();
             
-            return pixels.GetAsArray();
+            return pixels.AsContiguous().GetAsArray();
         }
 
         

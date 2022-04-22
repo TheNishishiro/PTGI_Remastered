@@ -32,12 +32,12 @@ namespace PTGI_Remastered.Structs
                 throw new Exception("Not enough verticies to construct rectangle");
 
             Walls = new Line[4];
-            Point topLeft = Verticies[0];
-            Point bottomRight = Verticies[1];
+            var topLeft = Verticies[0];
+            var bottomRight = Verticies[1];
 
-            Point topRight = new Point();
+            var topRight = new Point();
             topRight.SetCoords(bottomRight.X, topLeft.Y);
-            Point bottomLeft = new Point();
+            var bottomLeft = new Point();
             bottomLeft.SetCoords(topLeft.X, bottomRight.Y);
 
             Walls[0].Setup(topLeft, topRight);
@@ -74,7 +74,7 @@ namespace PTGI_Remastered.Structs
 
         public void CreateWalls(Point[] Verticies)
         {
-            int verticiesCount = Verticies.Length;
+            var verticiesCount = Verticies.Length;
             if (verticiesCount < 3)
                 throw new Exception("Not enough verticies to construct polygon");
 
@@ -91,28 +91,26 @@ namespace PTGI_Remastered.Structs
 
         public Point GetIntersectionPoint(Line line, Line wallToIgnore)
         {
-            Point intersectionPoint = new Point();
+            var intersectionPoint = new Point();
             intersectionPoint.HasValue = 0;
 
-            float closestDistance = float.MaxValue;
-            int wallsCount = Walls.Count();
+            var closestDistance = float.MaxValue;
+            var wallsCount = Walls.Count();
 
-            for(int wallIndex = 0; wallIndex < wallsCount; wallIndex++)
+            for(var wallIndex = 0; wallIndex < wallsCount; wallIndex++)
             {
                 if (Walls[wallIndex].WasChecked == 1 || (wallToIgnore.HasValue == 1 && Walls[wallIndex].IsEqualTo(wallToIgnore)))
                     continue;
 
-                Point newIntersection = Walls[wallIndex].GetIntersection(line, wallToIgnore);
-                if(newIntersection.HasValue == 1)
-                {
-                    float distance = line.Source.GetDistance(newIntersection);
-                    if(closestDistance > distance)
-                    {
-                        intersectionPoint = newIntersection;
-                        closestDistance = distance;
-                        LastWallIntersectedIndex = wallIndex;
-                    }
-                }
+                var newIntersection = Walls[wallIndex].GetIntersection(line, wallToIgnore);
+                if (newIntersection.HasValue != 1) continue;
+                
+                var distance = line.Source.GetDistance(newIntersection);
+                if (!(closestDistance > distance)) continue;
+                
+                intersectionPoint = newIntersection;
+                closestDistance = distance;
+                LastWallIntersectedIndex = wallIndex;
             }
 
             return intersectionPoint;

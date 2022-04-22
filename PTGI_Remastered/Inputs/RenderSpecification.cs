@@ -22,17 +22,7 @@ namespace PTGI_Remastered.Inputs
         public int GridSize { get; set; }
         public bool UseCUDARenderer { get; set; }
         public bool IgnoreEnclosedPixels { get; set; }
-        public AcceleratorId GpuId { get; set; }
-
-        public Accelerator GetAccelerator(Context context)
-        {
-            if (GpuId != null)
-                return Accelerator.Create(context, GpuId);
-            else if (UseCUDARenderer)
-                return new CudaAccelerator(context);
-            else
-                return new CPUAccelerator(context);
-        }
+        public int DeviceId { get; set; }
 
         public Line[] GetWalls()
         {

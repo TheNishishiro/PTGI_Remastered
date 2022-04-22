@@ -22,18 +22,18 @@ namespace PTGI_Remastered.Structs
         public float EmissionStrength;
         public float Density;
 
-        public Line Setup(Point Source, Point Destination)
+        public Line Setup(Point source, Point destination)
         {
-            this.Source = Source;
-            this.Destination = Destination;
-            GetCoefficients();
+            Source = source;
+            Destination = destination;
+            Coefficient = GetCoefficients();
             HasValue = 1;
             return this;
         }
 
         private LineCoefficient GetCoefficients()
         {
-            LineCoefficient lineComponents = new LineCoefficient();
+            var lineComponents = new LineCoefficient();
 
             lineComponents.A = (Destination.Y - Source.Y) / (Destination.X - Source.X);
             lineComponents.B = Source.Y - lineComponents.A * Source.X;
@@ -58,10 +58,10 @@ namespace PTGI_Remastered.Structs
 
         public LineNormals GetNormals()
         {
-            float dx = Destination.X - Source.X;
-            float dy = Destination.Y - Source.Y;
+            var dx = Destination.X - Source.X;
+            var dy = Destination.Y - Source.Y;
 
-            LineNormals lineNormals = new LineNormals();
+            var lineNormals = new LineNormals();
             lineNormals.NormalDown = new Point();
             lineNormals.NormalDown.SetCoords(-dy, dx);
 
@@ -78,7 +78,7 @@ namespace PTGI_Remastered.Structs
 
         private LineNormals MoveNormalsRelative(LineNormals lineNormals, Point intersection, float reflectionArea)
         {
-            LineNormals movedLineNormals = new LineNormals();
+            var movedLineNormals = new LineNormals();
             movedLineNormals.NormalDown = lineNormals.NormalDown.MultiplyNew(reflectionArea).AddNew(intersection);
             movedLineNormals.NormalUp = lineNormals.NormalUp.MultiplyNew(reflectionArea).AddNew(intersection);
 
@@ -89,15 +89,12 @@ namespace PTGI_Remastered.Structs
         {
             var lineNormals = GetNormals().Normalize();
             var lineShiftedNormals = MoveNormalsRelative(lineNormals, intersection, reflectionArea);
-            if (source.GetDistance(lineShiftedNormals.NormalDown) <= source.GetDistance(lineShiftedNormals.NormalUp))
-                return lineShiftedNormals.NormalDown;
-            else
-                return lineShiftedNormals.NormalUp;
+            return source.GetDistance(lineShiftedNormals.NormalDown) <= source.GetDistance(lineShiftedNormals.NormalUp) ? lineShiftedNormals.NormalDown : lineShiftedNormals.NormalUp;
         }
 
         public Point GetDirection()
         {
-            Point point = new Point();
+            var point = new Point();
             point.SetCoords(Destination.X, Destination.Y);
             point.Substract(Source);
             return point;
@@ -111,16 +108,16 @@ namespace PTGI_Remastered.Structs
         /// <returns>if point exists return point with HasValue set to true</returns>
         public Point GetIntersection(Line intersectingLine, Line ignoredLine)
         {
-            Point intersectionPoint = new Point();
+            var intersectionPoint = new Point();
 
             if ((ignoredLine.HasValue == 1 && ignoredLine.IsEqualTo(this)) || WasChecked == 1)
                 return intersectionPoint;
-            float delta = (Source.X - Destination.X) * (intersectingLine.Source.Y - intersectingLine.Destination.Y) - (Source.Y - Destination.Y) * (intersectingLine.Source.X - intersectingLine.Destination.X);
+            var delta = (Source.X - Destination.X) * (intersectingLine.Source.Y - intersectingLine.Destination.Y) - (Source.Y - Destination.Y) * (intersectingLine.Source.X - intersectingLine.Destination.X);
             if(delta == 0)
                 return intersectionPoint;
 
-            float t = ((Source.X - intersectingLine.Source.X) * (intersectingLine.Source.Y - intersectingLine.Destination.Y) - (Source.Y - intersectingLine.Source.Y) * (intersectingLine.Source.X - intersectingLine.Destination.X)) / delta;
-            float u = -((Source.X - Destination.X) * (Source.Y - intersectingLine.Source.Y) - (Source.Y - Destination.Y) * (Source.X - intersectingLine.Source.X)) / delta;
+            var t = ((Source.X - intersectingLine.Source.X) * (intersectingLine.Source.Y - intersectingLine.Destination.Y) - (Source.Y - intersectingLine.Source.Y) * (intersectingLine.Source.X - intersectingLine.Destination.X)) / delta;
+            var u = -((Source.X - Destination.X) * (Source.Y - intersectingLine.Source.Y) - (Source.Y - Destination.Y) * (Source.X - intersectingLine.Source.X)) / delta;
 
             if(t >= 0 && t <= 1 && u >= 0 && u <= 1)
             {

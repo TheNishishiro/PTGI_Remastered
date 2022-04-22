@@ -25,7 +25,7 @@ namespace PTGI_Remastered.Structs
 
         public Point SubstractNew(Point point)
         {
-            Point newPoint = new Point();
+            var newPoint = new Point();
             newPoint.SetCoords(X - point.X, Y - point.Y);
 
             return newPoint;
@@ -38,7 +38,7 @@ namespace PTGI_Remastered.Structs
 
         public Point AddNew(Point point)
         {
-            Point newPoint = new Point();
+            var newPoint = new Point();
             newPoint.SetCoords(X + point.X, Y + point.Y);
 
             return newPoint;
@@ -51,7 +51,7 @@ namespace PTGI_Remastered.Structs
 
         public Point MultiplyNew(float factor)
         {
-            Point newPoint = new Point();
+            var newPoint = new Point();
             newPoint.SetCoords(X * factor, Y * factor);
 
             return newPoint;
@@ -64,7 +64,7 @@ namespace PTGI_Remastered.Structs
 
         public Point MultiplyNew(Point point)
         {
-            Point newPoint = new Point();
+            var newPoint = new Point();
             newPoint.SetCoords(X * point.X, Y * point.Y);
 
             return newPoint;
@@ -93,7 +93,7 @@ namespace PTGI_Remastered.Structs
 
         public Point GetNormalized()
         {
-            Point newPoint = new Point();
+            var newPoint = new Point();
             var length = X * X + Y * Y;
             newPoint.SetCoords(X / XMath.Sqrt(length), Y / XMath.Sqrt(length));
             return newPoint;
@@ -116,7 +116,7 @@ namespace PTGI_Remastered.Structs
 
         public bool LiesInLine(Line line)
         {
-            float epsilon = 0.001f;
+            const float epsilon = 0.001f;
             return XMath.Abs(Y - (line.Coefficient.A * X + line.Coefficient.B)) < epsilon;
         }
 
@@ -141,18 +141,15 @@ namespace PTGI_Remastered.Structs
         
         private bool LiesInPolygon(Polygon obstacle)
         {
-            bool result = false;
-            int verticiesCount = obstacle.Verticies.Length;
-            int j = verticiesCount - 1;
+            var result = false;
+            var verticiesCount = obstacle.Verticies.Length;
+            var j = verticiesCount - 1;
 
-            for (int i = 0; i < verticiesCount; i++)
+            for (var i = 0; i < verticiesCount; i++)
             {
-                if (obstacle.Verticies[i].Y < Y && obstacle.Verticies[j].Y >= Y || obstacle.Verticies[j].Y < Y && obstacle.Verticies[i].Y >= Y)
+                if ((obstacle.Verticies[i].Y < Y && obstacle.Verticies[j].Y >= Y || obstacle.Verticies[j].Y < Y && obstacle.Verticies[i].Y >= Y) && obstacle.Verticies[i].X + (Y - obstacle.Verticies[i].Y) / (obstacle.Verticies[j].Y - obstacle.Verticies[i].Y) * (obstacle.Verticies[j].X - obstacle.Verticies[i].X) < X)
                 {
-                    if (obstacle.Verticies[i].X + (Y - obstacle.Verticies[i].Y) / (obstacle.Verticies[j].Y - obstacle.Verticies[i].Y) * (obstacle.Verticies[j].X - obstacle.Verticies[i].X) < X)
-                    {
-                        result = !result;
-                    }
+                    result = !result;
                 }
                 j = i;
             }

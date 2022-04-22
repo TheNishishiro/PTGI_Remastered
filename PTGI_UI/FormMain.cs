@@ -23,7 +23,7 @@ namespace PTGI_UI
         protected PTGI_Denoiser.Denoiser Denoiser { get; set; }
         protected PTGI_Remastered.PTGI PathTracer { get; set; }
         protected SettingsView Settings { get; set; }
-        protected AcceleratorId GpuId { get; set; }
+        protected int GpuId { get; set; }
         protected int popupTime { get; set; } = 0;
         protected List<PTGI_Remastered.Structs.Polygon> Polygons { get; set; }
 
@@ -60,7 +60,7 @@ namespace PTGI_UI
                     renderSpecification = new RenderSpecification()
                     {
                         BounceLimit = Settings.BounceLimit,
-                        GpuId = GpuId,
+                        DeviceId = 0,
                         GridSize = Settings.GridDivider,
                         UseCUDARenderer = Settings.UseCUDA,
                         ImageHeight = Settings.RenderHeight,
@@ -81,7 +81,7 @@ namespace PTGI_UI
                     denoiseResult = Denoiser.Denoise(new PTGI_Denoiser.DenoiseRequest()
                     {
                         bitmap = pathTraceResult.bitmap,
-                        GpuId = GpuId,
+                        DeviceId = 0,
                         Pixels = pathTraceResult.Pixels,
                         KernelSize = Settings.DenoiserKernelSize,
                         IterationCount = Settings.DenoiserIterationCount

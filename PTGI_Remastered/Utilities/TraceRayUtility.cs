@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using ILGPU.Runtime;
 
 namespace PTGI_Remastered.Utilities
 {
@@ -26,7 +27,7 @@ namespace PTGI_Remastered.Utilities
     public class TraceRayUtility
     {
         
-        public static NextRay NextRayDirection(Index1 index, ArrayView<int> seedArray, Line collisionObject, Line wallToIgnore, Point raySource, Point intersection, float reflectionArea, bool swapDensity)
+        public static NextRay NextRayDirection(Index1D index, ArrayView1D<int, Stride1D.Dense> seedArray, Line collisionObject, Line wallToIgnore, Point raySource, Point intersection, float reflectionArea, bool swapDensity)
         {
             const float reflectFromGlassChanceThreshold = 0.15f;
             const int directionRayOffset = 1000;
@@ -48,7 +49,7 @@ namespace PTGI_Remastered.Utilities
         }
 
         
-        private static NextRay ProcessRough(Index1 index, ArrayView<int> seedArray, float directionRayOffset, Point closestNormal, Point intersection, bool swapDensity)
+        private static NextRay ProcessRough(Index1D index, ArrayView1D<int, Stride1D.Dense> seedArray, float directionRayOffset, Point closestNormal, Point intersection, bool swapDensity)
         {
             var nextRay = new NextRay();
 
@@ -89,7 +90,7 @@ namespace PTGI_Remastered.Utilities
         }
 
         
-        private static NextRay ProcessSemiRough(Index1 index, ArrayView<int> seedArray, float directionRayOffset, Point closestNormal, Point raySource, Point intersection, float reflectionArea, bool swapDensity)
+        private static NextRay ProcessSemiRough(Index1D index, ArrayView1D<int, Stride1D.Dense> seedArray, float directionRayOffset, Point closestNormal, Point raySource, Point intersection, float reflectionArea, bool swapDensity)
         {
             var nextRay = new NextRay();
             nextRay = ProcessSmooth(closestNormal, directionRayOffset, raySource, intersection, swapDensity);

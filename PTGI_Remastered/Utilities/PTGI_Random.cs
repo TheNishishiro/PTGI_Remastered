@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using ILGPU.Runtime;
 
 namespace PTGI_Remastered.Utilities
 {
@@ -17,63 +18,57 @@ namespace PTGI_Remastered.Utilities
 
         public static int Next()
         {
-            Random inst = _local;
-            if (inst == null)
-            {
-                int seed;
-                lock (_global) seed = _global.Next();
-                _local = inst = new Random(seed);
-            }
+            var inst = _local;
+            if (inst != null) return inst.Next();
+            int seed;
+            lock (_global) seed = _global.Next();
+            _local = inst = new Random(seed);
             return inst.Next();
         }
 
         public static int Next(int x, int y)
         {
-            Random inst = _local;
-            if (inst == null)
-            {
-                int seed;
-                lock (_global) seed = _global.Next();
-                _local = inst = new Random(seed);
-            }
+            var inst = _local;
+            if (inst != null) return inst.Next(x, y);
+            int seed;
+            lock (_global) seed = _global.Next();
+            _local = inst = new Random(seed);
             return inst.Next(x, y);
         }
 
         public static float Nextfloat()
         {
-            Random inst = _local;
-            if (inst == null)
-            {
-                int seed;
-                lock (_global) seed = _global.Next();
-                _local = inst = new Random(seed);
-            }
+            var inst = _local;
+            if (inst != null) return (float) inst.NextDouble();
+            int seed;
+            lock (_global) seed = _global.Next();
+            _local = inst = new Random(seed);
             return (float)inst.NextDouble();
         }
 
-        public static float GetRandom(Index1 index, ArrayView<int> seed, int Xn)
+        public static float GetRandom(Index1D index, ArrayView1D<int, Stride1D.Dense> seed, int xn)
         {
-            int a = 1103515245;
-            int c = 12345;
-            int m = (int)PTGI_Math.Pow(2, 31);
+            const int a = 1103515245;
+            const int c = 12345;
+            var m = (int)PTGI_Math.Pow(2, 31);
 
-            seed[index] = (a * Xn + c) % m;
+            seed[index] = (a * xn + c) % m;
 
             return XMath.Abs((float)seed[index] / (float)m);
         }
 
-        public static float GetRandomBetween(Index1 index, ArrayView<int> seed, float minimum, float maximum)
+        public static float GetRandomBetween(Index1D index, ArrayView1D<int, Stride1D.Dense> seed, float minimum, float maximum)
         {
-            float random = GetRandom(index, seed, seed[index]);
+            var random = GetRandom(index, seed, seed[index]);
             return random * (maximum - minimum) + minimum;
         }
 
-        public static Point GetPointInRadius(Index1 index, ArrayView<int> seed, float radius)
+        public static Point GetPointInRadius(Index1D index, ArrayView1D<int, Stride1D.Dense> seed, float radius)
         {
-            float distance = GetRandomBetween(index, seed, 0, XMath.Floor(radius));
-            float angleInRadians = GetRandomBetween(index, seed, 0, 360) / (2 * 3.14f);
+            var distance = GetRandomBetween(index, seed, 0, XMath.Floor(radius));
+            var angleInRadians = GetRandomBetween(index, seed, 0, 360) / (2 * 3.14f);
 
-            Point pointInRadius = new Point();
+            var pointInRadius = new Point();
             pointInRadius.SetCoords(distance * XMath.Cos(angleInRadians), distance * XMath.Sin(angleInRadians));
 
             return pointInRadius;

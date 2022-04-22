@@ -19,11 +19,11 @@ namespace PTGI_Remastered.Structs
         public float Luminocity;
         public byte Skip;
 
-        public void SetColor(float R, float G, float B)
+        public void SetColor(float r, float g, float b)
         {
-            this.R = R;
-            this.G = G;
-            this.B = B;
+            R = r;
+            G = g;
+            B = b;
         }
 
         public void SetColor(Color color, float mixFactor)
@@ -75,7 +75,7 @@ namespace PTGI_Remastered.Structs
 
         public Color GetRescaled(float factor)
         {
-            Color newColor = new Color();
+            var newColor = new Color();
             newColor.SetColor(R / factor, G / factor, B / factor);
             return newColor;
         }
@@ -108,13 +108,13 @@ namespace PTGI_Remastered.Structs
         {
             var luminance = GetLuminance();
 
-            if (luminance <= (216 / 24389))
+            if (luminance <= (216.0f / 24389.0f))
             {     
-                return luminance * (24389 / 27); 
+                return luminance * (24389.0f / 27.0f); 
             }
             else
             {
-                return PTGI_Math.PowFloat(luminance, (1 / 3)) * 116 - 16;
+                return PTGI_Math.PowFloat(luminance, (1.0f / 3.0f)) * 116 - 16;
             }
         }
 
@@ -152,15 +152,15 @@ namespace PTGI_Remastered.Structs
         public int WallsCount;
         public int GridSize;
 
-        public void SetBitmapSettings(int Width, int Height, int wallsCount)
+        public void SetBitmapSettings(int width, int height, int wallsCount)
         {
-            this.Width = Width;
-            this.Height = Height;
-            Size = Width * Height;
+            this.Width = width;
+            this.Height = height;
+            Size = width * height;
             WallsCount = wallsCount;
         }
 
-        public void SetPixel(int id, Color pixelColor, float gammaCorrectionScale, ArrayView<Color> pixels)
+        public void SetPixel(int id, Color pixelColor, float gammaCorrectionScale, ArrayView1D<Color, Stride1D.Dense> pixels)
         {
             pixelColor.ApplyGammaCorrection(gammaCorrectionScale);
             pixelColor.Clip();

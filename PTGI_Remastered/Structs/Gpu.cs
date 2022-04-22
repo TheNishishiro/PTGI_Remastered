@@ -9,7 +9,7 @@ namespace PTGI_Remastered.Structs
 {
     public class Gpu
     {
-        public AcceleratorId Id { get; set; }
+        public int Id { get; set; }
         public string Name { get; set; }
     }
 }

@@ -27,7 +27,7 @@ namespace PTGI_Remastered.Structs
             StructType = new PTGI_StructTypes[PolygonCount];
             ObjectTypes = new PTGI_ObjectTypes[PolygonCount];
 
-            for (int i = 0; i < PolygonCount; i++)
+            for (var i = 0; i < PolygonCount; i++)
             {
                 walls[i] = collisionObjects[i].Walls;
                 verticies[i] = collisionObjects[i].Verticies;
@@ -42,7 +42,7 @@ namespace PTGI_Remastered.Structs
         }
         public void CUDA_Copy(Polygon[] CUDAcollisionObjects, Line[][] walls, Point[][] verticies)
         {
-            for (int i = 0; i < PolygonCount; i++)
+            for (var i = 0; i < PolygonCount; i++)
             {
                 CUDAcollisionObjects[i] = new Polygon();
                 CUDAcollisionObjects[i].Walls = walls[i];

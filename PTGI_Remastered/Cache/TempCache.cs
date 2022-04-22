@@ -1,4 +1,5 @@
-﻿using ILGPU;
+﻿using System.Linq;
+using ILGPU;
 using ILGPU.Backends.OpenCL;
 using ILGPU.Runtime;
 using ILGPU.Runtime.CPU;
@@ -16,10 +17,10 @@ namespace PTGI_Remastered.Cache
         public Context Context { get; private set; }
         public Accelerator Accelerator { get; private set; }
         
-        public MemoryBuffer<Color> PixelBuffer { get; set; }
-        public MemoryBuffer<int> SeedBuffer { get; set; }
-        public MemoryBuffer<Line> WallBuffer { get; set; }
-        public MemoryBuffer3D<int> GridDataBuffer { get; set; }
+        public MemoryBuffer1D<Color, Stride1D.Dense> PixelBuffer { get; set; }
+        public MemoryBuffer1D<int, Stride1D.Dense> SeedBuffer { get; set; }
+        public MemoryBuffer1D<Line, Stride1D.Dense> WallBuffer { get; set; }
+        public MemoryBuffer3D<int, Stride3D.DenseXY> GridDataBuffer { get; set; }
         public Grid GridCached { get; set; }
        
         private int _pixelBufferLength;
@@ -35,21 +36,17 @@ namespace PTGI_Remastered.Cache
 
         public void WithContext()
         {
-            if (Context == null)
-                Context = new Context(ContextFlags.Force32BitFloats, ILGPU.IR.Transformations.OptimizationLevel.O2);
+            Context ??= Context.Create().Optimize(OptimizationLevel.O2).Cuda().ToContext();
         }
 
-        public void WithAccelerator(AcceleratorId GpuId, bool UseCudaRenderer)
+        public void WithAccelerator(int deviceId, bool useCudaRenderer)
         {
-            if (Accelerator == null)
-            {
-                if (GpuId != null)
-                    Accelerator = Accelerator.Create(Context, GpuId);
-                else if (UseCudaRenderer)
-                    Accelerator = new CudaAccelerator(Context);
-                else
-                    Accelerator = new CPUAccelerator(Context);
-            }
+            if (Accelerator != null) return;
+            
+            if (useCudaRenderer)
+                Accelerator = Context.CreateCudaAccelerator(deviceId);
+            else
+                Accelerator = Context.CreateCPUAccelerator(deviceId);
         }
 
         public void WithEnclosureDetection(Bitmap bitmap, RenderSpecification renderSpecification)
@@ -79,17 +76,16 @@ namespace PTGI_Remastered.Cache
         {
             if (_pixelBufferLength != cachePixels.Length || PixelBuffer == null || _updatePixelBuffer)
                 AllocatePixelBuffer(cachePixels.Length);
-            PixelBuffer.CopyFrom(cachePixels, 0, Index1.Zero, cachePixels.Length);
+            PixelBuffer.CopyFromCPU(cachePixels);
         }
         
         public void SetSeedBuffer(int bitmapSize)
         {
-            if (_pixelBufferLength != bitmapSize || SeedBuffer == null || _updatePixelBuffer)
-            {
-                var seed = GenerateRandomSeed(bitmapSize);
-                AllocateSeedBuffer(seed.Length);
-                SeedBuffer.CopyFrom(seed, 0, Index1.Zero, seed.Length);
-            }
+            if (_pixelBufferLength == bitmapSize && SeedBuffer != null && !_updatePixelBuffer) return;
+            
+            var seed = GenerateRandomSeed(bitmapSize);
+            AllocateSeedBuffer(seed.Length);
+            SeedBuffer.CopyFromCPU(seed);
         }
 
         private int[] GenerateRandomSeed(int bitmapSize)
@@ -106,7 +102,7 @@ namespace PTGI_Remastered.Cache
         {
             if (_wallBufferLength != walls.Length || WallBuffer == null)
                 AllocateWallBuffer(walls.Length);
-            WallBuffer.CopyFrom(walls, 0, Index1.Zero, walls.Length);
+            WallBuffer.CopyFromCPU(walls);
         }
 
         public void SetGridDataBuffer(Line[] walls, Bitmap bitmap, int gridSize)
@@ -115,7 +111,7 @@ namespace PTGI_Remastered.Cache
             {
                 AllocateGridDataBuffer(walls, bitmap, gridSize);
             }
-            GridDataBuffer.CopyFrom(gridLocalData, LongIndex3.Zero, Index3.Zero, GridDataBuffer.Extent);
+            GridDataBuffer.CopyFromCPU(gridLocalData);
         }
         
         public void Finalize()
@@ -127,21 +123,21 @@ namespace PTGI_Remastered.Cache
         {
             _pixelBufferLength = size;
             PixelBuffer?.Dispose();
-            PixelBuffer = Accelerator.Allocate<Color>(size);
+            PixelBuffer = Accelerator.Allocate1D<Color>(size);
         }
 
         private void AllocateSeedBuffer(int size)
         {
             _pixelBufferLength = size;
             SeedBuffer?.Dispose();
-            SeedBuffer = Accelerator.Allocate<int>(size);
+            SeedBuffer = Accelerator.Allocate1D<int>(size);
         }
 
         private void AllocateWallBuffer(int size)
         {
             _wallBufferLength = size;
             WallBuffer?.Dispose();
-            WallBuffer = Accelerator.Allocate<Line>(size);
+            WallBuffer = Accelerator.Allocate1D<Line>(size);
         }
 
         private void AllocateGridDataBuffer(Line[] walls, Bitmap bitmap, int gridSize)
@@ -151,7 +147,7 @@ namespace PTGI_Remastered.Cache
 
             GridCached = GridCached.Create(bitmap, gridSize);
             gridLocalData = GridCached.CPU_FillGrid(walls);
-            GridDataBuffer = Accelerator.Allocate<int>(gridLocalData);
+            GridDataBuffer = Accelerator.Allocate3DDenseXY<int>(gridLocalData);
         }
     }
 }
