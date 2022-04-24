@@ -3,8 +3,11 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading;
 using System.Windows.Forms;
+using PTGI_Remastered.Structs;
+using PTGI_Remastered.Utilities;
 
 namespace PTGI_UI
 {
@@ -50,11 +53,13 @@ namespace PTGI_UI
             Polygons = new List<PTGI_Remastered.Structs.Polygon>();
             ResetZoom();
 
-            GpuId = 0;
-            var gpus = PathTracer.GetAvaiableHardwareAccelerators().ToArray();
+            var gpus = PathTracer.GetAvailableHardwareAccelerators().ToArray();
             gpuSelectorControl.Items.AddRange(gpus);
             gpuSelectorControl.DisplayMember = "Name";
-            gpuSelectorControl.ValueMember = "Id";
+
+            var savedSelection = gpus.FirstOrDefault(x => x.Id == Settings.DeviceId && x.AcceleratorType == Settings.AcceleratorType);
+            if (savedSelection is not null)
+                gpuSelectorControl.SelectedItem = savedSelection;
         }
 
         private void UpdateObjectSettings(object sender, EventArgs e)
@@ -189,6 +194,13 @@ namespace PTGI_UI
         private void generateRandomSceneButton_Click(object sender, EventArgs e)
         {
             GenerateScene();
+        }
+
+        private void gpuSelectorControl_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            var selectedGpu = (Gpu)gpuSelectorControl.SelectedItem;
+            Settings.DeviceId = selectedGpu.Id;
+            Settings.AcceleratorType = selectedGpu.AcceleratorType;
         }
     }
 }

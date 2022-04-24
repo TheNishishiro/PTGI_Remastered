@@ -1,4 +1,6 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
+using System.Threading;
 using ILGPU;
 using ILGPU.Backends.OpenCL;
 using ILGPU.Runtime;
@@ -9,6 +11,7 @@ using PTGI_Remastered.Inputs;
 using PTGI_Remastered.Structs;
 using PTGI_Remastered.Utilities;
 using System.Threading.Tasks;
+using ILGPU.Runtime.OpenCL;
 using Grid = PTGI_Remastered.Structs.Grid;
 
 namespace PTGI_Remastered.Cache
@@ -30,30 +33,37 @@ namespace PTGI_Remastered.Cache
         private int _gridDividerBufferSize;
         private bool _updatePixelBuffer;
         private bool _previousEnclousureOptionState;
-        private bool? _previouslyUsedCudaRenderer;
+        private AcceleratorType _previouslyUsedAccelerator;
         private int _previouslyDeviceId;
         private bool _isLiveDisplay = true; // TODO: constantly update?
 
         private Color[] cachePixels; 
         private int[] gridLocalData { get; set; }
 
-        public void WithContext(int deviceId, bool useCudaRenderer)
+        public void WithContext(int deviceId, AcceleratorType acceleratorType)
         {
-            if (_previouslyUsedCudaRenderer == useCudaRenderer && _previouslyDeviceId == deviceId) return;
+            if (_previouslyUsedAccelerator == acceleratorType && _previouslyDeviceId == deviceId) return;
 
-            _previouslyUsedCudaRenderer = useCudaRenderer;
+            _previouslyUsedAccelerator = acceleratorType;
             _previouslyDeviceId = deviceId;
             ResetBuffers();
             var contextBuilder = Context.Create().EnableAlgorithms().Math(MathMode.Fast32BitOnly).Optimize(OptimizationLevel.O2);
-            if (useCudaRenderer)
+            switch (acceleratorType)
             {
-                Context = contextBuilder.Cuda().ToContext();
-                Accelerator = Context.CreateCudaAccelerator(deviceId);
-            }
-            else
-            {
-                Context = contextBuilder.CPU().ToContext();
-                Accelerator = Context.CreateCPUAccelerator(deviceId);
+                case AcceleratorType.Cuda:
+                    Context = contextBuilder.Cuda().ToContext();
+                    Accelerator = Context.CreateCudaAccelerator(deviceId);
+                    break;
+                case AcceleratorType.CPU:
+                    Context = contextBuilder.CPU().ToContext();
+                    Accelerator = Context.CreateCPUAccelerator(deviceId, CPUAcceleratorMode.Auto, ThreadPriority.Highest);
+                    break;
+                case AcceleratorType.OpenCL:
+                    Context = contextBuilder.OpenCL().ToContext();
+                    Accelerator = Context.CreateCudaAccelerator(deviceId);
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(acceleratorType), acceleratorType, null);
             }
         }
 

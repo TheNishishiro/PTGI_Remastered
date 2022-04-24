@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using ILGPU.Runtime;
 
 namespace PTGI_UI
 {
@@ -13,7 +14,8 @@ namespace PTGI_UI
     {
         public void Default()
         {
-            UseCUDA = true;
+            AcceleratorType = AcceleratorType.Cuda;
+            DeviceId = 0;
             UseDenoiser = false;
             DrawGrid = false;
             DrawObjectsOverline = true;
@@ -34,7 +36,8 @@ namespace PTGI_UI
             File.WriteAllText(@".\settings.json", JsonConvert.SerializeObject(this));
         }
 
-        public bool UseCUDA { get; set; }
+        public int DeviceId { get; set; }
+        public AcceleratorType AcceleratorType { get; set; }
         public bool DrawGrid { get; set; }
         public bool DrawObjectsOverline { get; set; }
         public bool UseDenoiser { get; set; }

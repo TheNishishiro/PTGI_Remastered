@@ -86,7 +86,6 @@ namespace PTGI_UI
             this.materialLabel6 = new MaterialSkin2DotNet.Controls.MaterialLabel();
             this.isLiveRenderSwitch = new MaterialSkin2DotNet.Controls.MaterialSwitch();
             this.renderFlagIgnoreObstacleInteriors = new MaterialSkin2DotNet.Controls.MaterialSwitch();
-            this.useCudaCheckbox = new MaterialSkin2DotNet.Controls.MaterialSwitch();
             this.materialLabel1 = new MaterialSkin2DotNet.Controls.MaterialLabel();
             this.tabPage3 = new System.Windows.Forms.TabPage();
             this.materialCard4 = new MaterialSkin2DotNet.Controls.MaterialCard();
@@ -165,6 +164,7 @@ namespace PTGI_UI
             // tabPage1
             // 
             this.tabPage1.AutoScroll = true;
+            this.tabPage1.BackColor = System.Drawing.Color.White;
             this.tabPage1.Controls.Add(this.panel2);
             this.tabPage1.Controls.Add(this.panel3);
             this.tabPage1.Location = new System.Drawing.Point(4, 24);
@@ -173,7 +173,6 @@ namespace PTGI_UI
             this.tabPage1.Size = new System.Drawing.Size(1344, 962);
             this.tabPage1.TabIndex = 0;
             this.tabPage1.Text = "Render view";
-            this.tabPage1.UseVisualStyleBackColor = true;
             // 
             // panel2
             // 
@@ -232,6 +231,23 @@ namespace PTGI_UI
             this.renderingButtonsPanel.Size = new System.Drawing.Size(313, 204);
             this.renderingButtonsPanel.TabIndex = 6;
             // 
+            // materialButton1
+            // 
+            this.materialButton1.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+            this.materialButton1.Density = MaterialSkin2DotNet.Controls.MaterialButton.MaterialButtonDensity.Default;
+            this.materialButton1.Depth = 0;
+            this.materialButton1.HighEmphasis = true;
+            this.materialButton1.Icon = null;
+            this.materialButton1.Location = new System.Drawing.Point(0, 0);
+            this.materialButton1.Margin = new System.Windows.Forms.Padding(4, 6, 4, 6);
+            this.materialButton1.MouseState = MaterialSkin2DotNet.MouseState.HOVER;
+            this.materialButton1.Name = "materialButton1";
+            this.materialButton1.NoAccentTextColor = System.Drawing.Color.Empty;
+            this.materialButton1.Size = new System.Drawing.Size(64, 36);
+            this.materialButton1.TabIndex = 0;
+            this.materialButton1.Type = MaterialSkin2DotNet.Controls.MaterialButton.MaterialButtonType.Contained;
+            this.materialButton1.UseAccentColor = false;
+            // 
             // resetSceneButton
             // 
             this.resetSceneButton.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
@@ -244,7 +260,8 @@ namespace PTGI_UI
             this.resetSceneButton.Margin = new System.Windows.Forms.Padding(4, 60, 4, 6);
             this.resetSceneButton.MouseState = MaterialSkin2DotNet.MouseState.HOVER;
             this.resetSceneButton.Name = "resetSceneButton";
-            this.resetSceneButton.Size = new System.Drawing.Size(268, 36);
+            this.resetSceneButton.NoAccentTextColor = System.Drawing.Color.Empty;
+            this.resetSceneButton.Size = new System.Drawing.Size(285, 36);
             this.resetSceneButton.TabIndex = 8;
             this.resetSceneButton.Text = "Clear scene";
             this.resetSceneButton.Type = MaterialSkin2DotNet.Controls.MaterialButton.MaterialButtonType.Contained;
@@ -264,7 +281,8 @@ namespace PTGI_UI
             this.loadSceneButton.Margin = new System.Windows.Forms.Padding(4, 60, 4, 6);
             this.loadSceneButton.MouseState = MaterialSkin2DotNet.MouseState.HOVER;
             this.loadSceneButton.Name = "loadSceneButton";
-            this.loadSceneButton.Size = new System.Drawing.Size(268, 36);
+            this.loadSceneButton.NoAccentTextColor = System.Drawing.Color.Empty;
+            this.loadSceneButton.Size = new System.Drawing.Size(285, 36);
             this.loadSceneButton.TabIndex = 7;
             this.loadSceneButton.Text = "Load scene";
             this.loadSceneButton.Type = MaterialSkin2DotNet.Controls.MaterialButton.MaterialButtonType.Contained;
@@ -284,7 +302,8 @@ namespace PTGI_UI
             this.saveSceneButton.Margin = new System.Windows.Forms.Padding(4, 60, 4, 6);
             this.saveSceneButton.MouseState = MaterialSkin2DotNet.MouseState.HOVER;
             this.saveSceneButton.Name = "saveSceneButton";
-            this.saveSceneButton.Size = new System.Drawing.Size(268, 36);
+            this.saveSceneButton.NoAccentTextColor = System.Drawing.Color.Empty;
+            this.saveSceneButton.Size = new System.Drawing.Size(285, 36);
             this.saveSceneButton.TabIndex = 6;
             this.saveSceneButton.Text = "Save scene";
             this.saveSceneButton.Type = MaterialSkin2DotNet.Controls.MaterialButton.MaterialButtonType.Contained;
@@ -304,7 +323,8 @@ namespace PTGI_UI
             this.saveRenderButton.Margin = new System.Windows.Forms.Padding(4, 60, 4, 6);
             this.saveRenderButton.MouseState = MaterialSkin2DotNet.MouseState.HOVER;
             this.saveRenderButton.Name = "saveRenderButton";
-            this.saveRenderButton.Size = new System.Drawing.Size(268, 36);
+            this.saveRenderButton.NoAccentTextColor = System.Drawing.Color.Empty;
+            this.saveRenderButton.Size = new System.Drawing.Size(285, 36);
             this.saveRenderButton.TabIndex = 5;
             this.saveRenderButton.Text = "Save rendered image";
             this.saveRenderButton.Type = MaterialSkin2DotNet.Controls.MaterialButton.MaterialButtonType.Contained;
@@ -324,7 +344,8 @@ namespace PTGI_UI
             this.startRenderButton.Margin = new System.Windows.Forms.Padding(4, 6, 4, 60);
             this.startRenderButton.MouseState = MaterialSkin2DotNet.MouseState.HOVER;
             this.startRenderButton.Name = "startRenderButton";
-            this.startRenderButton.Size = new System.Drawing.Size(268, 36);
+            this.startRenderButton.NoAccentTextColor = System.Drawing.Color.Empty;
+            this.startRenderButton.Size = new System.Drawing.Size(285, 36);
             this.startRenderButton.TabIndex = 4;
             this.startRenderButton.Text = "Render";
             this.startRenderButton.Type = MaterialSkin2DotNet.Controls.MaterialButton.MaterialButtonType.Contained;
@@ -360,10 +381,11 @@ namespace PTGI_UI
             // 
             // objectEmissionStrengthControl
             // 
+            this.objectEmissionStrengthControl.AnimateReadOnly = false;
             this.objectEmissionStrengthControl.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.objectEmissionStrengthControl.Depth = 0;
             this.objectEmissionStrengthControl.Dock = System.Windows.Forms.DockStyle.Top;
-            this.objectEmissionStrengthControl.Font = new System.Drawing.Font("Roboto", 16F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Pixel);
+            this.objectEmissionStrengthControl.Font = new System.Drawing.Font("Roboto", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
             this.objectEmissionStrengthControl.LeadingIcon = null;
             this.objectEmissionStrengthControl.Location = new System.Drawing.Point(14, 586);
             this.objectEmissionStrengthControl.MaxLength = 50;
@@ -390,10 +412,11 @@ namespace PTGI_UI
             // 
             // objectDensityControl
             // 
+            this.objectDensityControl.AnimateReadOnly = false;
             this.objectDensityControl.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.objectDensityControl.Depth = 0;
             this.objectDensityControl.Dock = System.Windows.Forms.DockStyle.Top;
-            this.objectDensityControl.Font = new System.Drawing.Font("Roboto", 16F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Pixel);
+            this.objectDensityControl.Font = new System.Drawing.Font("Roboto", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
             this.objectDensityControl.LeadingIcon = null;
             this.objectDensityControl.Location = new System.Drawing.Point(14, 517);
             this.objectDensityControl.MaxLength = 50;
@@ -496,10 +519,11 @@ namespace PTGI_UI
             // 
             // objectNameControl
             // 
+            this.objectNameControl.AnimateReadOnly = false;
             this.objectNameControl.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.objectNameControl.Depth = 0;
             this.objectNameControl.Dock = System.Windows.Forms.DockStyle.Top;
-            this.objectNameControl.Font = new System.Drawing.Font("Roboto", 16F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Pixel);
+            this.objectNameControl.Font = new System.Drawing.Font("Roboto", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
             this.objectNameControl.LeadingIcon = null;
             this.objectNameControl.Location = new System.Drawing.Point(14, 33);
             this.objectNameControl.MaxLength = 50;
@@ -597,6 +621,7 @@ namespace PTGI_UI
             // 
             // tabPage2
             // 
+            this.tabPage2.BackColor = System.Drawing.Color.White;
             this.tabPage2.Controls.Add(this.materialCard7);
             this.tabPage2.Controls.Add(this.materialCard2);
             this.tabPage2.Controls.Add(this.materialCard1);
@@ -606,7 +631,6 @@ namespace PTGI_UI
             this.tabPage2.Size = new System.Drawing.Size(1344, 962);
             this.tabPage2.TabIndex = 1;
             this.tabPage2.Text = "Render settings";
-            this.tabPage2.UseVisualStyleBackColor = true;
             // 
             // materialCard7
             // 
@@ -629,11 +653,12 @@ namespace PTGI_UI
             // 
             // materialTextBox1
             // 
+            this.materialTextBox1.AnimateReadOnly = false;
             this.materialTextBox1.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.materialTextBox1.DataBindings.Add(new System.Windows.Forms.Binding("Text", this.settingsViewBindingSource, "DenoiserIterationCountControlValue", true));
             this.materialTextBox1.Depth = 0;
             this.materialTextBox1.Dock = System.Windows.Forms.DockStyle.Top;
-            this.materialTextBox1.Font = new System.Drawing.Font("Roboto", 16F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Pixel);
+            this.materialTextBox1.Font = new System.Drawing.Font("Roboto", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
             this.materialTextBox1.LeadingIcon = null;
             this.materialTextBox1.Location = new System.Drawing.Point(14, 158);
             this.materialTextBox1.MaxLength = 50;
@@ -664,11 +689,12 @@ namespace PTGI_UI
             // 
             // denoiserKernelSize
             // 
+            this.denoiserKernelSize.AnimateReadOnly = false;
             this.denoiserKernelSize.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.denoiserKernelSize.DataBindings.Add(new System.Windows.Forms.Binding("Text", this.settingsViewBindingSource, "DenoiserKernelSizeControlValue", true));
             this.denoiserKernelSize.Depth = 0;
             this.denoiserKernelSize.Dock = System.Windows.Forms.DockStyle.Top;
-            this.denoiserKernelSize.Font = new System.Drawing.Font("Roboto", 16F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Pixel);
+            this.denoiserKernelSize.Font = new System.Drawing.Font("Roboto", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
             this.denoiserKernelSize.LeadingIcon = null;
             this.denoiserKernelSize.Location = new System.Drawing.Point(14, 89);
             this.denoiserKernelSize.MaxLength = 50;
@@ -760,10 +786,11 @@ namespace PTGI_UI
             // 
             // samplePerPixelControl
             // 
+            this.samplePerPixelControl.AnimateReadOnly = false;
             this.samplePerPixelControl.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.samplePerPixelControl.DataBindings.Add(new System.Windows.Forms.Binding("Text", this.settingsViewBindingSource, "SamplesPerPixelControlValue", true));
             this.samplePerPixelControl.Depth = 0;
-            this.samplePerPixelControl.Font = new System.Drawing.Font("Roboto", 16F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Pixel);
+            this.samplePerPixelControl.Font = new System.Drawing.Font("Roboto", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
             this.samplePerPixelControl.LeadingIcon = null;
             this.samplePerPixelControl.Location = new System.Drawing.Point(58, 162);
             this.samplePerPixelControl.MaxLength = 50;
@@ -801,10 +828,11 @@ namespace PTGI_UI
             // 
             // renderResolutionWidth
             // 
+            this.renderResolutionWidth.AnimateReadOnly = false;
             this.renderResolutionWidth.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.renderResolutionWidth.DataBindings.Add(new System.Windows.Forms.Binding("Text", this.settingsViewBindingSource, "RenderWidthControlValue", true));
             this.renderResolutionWidth.Depth = 0;
-            this.renderResolutionWidth.Font = new System.Drawing.Font("Roboto", 16F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Pixel);
+            this.renderResolutionWidth.Font = new System.Drawing.Font("Roboto", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
             this.renderResolutionWidth.LeadingIcon = null;
             this.renderResolutionWidth.Location = new System.Drawing.Point(58, 74);
             this.renderResolutionWidth.MaxLength = 50;
@@ -818,10 +846,11 @@ namespace PTGI_UI
             // 
             // bounceLimitControl
             // 
+            this.bounceLimitControl.AnimateReadOnly = false;
             this.bounceLimitControl.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.bounceLimitControl.DataBindings.Add(new System.Windows.Forms.Binding("Text", this.settingsViewBindingSource, "BounceLimitControlValue", true));
             this.bounceLimitControl.Depth = 0;
-            this.bounceLimitControl.Font = new System.Drawing.Font("Roboto", 16F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Pixel);
+            this.bounceLimitControl.Font = new System.Drawing.Font("Roboto", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
             this.bounceLimitControl.LeadingIcon = null;
             this.bounceLimitControl.Location = new System.Drawing.Point(58, 250);
             this.bounceLimitControl.MaxLength = 50;
@@ -847,10 +876,11 @@ namespace PTGI_UI
             // 
             // renderResolutionHeight
             // 
+            this.renderResolutionHeight.AnimateReadOnly = false;
             this.renderResolutionHeight.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.renderResolutionHeight.DataBindings.Add(new System.Windows.Forms.Binding("Text", this.settingsViewBindingSource, "RenderHeightControlValue", true));
             this.renderResolutionHeight.Depth = 0;
-            this.renderResolutionHeight.Font = new System.Drawing.Font("Roboto", 16F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Pixel);
+            this.renderResolutionHeight.Font = new System.Drawing.Font("Roboto", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
             this.renderResolutionHeight.LeadingIcon = null;
             this.renderResolutionHeight.Location = new System.Drawing.Point(297, 74);
             this.renderResolutionHeight.MaxLength = 50;
@@ -872,7 +902,6 @@ namespace PTGI_UI
             this.materialCard1.Controls.Add(this.materialLabel6);
             this.materialCard1.Controls.Add(this.isLiveRenderSwitch);
             this.materialCard1.Controls.Add(this.renderFlagIgnoreObstacleInteriors);
-            this.materialCard1.Controls.Add(this.useCudaCheckbox);
             this.materialCard1.Controls.Add(this.materialLabel1);
             this.materialCard1.Depth = 0;
             this.materialCard1.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(222)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))));
@@ -896,6 +925,7 @@ namespace PTGI_UI
             this.buttonSaveSettings.Margin = new System.Windows.Forms.Padding(4, 6, 4, 6);
             this.buttonSaveSettings.MouseState = MaterialSkin2DotNet.MouseState.HOVER;
             this.buttonSaveSettings.Name = "buttonSaveSettings";
+            this.buttonSaveSettings.NoAccentTextColor = System.Drawing.Color.Empty;
             this.buttonSaveSettings.Size = new System.Drawing.Size(269, 36);
             this.buttonSaveSettings.TabIndex = 11;
             this.buttonSaveSettings.Text = "Save settings";
@@ -919,13 +949,14 @@ namespace PTGI_UI
             this.gpuSelectorControl.FormattingEnabled = true;
             this.gpuSelectorControl.IntegralHeight = false;
             this.gpuSelectorControl.ItemHeight = 43;
-            this.gpuSelectorControl.Location = new System.Drawing.Point(14, 232);
+            this.gpuSelectorControl.Location = new System.Drawing.Point(14, 195);
             this.gpuSelectorControl.MaxDropDownItems = 4;
             this.gpuSelectorControl.MouseState = MaterialSkin2DotNet.MouseState.OUT;
             this.gpuSelectorControl.Name = "gpuSelectorControl";
             this.gpuSelectorControl.Size = new System.Drawing.Size(269, 49);
             this.gpuSelectorControl.StartIndex = 0;
             this.gpuSelectorControl.TabIndex = 9;
+            this.gpuSelectorControl.SelectedIndexChanged += new System.EventHandler(this.gpuSelectorControl_SelectedIndexChanged);
             // 
             // materialLabel7
             // 
@@ -933,22 +964,23 @@ namespace PTGI_UI
             this.materialLabel7.Depth = 0;
             this.materialLabel7.Dock = System.Windows.Forms.DockStyle.Top;
             this.materialLabel7.Font = new System.Drawing.Font("Roboto", 14F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Pixel);
-            this.materialLabel7.Location = new System.Drawing.Point(14, 213);
+            this.materialLabel7.Location = new System.Drawing.Point(14, 176);
             this.materialLabel7.MouseState = MaterialSkin2DotNet.MouseState.HOVER;
             this.materialLabel7.Name = "materialLabel7";
             this.materialLabel7.Size = new System.Drawing.Size(32, 19);
             this.materialLabel7.TabIndex = 10;
-            this.materialLabel7.Text = "GPU";
+            this.materialLabel7.Text = "Device";
             // 
             // gridDividerControl
             // 
+            this.gridDividerControl.AnimateReadOnly = false;
             this.gridDividerControl.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.gridDividerControl.DataBindings.Add(new System.Windows.Forms.Binding("Text", this.settingsViewBindingSource, "GridDividerControlValue", true));
             this.gridDividerControl.Depth = 0;
             this.gridDividerControl.Dock = System.Windows.Forms.DockStyle.Top;
-            this.gridDividerControl.Font = new System.Drawing.Font("Roboto", 16F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Pixel);
+            this.gridDividerControl.Font = new System.Drawing.Font("Roboto", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
             this.gridDividerControl.LeadingIcon = null;
-            this.gridDividerControl.Location = new System.Drawing.Point(14, 163);
+            this.gridDividerControl.Location = new System.Drawing.Point(14, 126);
             this.gridDividerControl.MaxLength = 50;
             this.gridDividerControl.MouseState = MaterialSkin2DotNet.MouseState.OUT;
             this.gridDividerControl.Multiline = false;
@@ -964,7 +996,7 @@ namespace PTGI_UI
             this.materialLabel6.Depth = 0;
             this.materialLabel6.Dock = System.Windows.Forms.DockStyle.Top;
             this.materialLabel6.Font = new System.Drawing.Font("Roboto", 14F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Pixel);
-            this.materialLabel6.Location = new System.Drawing.Point(14, 144);
+            this.materialLabel6.Location = new System.Drawing.Point(14, 107);
             this.materialLabel6.MouseState = MaterialSkin2DotNet.MouseState.HOVER;
             this.materialLabel6.Name = "materialLabel6";
             this.materialLabel6.Size = new System.Drawing.Size(81, 19);
@@ -979,7 +1011,7 @@ namespace PTGI_UI
             this.isLiveRenderSwitch.DataBindings.Add(new System.Windows.Forms.Binding("Checked", this.settingsViewBindingSource, "IsLivePreview", true));
             this.isLiveRenderSwitch.Depth = 0;
             this.isLiveRenderSwitch.Dock = System.Windows.Forms.DockStyle.Top;
-            this.isLiveRenderSwitch.Location = new System.Drawing.Point(14, 107);
+            this.isLiveRenderSwitch.Location = new System.Drawing.Point(14, 70);
             this.isLiveRenderSwitch.Margin = new System.Windows.Forms.Padding(0);
             this.isLiveRenderSwitch.MouseLocation = new System.Drawing.Point(-1, -1);
             this.isLiveRenderSwitch.MouseState = MaterialSkin2DotNet.MouseState.HOVER;
@@ -998,7 +1030,7 @@ namespace PTGI_UI
             this.renderFlagIgnoreObstacleInteriors.DataBindings.Add(new System.Windows.Forms.Binding("Checked", this.settingsViewBindingSource, "RenderFlag_IgnoreObstacleInterior", true));
             this.renderFlagIgnoreObstacleInteriors.Depth = 0;
             this.renderFlagIgnoreObstacleInteriors.Dock = System.Windows.Forms.DockStyle.Top;
-            this.renderFlagIgnoreObstacleInteriors.Location = new System.Drawing.Point(14, 70);
+            this.renderFlagIgnoreObstacleInteriors.Location = new System.Drawing.Point(14, 33);
             this.renderFlagIgnoreObstacleInteriors.Margin = new System.Windows.Forms.Padding(0);
             this.renderFlagIgnoreObstacleInteriors.MouseLocation = new System.Drawing.Point(-1, -1);
             this.renderFlagIgnoreObstacleInteriors.MouseState = MaterialSkin2DotNet.MouseState.HOVER;
@@ -1008,25 +1040,6 @@ namespace PTGI_UI
             this.renderFlagIgnoreObstacleInteriors.TabIndex = 13;
             this.renderFlagIgnoreObstacleInteriors.Text = "Ignore obstacle interiors";
             this.renderFlagIgnoreObstacleInteriors.UseVisualStyleBackColor = true;
-            // 
-            // useCudaCheckbox
-            // 
-            this.useCudaCheckbox.AutoSize = true;
-            this.useCudaCheckbox.Checked = true;
-            this.useCudaCheckbox.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.useCudaCheckbox.DataBindings.Add(new System.Windows.Forms.Binding("Checked", this.settingsViewBindingSource, "UseCUDA", true));
-            this.useCudaCheckbox.Depth = 0;
-            this.useCudaCheckbox.Dock = System.Windows.Forms.DockStyle.Top;
-            this.useCudaCheckbox.Location = new System.Drawing.Point(14, 33);
-            this.useCudaCheckbox.Margin = new System.Windows.Forms.Padding(0);
-            this.useCudaCheckbox.MouseLocation = new System.Drawing.Point(-1, -1);
-            this.useCudaCheckbox.MouseState = MaterialSkin2DotNet.MouseState.HOVER;
-            this.useCudaCheckbox.Name = "useCudaCheckbox";
-            this.useCudaCheckbox.Ripple = true;
-            this.useCudaCheckbox.Size = new System.Drawing.Size(269, 37);
-            this.useCudaCheckbox.TabIndex = 0;
-            this.useCudaCheckbox.Text = "Use CUDA";
-            this.useCudaCheckbox.UseVisualStyleBackColor = true;
             // 
             // materialLabel1
             // 
@@ -1043,6 +1056,7 @@ namespace PTGI_UI
             // 
             // tabPage3
             // 
+            this.tabPage3.BackColor = System.Drawing.Color.White;
             this.tabPage3.Controls.Add(this.materialCard4);
             this.tabPage3.Location = new System.Drawing.Point(4, 24);
             this.tabPage3.Name = "tabPage3";
@@ -1050,7 +1064,6 @@ namespace PTGI_UI
             this.tabPage3.Size = new System.Drawing.Size(1344, 962);
             this.tabPage3.TabIndex = 2;
             this.tabPage3.Text = "Object options";
-            this.tabPage3.UseVisualStyleBackColor = true;
             // 
             // materialCard4
             // 
@@ -1120,6 +1133,7 @@ namespace PTGI_UI
             this.deleteVerticie.Margin = new System.Windows.Forms.Padding(4, 6, 4, 6);
             this.deleteVerticie.MouseState = MaterialSkin2DotNet.MouseState.HOVER;
             this.deleteVerticie.Name = "deleteVerticie";
+            this.deleteVerticie.NoAccentTextColor = System.Drawing.Color.Empty;
             this.deleteVerticie.Size = new System.Drawing.Size(282, 36);
             this.deleteVerticie.TabIndex = 9;
             this.deleteVerticie.Text = "Delete selected";
@@ -1130,6 +1144,7 @@ namespace PTGI_UI
             // 
             // tabPage5
             // 
+            this.tabPage5.BackColor = System.Drawing.Color.White;
             this.tabPage5.Controls.Add(this.materialCard3);
             this.tabPage5.Controls.Add(this.materialCard6);
             this.tabPage5.Location = new System.Drawing.Point(4, 24);
@@ -1138,7 +1153,6 @@ namespace PTGI_UI
             this.tabPage5.Size = new System.Drawing.Size(1344, 962);
             this.tabPage5.TabIndex = 4;
             this.tabPage5.Text = "Misc";
-            this.tabPage5.UseVisualStyleBackColor = true;
             // 
             // materialCard3
             // 
@@ -1158,10 +1172,11 @@ namespace PTGI_UI
             // 
             // terrariaBlockSizeTextbox
             // 
+            this.terrariaBlockSizeTextbox.AnimateReadOnly = false;
             this.terrariaBlockSizeTextbox.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.terrariaBlockSizeTextbox.DataBindings.Add(new System.Windows.Forms.Binding("Text", this.settingsViewBindingSource, "TerrariaWorldCellSizeControlValue", true));
             this.terrariaBlockSizeTextbox.Depth = 0;
-            this.terrariaBlockSizeTextbox.Font = new System.Drawing.Font("Roboto", 16F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Pixel);
+            this.terrariaBlockSizeTextbox.Font = new System.Drawing.Font("Roboto", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
             this.terrariaBlockSizeTextbox.LeadingIcon = null;
             this.terrariaBlockSizeTextbox.Location = new System.Drawing.Point(33, 87);
             this.terrariaBlockSizeTextbox.MaxLength = 50;
@@ -1224,6 +1239,7 @@ namespace PTGI_UI
             this.generateRandomSceneButton.Margin = new System.Windows.Forms.Padding(4, 6, 4, 6);
             this.generateRandomSceneButton.MouseState = MaterialSkin2DotNet.MouseState.HOVER;
             this.generateRandomSceneButton.Name = "generateRandomSceneButton";
+            this.generateRandomSceneButton.NoAccentTextColor = System.Drawing.Color.Empty;
             this.generateRandomSceneButton.Size = new System.Drawing.Size(210, 36);
             this.generateRandomSceneButton.TabIndex = 7;
             this.generateRandomSceneButton.Text = "Generate random scene";
@@ -1243,6 +1259,7 @@ namespace PTGI_UI
             this.minecraftWorldGeneration.Margin = new System.Windows.Forms.Padding(4, 6, 4, 10);
             this.minecraftWorldGeneration.MouseState = MaterialSkin2DotNet.MouseState.HOVER;
             this.minecraftWorldGeneration.Name = "minecraftWorldGeneration";
+            this.minecraftWorldGeneration.NoAccentTextColor = System.Drawing.Color.Empty;
             this.minecraftWorldGeneration.Padding = new System.Windows.Forms.Padding(5);
             this.minecraftWorldGeneration.Size = new System.Drawing.Size(221, 36);
             this.minecraftWorldGeneration.TabIndex = 6;
@@ -1254,6 +1271,7 @@ namespace PTGI_UI
             // 
             // tabPage4
             // 
+            this.tabPage4.BackColor = System.Drawing.Color.White;
             this.tabPage4.Controls.Add(this.materialCard5);
             this.tabPage4.Location = new System.Drawing.Point(4, 24);
             this.tabPage4.Name = "tabPage4";
@@ -1261,7 +1279,6 @@ namespace PTGI_UI
             this.tabPage4.Size = new System.Drawing.Size(1344, 962);
             this.tabPage4.TabIndex = 3;
             this.tabPage4.Text = "Debug Settings";
-            this.tabPage4.UseVisualStyleBackColor = true;
             // 
             // materialCard5
             // 
@@ -1404,7 +1421,6 @@ namespace PTGI_UI
         private System.Windows.Forms.TabPage tabPage1;
         private System.Windows.Forms.TabPage tabPage2;
         private MaterialSkin2DotNet.Controls.MaterialDrawer materialDrawer1;
-        private MaterialSkin2DotNet.Controls.MaterialSwitch useCudaCheckbox;
         private MaterialSkin2DotNet.Controls.MaterialCard materialCard2;
         private MaterialSkin2DotNet.Controls.MaterialLabel materialLabel2;
         private MaterialSkin2DotNet.Controls.MaterialCard materialCard1;

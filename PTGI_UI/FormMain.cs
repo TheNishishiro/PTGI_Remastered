@@ -4,6 +4,7 @@ using MaterialSkin2DotNet.Controls;
 using PTGI_Remastered.Inputs;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
@@ -23,7 +24,6 @@ namespace PTGI_UI
         protected PTGI_Denoiser.Denoiser Denoiser { get; set; }
         protected PTGI_Remastered.PTGI PathTracer { get; set; }
         protected SettingsView Settings { get; set; }
-        protected int GpuId { get; set; }
         protected int popupTime { get; set; } = 0;
         protected List<PTGI_Remastered.Structs.Polygon> Polygons { get; set; }
 
@@ -60,9 +60,9 @@ namespace PTGI_UI
                     renderSpecification = new RenderSpecification()
                     {
                         BounceLimit = Settings.BounceLimit,
-                        DeviceId = 0,
+                        DeviceId = Settings.DeviceId,
                         GridSize = Settings.GridDivider,
-                        UseCUDARenderer = Settings.UseCUDA,
+                        AcceleratorType = Settings.AcceleratorType,
                         ImageHeight = Settings.RenderHeight,
                         ImageWidth = Settings.RenderWidth,
                         Objects = Polygons.ToArray(),
@@ -81,7 +81,7 @@ namespace PTGI_UI
                     denoiseResult = Denoiser.Denoise(new PTGI_Denoiser.DenoiseRequest()
                     {
                         bitmap = pathTraceResult.bitmap,
-                        DeviceId = 0,
+                        DeviceId = Settings.DeviceId,
                         Pixels = pathTraceResult.Pixels,
                         KernelSize = Settings.DenoiserKernelSize,
                         IterationCount = Settings.DenoiserIterationCount
@@ -89,12 +89,16 @@ namespace PTGI_UI
                     pixels = denoiseResult.Pixels;
                 }
 
-                this.Invoke(new MethodInvoker(delegate () {
+                this.Invoke(new MethodInvoker(delegate ()
+                {
+                    var stopwatch = Stopwatch.StartNew();
+                    RenderedPictureBox.BackgroundImage = RenderedImage = ApplyBitmap(pixels, pathTraceResult.bitmap.Size);
+                    stopwatch.Stop();
                     ShowPopupMessage($"Render time: {pathTraceResult.RenderTime} ms;" +
                         $"Allocation time: {pathTraceResult.ProcessTime - pathTraceResult.RenderTime} ms;" +
                         $"Denoiser time: {denoiseResult.DenoiseTime} ms;" +
-                        $"Total time: {pathTraceResult.ProcessTime + denoiseResult.DenoiseTime} ms", 10);
-                    RenderedPictureBox.BackgroundImage = RenderedImage = ApplyBitmap(pixels, pathTraceResult.bitmap.Size);
+                        $"Apply bitmap: {stopwatch.ElapsedMilliseconds} ms;" +
+                        $"Total time: {pathTraceResult.ProcessTime + denoiseResult.DenoiseTime + stopwatch.ElapsedMilliseconds} ms", 10);
                     ZoomImage();
                 }));
             }

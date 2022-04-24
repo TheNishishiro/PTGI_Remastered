@@ -20,9 +20,9 @@ namespace PTGI_Remastered.Inputs
         public int SampleCount { get; set; }
         public int BounceLimit { get; set; } 
         public int GridSize { get; set; }
-        public bool UseCUDARenderer { get; set; }
         public bool IgnoreEnclosedPixels { get; set; }
         public int DeviceId { get; set; }
+        public AcceleratorType AcceleratorType { get; set; }
 
         public Line[] GetWalls()
         {

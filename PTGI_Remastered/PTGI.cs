@@ -13,6 +13,7 @@ using System.Text;
 using System.Threading.Tasks;
 using PTGI_Remastered.Cache;
 using ILGPU.Algorithms;
+using ILGPU.Runtime.OpenCL;
 using Grid = PTGI_Remastered.Structs.Grid;
 
 namespace PTGI_Remastered
@@ -26,21 +27,28 @@ namespace PTGI_Remastered
             _cache = new TempCache();
         }
         
-        public List<Gpu> GetAvaiableHardwareAccelerators()
+        public List<Gpu> GetAvailableHardwareAccelerators()
         {
-            var context = Context.Create().ToContext();
+            var context = Context.CreateDefault();
+            
             var gpus = new List<Gpu>();
             foreach (var device in context)
             {
-                using (var accl = device.CreateAccelerator(context))
+                using var accelerator = device.CreateAccelerator(context);
+                switch (accelerator)
                 {
-                    gpus.Add(new Gpu()
-                    {
-                        Name = accl.Name
-                    });
-
-                    accl.PrintInformation();
+                    case CPUAccelerator cpuAccelerator:
+                        gpus.Add(new Gpu(cpuAccelerator));
+                        break;
+                    case CudaAccelerator cudaAccelerator:
+                        gpus.Add(new Gpu(cudaAccelerator));
+                        break;
+                    case CLAccelerator clAccelerator:
+                        gpus.Add(new Gpu(clAccelerator));
+                        break;
                 }
+
+                accelerator.PrintInformation();
             }
             context.Dispose();
 
@@ -58,7 +66,7 @@ namespace PTGI_Remastered
             bitmap.SetBitmapSettings(renderSpecification.ImageWidth, renderSpecification.ImageHeight, walls.Length);
 
             _cache.WithEnclosureDetection(bitmap, renderSpecification);
-            _cache.WithContext(renderSpecification.DeviceId, renderSpecification.UseCUDARenderer);
+            _cache.WithContext(renderSpecification.DeviceId, renderSpecification.AcceleratorType);
             _cache.SetPixelBuffer();
             _cache.SetSeedBuffer(bitmap.Size);
             _cache.SetWallBuffer(walls);
