@@ -25,6 +25,11 @@ namespace PTGI_Remastered.Utilities
         {
             return (int)y * bitmap.Width + (int)x;
         }
+
+        public static int Convert3dIndexTo1d(int x, int y, int z, int width, int height)
+        {
+            return (z * width * height) + (y * width) + x;
+        }
         
         public static float Pow(float x, float y)
         {

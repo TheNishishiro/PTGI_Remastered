@@ -21,21 +21,21 @@ namespace PTGI_Remastered.Cache
         public MemoryBuffer1D<Color, Stride1D.Dense> PixelBuffer { get; set; }
         public MemoryBuffer1D<int, Stride1D.Dense> SeedBuffer { get; set; }
         public MemoryBuffer1D<Line, Stride1D.Dense> WallBuffer { get; set; }
-        public MemoryBuffer3D<int, Stride3D.DenseXY> GridDataBuffer { get; set; }
+        public MemoryBuffer1D<int, Stride1D.Dense> GridDataBuffer { get; set; }
         public Grid GridCached { get; set; }
        
         private int _pixelBufferLength;
         private int _wallBufferLength;
         private int _objectBufferLength;
-        private int _gridDivderBufferSize;
+        private int _gridDividerBufferSize;
         private bool _updatePixelBuffer;
-        private bool _previouseEnclousureOptionState;
+        private bool _previousEnclousureOptionState;
         private bool? _previouslyUsedCudaRenderer;
         private int _previouslyDeviceId;
         private bool _isLiveDisplay = true; // TODO: constantly update?
 
         private Color[] cachePixels; 
-        private int[,,] gridLocalData { get; set; }
+        private int[] gridLocalData { get; set; }
 
         public void WithContext(int deviceId, bool useCudaRenderer)
         {
@@ -68,13 +68,13 @@ namespace PTGI_Remastered.Cache
         public void WithEnclosureDetection(Bitmap bitmap, RenderSpecification renderSpecification)
         {
             // TODO: add better update logic
-            if (bitmap.Size == _pixelBufferLength && renderSpecification.Objects.Length == _objectBufferLength && _previouseEnclousureOptionState == renderSpecification.IgnoreEnclosedPixels)
+            if (bitmap.Size == _pixelBufferLength && renderSpecification.Objects.Length == _objectBufferLength && _previousEnclousureOptionState == renderSpecification.IgnoreEnclosedPixels)
                 return;
 
             cachePixels = new Color[bitmap.Size];
             _pixelBufferLength = bitmap.Size;
             _objectBufferLength = renderSpecification.Objects.Length;
-            _previouseEnclousureOptionState = renderSpecification.IgnoreEnclosedPixels;
+            _previousEnclousureOptionState = renderSpecification.IgnoreEnclosedPixels;
             _updatePixelBuffer = true;
 
             if (!renderSpecification.IgnoreEnclosedPixels)
@@ -123,7 +123,7 @@ namespace PTGI_Remastered.Cache
 
         public void SetGridDataBuffer(Line[] walls, Bitmap bitmap, int gridSize)
         {
-            if (_isLiveDisplay || _pixelBufferLength != bitmap.Size || GridDataBuffer == null || _updatePixelBuffer || gridLocalData == null || _gridDivderBufferSize != gridSize)
+            if (_isLiveDisplay || _pixelBufferLength != bitmap.Size || GridDataBuffer == null || _updatePixelBuffer || gridLocalData == null || _gridDividerBufferSize != gridSize)
             {
                 AllocateGridDataBuffer(walls, bitmap, gridSize);
             }
@@ -158,12 +158,12 @@ namespace PTGI_Remastered.Cache
 
         private void AllocateGridDataBuffer(Line[] walls, Bitmap bitmap, int gridSize)
         {
-            _gridDivderBufferSize = gridSize;
+            _gridDividerBufferSize = gridSize;
             GridDataBuffer?.Dispose();
 
             GridCached = GridCached.Create(bitmap, gridSize);
             gridLocalData = GridCached.CPU_FillGrid(walls);
-            GridDataBuffer = Accelerator.Allocate3DDenseXY<int>(gridLocalData);
+            GridDataBuffer = Accelerator.Allocate1D<int>(gridLocalData);
         }
     }
 }

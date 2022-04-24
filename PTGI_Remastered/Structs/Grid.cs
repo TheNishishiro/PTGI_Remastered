@@ -80,9 +80,9 @@ namespace PTGI_Remastered.Structs
             return this;
         }
 
-        public int[,,] CPU_FillGrid(Line[] walls)
+        public int[] CPU_FillGrid(Line[] walls)
         {
-            var cells = new int[CellsInRow, CellsInRow, walls.Length];
+            var cells = new int[CellsInRow * CellsInRow * walls.Length];
 
 
             for(var wallIndex = 0; wallIndex < walls.Length; wallIndex++)
@@ -94,12 +94,13 @@ namespace PTGI_Remastered.Structs
                 {
                     for(var i = 0; i < walls.Length; i++)
                     {
-                        if (cells[(int)markedCell.X, (int)markedCell.Y, i] == wallIndex + 1)
+                        var index = PTGI_Math.Convert3dIndexTo1d((int) markedCell.X, (int) markedCell.Y, i, CellsInRow, CellsInRow);
+                        if (cells[index] == wallIndex + 1)
                             break;
 
-                        if (cells[(int) markedCell.X, (int) markedCell.Y, i] != 0) continue;
+                        if (cells[index] != 0) continue;
                             
-                        cells[(int)markedCell.X, (int)markedCell.Y, i] = wallIndex + 1;
+                        cells[index] = wallIndex + 1;
                         break;
                     }
                 }
@@ -260,7 +261,7 @@ namespace PTGI_Remastered.Structs
 
             return gridVariables;
         }
-        public GridTraversalResult TraverseGrid(Line lightRay, int wallsCount, ArrayView3D<int, Stride3D.DenseXY> gridData, ArrayView1D<Line, Stride1D.Dense> walls, Line ignoredWall)
+        public GridTraversalResult TraverseGrid(Line lightRay, int wallsCount, ArrayView1D<int, Stride1D.Dense> gridData, ArrayView1D<Line, Stride1D.Dense> walls, Line ignoredWall)
         {
             var closestDistance = float.MaxValue;
             var gridVariables = GetGridTraversalVariables(lightRay);
@@ -272,7 +273,9 @@ namespace PTGI_Remastered.Structs
 
                 for (var cellObjectId = 0; cellObjectId < wallsCount; cellObjectId++)
                 {
-                    var collisionObjectIds = gridData[gridVariables.CurrentTileIDX, gridVariables.CurrentTileIDY, cellObjectId];
+                    var index3d = PTGI_Math.Convert3dIndexTo1d(gridVariables.CurrentTileIDX,
+                        gridVariables.CurrentTileIDY, cellObjectId, CellsInRow, CellsInRow);
+                    var collisionObjectIds = gridData[index3d];
                     if (collisionObjectIds == 0)
                         break;
 
