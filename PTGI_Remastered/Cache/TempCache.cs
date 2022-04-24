@@ -30,27 +30,41 @@ namespace PTGI_Remastered.Cache
         private int _gridDivderBufferSize;
         private bool _updatePixelBuffer;
         private bool _previouseEnclousureOptionState;
+        private bool? _previouslyUsedCudaRenderer;
+        private int _previouslyDeviceId;
         private bool _isLiveDisplay = true; // TODO: constantly update?
 
         private Color[] cachePixels; 
         private int[,,] gridLocalData { get; set; }
 
-        public void WithContext()
+        public void WithContext(int deviceId, bool useCudaRenderer)
         {
-            // TODO: Bring back CPU support
-            Context ??= Context.Create().EnableAlgorithms().Math(MathMode.Fast32BitOnly).Optimize(OptimizationLevel.O2).Cuda().ToContext();
-        }
+            if (_previouslyUsedCudaRenderer == useCudaRenderer && _previouslyDeviceId == deviceId) return;
 
-        public void WithAccelerator(int deviceId, bool useCudaRenderer)
-        {
-            if (Accelerator != null) return;
-            
+            _previouslyUsedCudaRenderer = useCudaRenderer;
+            _previouslyDeviceId = deviceId;
+            ResetBuffers();
+            var contextBuilder = Context.Create().EnableAlgorithms().Math(MathMode.Fast32BitOnly).Optimize(OptimizationLevel.O2);
             if (useCudaRenderer)
+            {
+                Context = contextBuilder.Cuda().ToContext();
                 Accelerator = Context.CreateCudaAccelerator(deviceId);
+            }
             else
+            {
+                Context = contextBuilder.CPU().ToContext();
                 Accelerator = Context.CreateCPUAccelerator(deviceId);
+            }
         }
 
+        private void ResetBuffers()
+        {
+            PixelBuffer = null;
+            SeedBuffer = null;
+            WallBuffer = null;
+            GridDataBuffer = null;
+        }
+        
         public void WithEnclosureDetection(Bitmap bitmap, RenderSpecification renderSpecification)
         {
             // TODO: add better update logic

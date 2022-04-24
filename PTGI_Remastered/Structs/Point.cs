@@ -106,7 +106,7 @@ namespace PTGI_Remastered.Structs
 
         public float GetDistance(Point destination)
         {
-            return XMath.Sqrt(PTGI_Math.Pow(destination.X - X, 2) + PTGI_Math.Pow(destination.Y - Y, 2));
+            return XMath.Sqrt((destination.X - X) * (destination.X - X)  + (destination.Y - Y) * (destination.Y - Y));
         }
 
         public float Magnitude()

@@ -85,24 +85,22 @@ namespace PTGI_Remastered.Structs
             var cells = new int[CellsInRow, CellsInRow, walls.Length];
 
 
-            for(int wallIndex = 0; wallIndex < walls.Length; wallIndex++)
+            for(var wallIndex = 0; wallIndex < walls.Length; wallIndex++)
             {
                 var cellsContainingWall = GetVisitedCells(walls[wallIndex].Source, walls[wallIndex].Destination);
-                if(cellsContainingWall != null)
+                if (!cellsContainingWall.Any()) continue;
+                
+                foreach(var markedCell in cellsContainingWall)
                 {
-                    foreach(Point markedCell in cellsContainingWall)
+                    for(var i = 0; i < walls.Length; i++)
                     {
-                        for(int i = 0; i < walls.Length; i++)
-                        {
-                            if (cells[(int)markedCell.X, (int)markedCell.Y, i] == wallIndex + 1)
-                                break;
+                        if (cells[(int)markedCell.X, (int)markedCell.Y, i] == wallIndex + 1)
+                            break;
 
-                            if (cells[(int)markedCell.X, (int)markedCell.Y, i] == 0)
-                            {
-                                cells[(int)markedCell.X, (int)markedCell.Y, i] = wallIndex + 1;
-                                break;
-                            }
-                        }
+                        if (cells[(int) markedCell.X, (int) markedCell.Y, i] != 0) continue;
+                            
+                        cells[(int)markedCell.X, (int)markedCell.Y, i] = wallIndex + 1;
+                        break;
                     }
                 }
             }
@@ -114,84 +112,84 @@ namespace PTGI_Remastered.Structs
         {
             var visited = new List<Point>();
 
-            var startTileIDX = (int)XMath.Floor(StartLocation.X / CellWidth);
-            var startTileIDY = (int)XMath.Floor(StartLocation.Y / CellHeight);
+            var startTileIdx = (int)XMath.Floor(StartLocation.X / CellWidth);
+            var startTileIdy = (int)XMath.Floor(StartLocation.Y / CellHeight);
 
-            var endTileIDX = (int)XMath.Floor(EndLocation.X / CellWidth);
-            var endTileIDY = (int)XMath.Floor(EndLocation.Y / CellHeight);
+            var endTileIdx = (int)XMath.Floor(EndLocation.X / CellWidth);
+            var endTileIdy = (int)XMath.Floor(EndLocation.Y / CellHeight);
 
-            var currentTileIDX = startTileIDX;
-            var currentTileIDY = startTileIDY;
+            var currentTileIdx = startTileIdx;
+            var currentTileIdy = startTileIdy;
 
-            Point firstPoint = new Point();
-            firstPoint.SetCoords(currentTileIDX, currentTileIDY);
+            var firstPoint = new Point();
+            firstPoint.SetCoords(currentTileIdx, currentTileIdy);
             visited.Add(firstPoint);
 
-            if (startTileIDX >= CellsInRow || startTileIDY >= CellsInRow || endTileIDX >= CellsInRow || endTileIDY >= CellsInRow)
-                return null;
+            if (startTileIdx >= CellsInRow || startTileIdy >= CellsInRow || endTileIdx >= CellsInRow || endTileIdy >= CellsInRow)
+                return new List<Point>();
 
-            if (startTileIDX == endTileIDX && startTileIDY == endTileIDY)
+            if (startTileIdx == endTileIdx && startTileIdy == endTileIdy)
                 return visited;
 
-            var StepX = EndLocation.X > StartLocation.X ? 1 : -1;
+            var stepX = EndLocation.X > StartLocation.X ? 1 : -1;
             if (EndLocation.X == StartLocation.X)
-                StepX = 0;
-            var StepY = EndLocation.Y > StartLocation.Y ? 1 : -1;
+                stepX = 0;
+            var stepY = EndLocation.Y > StartLocation.Y ? 1 : -1;
             if (EndLocation.Y == StartLocation.Y)
-                StepY = 0;
+                stepY = 0;
 
             var moveAlongX = true;
             var moveAlongY = true;
 
-            var DeltaX = CellWidth / Math.Abs(EndLocation.X - StartLocation.X);
-            var DeltaY = CellHeight / Math.Abs(EndLocation.Y - StartLocation.Y);
-            if (float.IsInfinity(DeltaX))
+            var deltaX = CellWidth / Math.Abs(EndLocation.X - StartLocation.X);
+            var deltaY = CellHeight / Math.Abs(EndLocation.Y - StartLocation.Y);
+            if (float.IsInfinity(deltaX))
                 moveAlongX = false;
-            if (float.IsInfinity(DeltaY))
+            if (float.IsInfinity(deltaY))
                 moveAlongY = false;
 
-            var PositionInsideTile_X = (StartLocation.X % CellWidth) / CellWidth;
-            var DistanceToBoundary_X = Math.Abs(StepX - PositionInsideTile_X) % 1;
-            var PositionInsideTile_Y = (StartLocation.Y % CellHeight) / CellHeight;
-            var DistanceToBoundary_Y = Math.Abs(StepY - PositionInsideTile_Y) % 1;
+            var positionInsideTileX = (StartLocation.X % CellWidth) / CellWidth;
+            var distanceToBoundaryX = Math.Abs(stepX - positionInsideTileX) % 1;
+            var positionInsideTileY = (StartLocation.Y % CellHeight) / CellHeight;
+            var distanceToBoundaryY = Math.Abs(stepY - positionInsideTileY) % 1;
 
-            var CurrentDeltaX = moveAlongX ? DeltaX * DistanceToBoundary_X : 1;
-            var CurrentDeltaY = moveAlongY ? DeltaY * DistanceToBoundary_Y : 1;
+            var currentDeltaX = moveAlongX ? deltaX * distanceToBoundaryX : 1;
+            var currentDeltaY = moveAlongY ? deltaY * distanceToBoundaryY : 1;
 
 
-            while ((CurrentDeltaX < 1) || (CurrentDeltaY < 1))
+            while ((currentDeltaX < 1) || (currentDeltaY < 1))
             {
                 switch (moveAlongX)
                 {
                     case true when moveAlongY:
                     {
-                        if (CurrentDeltaX < CurrentDeltaY)
+                        if (currentDeltaX < currentDeltaY)
                         {
-                            currentTileIDX += StepX;
-                            CurrentDeltaX += DeltaX;
+                            currentTileIdx += stepX;
+                            currentDeltaX += deltaX;
                         }
                         else
                         {
-                            currentTileIDY += StepY;
-                            CurrentDeltaY += DeltaY;
+                            currentTileIdy += stepY;
+                            currentDeltaY += deltaY;
                         }
 
                         break;
                     }
                     case true:
-                        currentTileIDX += StepX;
-                        CurrentDeltaX += DeltaX;
+                        currentTileIdx += stepX;
+                        currentDeltaX += deltaX;
                         break;
                     default:
-                        currentTileIDY += StepY;
-                        CurrentDeltaY += DeltaY;
+                        currentTileIdy += stepY;
+                        currentDeltaY += deltaY;
                         break;
                 }
-                if (currentTileIDY < 0 || currentTileIDY >= CellsInRow || currentTileIDX < 0 || currentTileIDX >= CellsInRow)
+                if (currentTileIdy < 0 || currentTileIdy >= CellsInRow || currentTileIdx < 0 || currentTileIdx >= CellsInRow)
                     break;
 
                 var nextPoint = new Point();
-                nextPoint.SetCoords(currentTileIDX, currentTileIDY);
+                nextPoint.SetCoords(currentTileIdx, currentTileIdy);
                 visited.Add(nextPoint);
             }
 
@@ -214,12 +212,12 @@ namespace PTGI_Remastered.Structs
         {
             var gridVariables = new GridVariables();
 
-            // Calculate starting cell index based on begining of a ray
-            var startTileIDX = (int)XMath.Floor(StartLocation.X / CellWidth);
-            var startTileIDY = (int)XMath.Floor(StartLocation.Y / CellHeight);
+            // Calculate starting cell index based on beginning of a ray
+            var startTileIdx = (int)(StartLocation.X / CellWidth);
+            var startTileIdy = (int)(StartLocation.Y / CellHeight);
 
-            gridVariables.CurrentTileIDX = startTileIDX;
-            gridVariables.CurrentTileIDY = startTileIDY;
+            gridVariables.CurrentTileIDX = startTileIdx;
+            gridVariables.CurrentTileIDY = startTileIdy;
 
             // Determine step (direction) in which cells will be traversed
             gridVariables.StepX = EndLocation.X > StartLocation.X ? 1 : -1;
@@ -245,14 +243,14 @@ namespace PTGI_Remastered.Structs
             gridVariables.DeltaY = CellHeight / dividerY;
 
             // Calculate how far the ray is into cell
-            var PositionInsideTile_X = PTGI_Math.Modulo(StartLocation.X, CellWidth) / CellWidth;
-            var DistanceToBoundary_X = PTGI_Math.Modulo(XMath.Abs(gridVariables.StepX - PositionInsideTile_X), 1);
-            var PositionInsideTile_Y = PTGI_Math.Modulo(StartLocation.Y, CellHeight) / CellHeight;
-            var DistanceToBoundary_Y = PTGI_Math.Modulo(XMath.Abs(gridVariables.StepY - PositionInsideTile_Y), 1);
+            var positionInsideTileX = (StartLocation.X % CellWidth) / CellWidth;
+            var distanceToBoundaryX = (XMath.Abs(gridVariables.StepX - positionInsideTileX) % 1);
+            var positionInsideTileY = (StartLocation.Y % CellHeight) / CellHeight;
+            var distanceToBoundaryY = (XMath.Abs(gridVariables.StepY - positionInsideTileY) % 1);
 
             // How far are we into the grid
-            gridVariables.CurrentDeltaX = gridVariables.MoveAlongX == 1 ? gridVariables.DeltaX * DistanceToBoundary_X : 1;
-            gridVariables.CurrentDeltaY = gridVariables.MoveAlongY == 1 ? gridVariables.DeltaY * DistanceToBoundary_Y : 1;
+            gridVariables.CurrentDeltaX = gridVariables.MoveAlongX == 1 ? gridVariables.DeltaX * distanceToBoundaryX : 1;
+            gridVariables.CurrentDeltaY = gridVariables.MoveAlongY == 1 ? gridVariables.DeltaY * distanceToBoundaryY : 1;
 
             // Correct delta for cases when ray starts on the edge of a cell and is assigned to a different one than algorithm assumes
             if (gridVariables.CurrentDeltaX == 0 && gridVariables.StepX == 1)
@@ -274,28 +272,29 @@ namespace PTGI_Remastered.Structs
 
                 for (var cellObjectId = 0; cellObjectId < wallsCount; cellObjectId++)
                 {
-                    int collisionObjectIds = gridData[gridVariables.CurrentTileIDX, gridVariables.CurrentTileIDY, cellObjectId];
+                    var collisionObjectIds = gridData[gridVariables.CurrentTileIDX, gridVariables.CurrentTileIDY, cellObjectId];
                     if (collisionObjectIds == 0)
                         break;
 
                     collisionObjectIds--;
-                    var rayWallIntersection = walls[collisionObjectIds].GetIntersection(lightRay, ignoredWall);
+                    var currentWall = walls[collisionObjectIds];
+                    var rayWallIntersection = currentWall.GetIntersection(lightRay, ignoredWall);
                     if (rayWallIntersection.HasValue != 1) continue;
                     
                     var raySourceToWallIntersectionDistance = lightRay.Source.GetDistance(rayWallIntersection);
-                    if (!(raySourceToWallIntersectionDistance < closestDistance)) continue;
+                    if (raySourceToWallIntersectionDistance >= closestDistance) continue;
                     
                     gridTraversalResult.IntersectionPoint = rayWallIntersection;
                     closestDistance = raySourceToWallIntersectionDistance;
-                    gridTraversalResult.IsClosestIntersectionLight = walls[collisionObjectIds].ObjectType == 2;
-                    gridTraversalResult.IntesectedWall = walls[collisionObjectIds];
+                    gridTraversalResult.IsClosestIntersectionLight = currentWall.ObjectType == 2;
+                    gridTraversalResult.IntesectedWall = currentWall;
                     gridTraversalResult.IntesectedWall.HasValue = 1;
                 }
 
                 if (gridTraversalResult.IsIntersectionPointFound())
                 {
-                    var intersectionTileIdX = (int)XMath.Floor(gridTraversalResult.IntersectionPoint.X / CellWidth);
-                    var intersectionTileIdY = (int)XMath.Floor(gridTraversalResult.IntersectionPoint.Y / CellHeight);
+                    var intersectionTileIdX = (int)(gridTraversalResult.IntersectionPoint.X / CellWidth);
+                    var intersectionTileIdY = (int)(gridTraversalResult.IntersectionPoint.Y / CellHeight);
                     if (intersectionTileIdX == gridVariables.CurrentTileIDX && intersectionTileIdY == gridVariables.CurrentTileIDY)
                         break;
                 }

@@ -58,8 +58,7 @@ namespace PTGI_Remastered
             bitmap.SetBitmapSettings(renderSpecification.ImageWidth, renderSpecification.ImageHeight, walls.Length);
 
             _cache.WithEnclosureDetection(bitmap, renderSpecification);
-            _cache.WithContext();
-            _cache.WithAccelerator(renderSpecification.DeviceId, renderSpecification.UseCUDARenderer);
+            _cache.WithContext(renderSpecification.DeviceId, renderSpecification.UseCUDARenderer);
             _cache.SetPixelBuffer();
             _cache.SetSeedBuffer(bitmap.Size);
             _cache.SetWallBuffer(walls);
