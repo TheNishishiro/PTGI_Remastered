@@ -1,6 +1,6 @@
 # Notice
 
-Current branch is under heavy refactorization, some features are completely removed until migration from Alea to ILGPU is completed
+Current implementation is completely moved to ILGPU with only a couple things still missing (material properties for example have not been reimplemented yet as I focus on performance right now), readme and screenshots probably needs redoing at this point
 
 Currently even without previous optimizations performance is greatly improved, up to real time rendering on GTX 1050m
 
