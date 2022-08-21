@@ -89,6 +89,22 @@ namespace PTGI_Remastered.Structs
             structType = PTGI_StructTypes.Polygon;
         }
 
+        public void MovePolygon(float offsetX, float offsetY)
+        {
+            var point = new Point();
+            point.SetCoords(offsetX, offsetY);
+            for (var index = 0; index < Verticies.Length; index++)
+            {
+                Verticies[index].Add(point);
+            }
+
+            for (var index = 0; index < Walls.Length; index++)
+            {
+                Walls[index].Destination.Add(point);
+                Walls[index].Source.Add(point);
+            }
+        }
+
         public Point GetIntersectionPoint(Line line, Line wallToIgnore)
         {
             var intersectionPoint = new Point();

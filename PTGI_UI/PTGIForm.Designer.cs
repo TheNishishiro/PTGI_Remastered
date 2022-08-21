@@ -396,6 +396,7 @@ namespace PTGI_UI
             this.objectEmissionStrengthControl.TabIndex = 13;
             this.objectEmissionStrengthControl.Text = "1";
             this.objectEmissionStrengthControl.TrailingIcon = null;
+            this.objectEmissionStrengthControl.TextChanged += new System.EventHandler(this.UpdateObjectSettings);
             // 
             // materialLabel12
             // 
@@ -427,7 +428,7 @@ namespace PTGI_UI
             this.objectDensityControl.TabIndex = 12;
             this.objectDensityControl.Text = "1.4";
             this.objectDensityControl.TrailingIcon = null;
-            // 
+            this.objectDensityControl.TextChanged += new System.EventHandler(this.UpdateObjectSettings);
             // materialLabel11
             // 
             this.materialLabel11.AutoSize = true;

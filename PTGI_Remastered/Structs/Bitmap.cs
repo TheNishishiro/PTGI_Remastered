@@ -80,6 +80,13 @@ namespace PTGI_Remastered.Structs
             return newColor;
         }
 
+        public Color GetMultiplied(float factor)
+        {
+            var newColor = new Color();
+            newColor.SetColor(R * factor, G * factor, B * factor);
+            return newColor;
+        }
+
         public void Multiply(Color color)
         {
             R *= color.R;

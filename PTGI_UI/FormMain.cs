@@ -578,5 +578,27 @@ namespace PTGI_UI
             Polygons.RemoveAll(x => x.Name == "MouseCursor");
             RenderedPictureBox.Refresh();
         }
+
+        protected void MoveSelected(Keys keyPress)
+        {
+            var selectedPolygon = Polygons[SelectedPolygon];
+            switch (keyPress)
+            {
+                case Keys.Up:
+                    selectedPolygon.MovePolygon(0, -10);
+                    break;
+                case Keys.Down:
+                    selectedPolygon.MovePolygon(0, 10);
+                    break;
+                case Keys.Left:
+                    selectedPolygon.MovePolygon(-10, 0);
+                    break;
+                case Keys.Right:
+                    selectedPolygon.MovePolygon(10, 0);
+                    break;
+            }
+            PathTraceThread();
+            RenderedPictureBox.Refresh();
+        }
     }
 }

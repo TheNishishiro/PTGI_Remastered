@@ -146,6 +146,12 @@ namespace PTGI_UI
                     ZoomImage();
                     Refresh();
                     break;
+                case Keys.Up:
+                case Keys.Down:
+                case Keys.Left:
+                case Keys.Right:
+                    MoveSelected(e.KeyCode);
+                    break;
             }
         }
 

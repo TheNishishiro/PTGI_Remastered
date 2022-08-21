@@ -173,8 +173,7 @@ namespace PTGI_Remastered
                 }
                 else if(gridTraversalResult.IsClosestIntersectionLight)
                 {
-                    rayTraceResult.pixelColor.TintWith(gridTraversalResult.IntesectedWall.Color, gridTraversalResult.IntesectedWall.EmissionStrength);
-                    rayTraceResult.pixelColor.Rescale(255);
+                    rayTraceResult.pixelColor.TintWith(gridTraversalResult.IntesectedWall.Color.GetRescaled(255), gridTraversalResult.IntesectedWall.EmissionStrength);
                     return rayTraceResult;
                 }
                 else
@@ -195,7 +194,7 @@ namespace PTGI_Remastered
                     }
                     else
                     {
-                        rayTraceResult.pixelColor.Multiply(gridTraversalResult.IntesectedWall.Color.GetRescaled(255).GetRescaled(XMath.PI));
+                        rayTraceResult.pixelColor.Multiply(gridTraversalResult.IntesectedWall.Color.GetRescaled(XMath.PI).GetRescaled(255));
                     }
 
                     if (rayTraceResult.pixelColor.IsDim())
