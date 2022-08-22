@@ -14,33 +14,30 @@ namespace PTGI_Denoiser.Cache
         public Context Context { get; private set; }
         public Accelerator Accelerator { get; private set; }
 
-        public MemoryBuffer<Color> PixelBuffer { get; set; }
+        public MemoryBuffer1D<Color, Stride1D.Dense> PixelBuffer { get; set; }
         private int _pixelBufferLength;
 
         public void WithContext()
         {
-            if (Context == null)
-                Context = new Context(ContextFlags.Force32BitFloats, ILGPU.IR.Transformations.OptimizationLevel.O2);
+            Context ??= Context.Create().Optimize(OptimizationLevel.O2).Cuda().ToContext();
         }
 
-        public void WithAccelerator(AcceleratorId GpuId, bool UseCudaRenderer)
+        public void WithAccelerator(int deviceId, bool useCudaRenderer)
         {
-            if (Accelerator == null)
-            {
-                if (GpuId != null)
-                    Accelerator = Accelerator.Create(Context, GpuId);
-                else if (UseCudaRenderer)
-                    Accelerator = new CudaAccelerator(Context);
-                else
-                    Accelerator = new CPUAccelerator(Context);
-            }
+            if (Accelerator != null) return;
+            
+            if (useCudaRenderer)
+                Accelerator = Context.CreateCudaAccelerator(deviceId);
+            else
+                Accelerator = Context.CreateCPUAccelerator(deviceId);
         }
+
 
         public void SetPixelBuffer(Color[] cachePixels)
         {
             if (_pixelBufferLength != cachePixels.Length || PixelBuffer == null)
                 AllocatePixelBuffer(cachePixels.Length);
-            PixelBuffer.CopyFrom(cachePixels, 0, Index1.Zero, cachePixels.Length);
+            PixelBuffer.CopyFromCPU(cachePixels);
         }
 
         private void AllocatePixelBuffer(int size)
@@ -48,7 +45,7 @@ namespace PTGI_Denoiser.Cache
             _pixelBufferLength = size;
             if (PixelBuffer != null)
                 PixelBuffer.Dispose();
-            PixelBuffer = Accelerator.Allocate<Color>(size);
+            PixelBuffer = Accelerator.Allocate1D<Color>(size);
         }
     }
 }

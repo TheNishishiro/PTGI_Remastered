@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace PTGI_Remastered.Structs
 {
-    struct PolygonContainer
+    internal struct PolygonContainer
     {
         public int PolygonCount;
         public PTGI_ObjectTypes[] ObjectTypes;
@@ -17,7 +17,7 @@ namespace PTGI_Remastered.Structs
         public float[] EmissionStrength;
         public float[] Density;
         public bool[] HasValue;
-        public void Setup(Polygon[] collisionObjects, Line[][] walls, Point[][] verticies)
+        public void Setup(SPolygon[] collisionObjects, SLine[][] walls, SPoint[][] verticies)
         {
             HasValue = new bool[PolygonCount];
             EmissionStrength = new float[PolygonCount];
@@ -27,7 +27,7 @@ namespace PTGI_Remastered.Structs
             StructType = new PTGI_StructTypes[PolygonCount];
             ObjectTypes = new PTGI_ObjectTypes[PolygonCount];
 
-            for (int i = 0; i < PolygonCount; i++)
+            for (var i = 0; i < PolygonCount; i++)
             {
                 walls[i] = collisionObjects[i].Walls;
                 verticies[i] = collisionObjects[i].Verticies;
@@ -40,11 +40,11 @@ namespace PTGI_Remastered.Structs
                 ObjectTypes[i] = collisionObjects[i].objectType;
             }
         }
-        public void CUDA_Copy(Polygon[] CUDAcollisionObjects, Line[][] walls, Point[][] verticies)
+        public void CUDA_Copy(SPolygon[] CUDAcollisionObjects, SLine[][] walls, SPoint[][] verticies)
         {
-            for (int i = 0; i < PolygonCount; i++)
+            for (var i = 0; i < PolygonCount; i++)
             {
-                CUDAcollisionObjects[i] = new Polygon();
+                CUDAcollisionObjects[i] = new SPolygon();
                 CUDAcollisionObjects[i].Walls = walls[i];
                 CUDAcollisionObjects[i].EmissionStrength = EmissionStrength[i];
                 CUDAcollisionObjects[i].Verticies = verticies[i];

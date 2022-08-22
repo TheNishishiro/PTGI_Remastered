@@ -6,19 +6,21 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using ILGPU.Runtime;
+using PTGI_Remastered.Classes;
 
 namespace PTGI_Remastered.Utilities
 {
     public struct NextRay
     {
-        public Point Destination;
+        public SPoint Destination;
         public bool SwapDensity;
         public bool HasValue;
 
-        public void Setup(Point Destination, bool SwapDensity)
+        public void Setup(SPoint destination, bool swapDensity)
         {
-            this.Destination = Destination;
-            this.SwapDensity = SwapDensity;
+            Destination = destination;
+            SwapDensity = swapDensity;
             HasValue = true;
         }
     }
@@ -26,34 +28,31 @@ namespace PTGI_Remastered.Utilities
     public class TraceRayUtility
     {
         
-        public static NextRay NextRayDirection(Index1 index, ArrayView<int> seedArray, Line collisionObject, Line wallToIgnore, Point raySource, Point intersection, float reflectionArea, bool swapDensity)
+        public static NextRay NextRayDirection(Index1D index, ArrayView1D<int, Stride1D.Dense> seedArray, SLine collisionObject, SLine wallToIgnore, SPoint raySource, SPoint intersection, float reflectionArea, bool swapDensity)
         {
-            float reflectFromGlassChanceThreshold = 0.15f;
-            float directionRayOffset = 1000;
-            float airDensity = 1;
-            NextRay nextRay = new NextRay();
+            const float reflectFromGlassChanceThreshold = 0.15f;
+            const int directionRayOffset = 1000;
+            var nextRay = new NextRay();
 
             var closestNormal = wallToIgnore.GetShiftedClosestNormal(raySource, intersection, reflectionArea);
-            float reflectFromGlassChance = PTGI_Random.GetRandomBetween(index, seedArray, 0, 1);
+            var reflectFromGlassChance = PTGI_Random.GetRandomBetween(index, seedArray, 0, 1);
 
             var isReflectiveOrReflectFromGlass = collisionObject.ReflectivnessType != 4 || reflectFromGlassChance < reflectFromGlassChanceThreshold;
-            if (isReflectiveOrReflectFromGlass)
+            if (!isReflectiveOrReflectFromGlass) return nextRay;
+            nextRay = collisionObject.ReflectivnessType switch
             {
-                if (collisionObject.ReflectivnessType == 3)
-                    nextRay = ProcessSmooth(closestNormal, directionRayOffset, raySource, intersection, swapDensity);
-                else if (collisionObject.ReflectivnessType == 2)
-                    nextRay = ProcessSemiRough(index, seedArray, directionRayOffset, closestNormal, raySource, intersection, reflectionArea, swapDensity);
-                else
-                    nextRay = ProcessRough(index, seedArray, directionRayOffset, closestNormal, intersection, swapDensity);
-            }
+                3 => ProcessSmooth(closestNormal, directionRayOffset, raySource, intersection, swapDensity),
+                2 => ProcessSemiRough(index, seedArray, directionRayOffset, closestNormal, raySource, intersection, reflectionArea, swapDensity),
+                _ => ProcessRough(index, seedArray, directionRayOffset, closestNormal, intersection, swapDensity)
+            };
 
             return nextRay;
         }
 
         
-        private static NextRay ProcessRough(Index1 index, ArrayView<int> seedArray, float directionRayOffset, Point closestNormal, Point intersection, bool swapDensity)
+        private static NextRay ProcessRough(Index1D index, ArrayView1D<int, Stride1D.Dense> seedArray, float directionRayOffset, SPoint closestNormal, SPoint intersection, bool swapDensity)
         {
-            NextRay nextRay = new NextRay();
+            var nextRay = new NextRay();
 
             var newRayDirection = PTGI_Random.GetPointInRadius(index, seedArray, closestNormal.GetDistance(intersection));
             newRayDirection.Add(closestNormal);
@@ -70,20 +69,20 @@ namespace PTGI_Remastered.Utilities
         }
 
         
-        private static NextRay ProcessSmooth(Point closestNormal, float directionRayOffset, Point raySource, Point intersection, bool swapDensity)
+        private static NextRay ProcessSmooth(SPoint closestNormal, float directionRayOffset, SPoint raySource, SPoint intersection, bool swapDensity)
         {
-            NextRay nextRay = new NextRay();
+            var nextRay = new NextRay();
 
             var direction = raySource.GetDirection(intersection);
             direction.Normalize();
 
-            Point reflectionPoint = new Point();
+            var reflectionPoint = new SPoint();
             var dotProductResult = direction.DotProduct(closestNormal);
             reflectionPoint.SetCoords(
                 direction.X - 2 * dotProductResult * closestNormal.X,
                 direction.Y - 2 * dotProductResult * closestNormal.Y);
 
-            Point newDirection = new Point();
+            var newDirection = new SPoint();
             newDirection.SetCoords(intersection.X + (reflectionPoint.X * directionRayOffset), intersection.Y + (reflectionPoint.Y * directionRayOffset));
 
             nextRay.Setup(newDirection, swapDensity);
@@ -92,34 +91,36 @@ namespace PTGI_Remastered.Utilities
         }
 
         
-        private static NextRay ProcessSemiRough(Index1 index, ArrayView<int> seedArray, float directionRayOffset, Point closestNormal, Point raySource, Point intersection, float reflectionArea, bool swapDensity)
+        private static NextRay ProcessSemiRough(Index1D index, ArrayView1D<int, Stride1D.Dense> seedArray, float directionRayOffset, SPoint closestNormal, SPoint raySource, SPoint intersection, float reflectionArea, bool swapDensity)
         {
-            NextRay nextRay = new NextRay();
+            var nextRay = new NextRay();
             nextRay = ProcessSmooth(closestNormal, directionRayOffset, raySource, intersection, swapDensity);
 
-            var PointInCircle = PTGI_Random.GetPointInRadius(index, seedArray, reflectionArea);
-            nextRay.Destination.Add(PointInCircle);
+            var pointInCircle = PTGI_Random.GetPointInRadius(index, seedArray, reflectionArea);
+            nextRay.Destination.Add(pointInCircle);
 
             return nextRay;
         }
 
-        public static void IsRayStartingInPolygon(Point raySource, Polygon[] collisionObjects, int samples, ref Color pixel)
+        public static void IsRayStartingInPolygon(Point raySource, Polygon[] collisionObjects, ref Color pixel)
         {
-            for (int i = 0; i < collisionObjects.Length; i++)
+            for (var i = 0; i < collisionObjects.Length; i++)
             {
-                bool isInsideObject = raySource.LiesInObject(collisionObjects[i]);
-                if (isInsideObject)
+                if (collisionObjects[i].reflectivnessType == PTGI_MaterialReflectivness.Transparent)
+                    continue;
+                
+                var isInsideObject = raySource.LiesInObject(collisionObjects[i]);
+                if (!isInsideObject) continue;
+                
+                if (collisionObjects[i].objectType == PTGI_ObjectTypes.LightSource)
                 {
-                    if (collisionObjects[i].objectType == PTGI_ObjectTypes.LightSource)
-                    {
-                        pixel.SetColor(collisionObjects[i].Color, collisionObjects[i].EmissionStrength);
-                        pixel.Rescale(255);
-                        pixel.ApplyGammaCorrection(1);
-                        pixel.Clip();
-                    }
-                    pixel.Skip = 1;
-                    break;
+                    pixel.SetColor(collisionObjects[i].Color, collisionObjects[i].EmissionStrength);
+                    pixel.Rescale(255);
+                    pixel.ApplyGammaCorrection(1);
+                    pixel.Clip();
                 }
+                pixel.Skip = 1;
+                break;
             }
         }
     }

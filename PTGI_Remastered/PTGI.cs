@@ -13,7 +13,7 @@ using System.Text;
 using System.Threading.Tasks;
 using PTGI_Remastered.Cache;
 using ILGPU.Algorithms;
-using Grid = PTGI_Remastered.Structs.Grid;
+using ILGPU.Runtime.OpenCL;
 
 namespace PTGI_Remastered
 {
@@ -26,22 +26,28 @@ namespace PTGI_Remastered
             _cache = new TempCache();
         }
         
-        public List<Gpu> GetAvaiableHardwareAccelerators()
+        public List<Gpu> GetAvailableHardwareAccelerators()
         {
-            var context = new Context();
+            var context = Context.CreateDefault();
+            
             var gpus = new List<Gpu>();
-            foreach (var acceleratorId in Accelerator.Accelerators)
+            foreach (var device in context)
             {
-                using (var accl = Accelerator.Create(context, acceleratorId))
+                using var accelerator = device.CreateAccelerator(context);
+                switch (accelerator)
                 {
-                    gpus.Add(new Gpu()
-                    {
-                        Id = acceleratorId,
-                        Name = accl.Name
-                    });
-
-                    accl.PrintInformation();
+                    case CPUAccelerator cpuAccelerator:
+                        gpus.Add(new Gpu(cpuAccelerator));
+                        break;
+                    case CudaAccelerator cudaAccelerator:
+                        gpus.Add(new Gpu(cudaAccelerator));
+                        break;
+                    case CLAccelerator clAccelerator:
+                        gpus.Add(new Gpu(clAccelerator));
+                        break;
                 }
+
+                accelerator.PrintInformation();
             }
             context.Dispose();
 
@@ -50,7 +56,7 @@ namespace PTGI_Remastered
 
         public RenderResult PathTraceRender(RenderSpecification renderSpecification)
         {
-            Stopwatch processTimeStopwatch = new Stopwatch();
+            var processTimeStopwatch = new Stopwatch();
             processTimeStopwatch.Start();
             var walls = renderSpecification.GetWalls();
             var renderResult = new RenderResult();
@@ -59,8 +65,7 @@ namespace PTGI_Remastered
             bitmap.SetBitmapSettings(renderSpecification.ImageWidth, renderSpecification.ImageHeight, walls.Length);
 
             _cache.WithEnclosureDetection(bitmap, renderSpecification);
-            _cache.WithContext();
-            _cache.WithAccelerator(renderSpecification.GpuId, renderSpecification.UseCUDARenderer);
+            _cache.WithContext(renderSpecification.DeviceId, renderSpecification.AcceleratorType);
             _cache.SetPixelBuffer();
             _cache.SetSeedBuffer(bitmap.Size);
             _cache.SetWallBuffer(walls);
@@ -78,7 +83,7 @@ namespace PTGI_Remastered
                 renderSpecification.SampleCount, 
                 renderSpecification.BounceLimit,
                 _cache.GridDataBuffer,
-                _cache.GridCached);
+                _cache.SGridCached);
             renderTimeStopwatch.Stop();
 
             renderResult.RenderTime = renderTimeStopwatch.ElapsedMilliseconds;
@@ -88,24 +93,24 @@ namespace PTGI_Remastered
             return renderResult;
         }
 
-        private static Color[] StartRender(Accelerator accelerator, Bitmap bitmap, MemoryBuffer<Color> bitmapPixels, MemoryBuffer<int> randomSeedArray, MemoryBuffer<Line> walls, int samples, int bounceLimit, MemoryBuffer3D<int> gridData, Grid grid)
+        private static Color[] StartRender(Accelerator accelerator, Bitmap bitmap, MemoryBuffer1D<Color, Stride1D.Dense> bitmapPixels, MemoryBuffer1D<int, Stride1D.Dense> randomSeedArray, MemoryBuffer1D<SLine, Stride1D.Dense> walls, int samples, int bounceLimit, MemoryBuffer1D<int, Stride1D.Dense> gridData, SGrid sGrid)
         {
             var ptgiKernel = accelerator.LoadAutoGroupedStreamKernel<
-                Index1,
+                Index1D,
                 Bitmap,
-                ArrayView<Color>,
-                ArrayView<int>,
+                ArrayView1D<Color, Stride1D.Dense>,
+                ArrayView1D<int, Stride1D.Dense>,
                 int, 
                 int, 
-                ArrayView<Line>,
-                ArrayView3D<int>,
-                Grid>(CUDA_StartRender);
+                ArrayView1D<SLine, Stride1D.Dense>,
+                ArrayView1D<int, Stride1D.Dense>,
+                SGrid>(CUDA_StartRender);
 
             try
             {
-                ptgiKernel(bitmapPixels.Length, bitmap, bitmapPixels.View, randomSeedArray.View, samples, bounceLimit, walls.View, gridData.View, grid);
+                ptgiKernel((int)bitmapPixels.Length, bitmap, bitmapPixels.View, randomSeedArray.View, samples, bounceLimit, walls.View, gridData.View, sGrid);
                 accelerator.Synchronize();
-                return bitmapPixels.GetAsArray();
+                return bitmapPixels.AsContiguous().GetAsArray();
             }
             catch(Exception ex)
             {
@@ -115,54 +120,51 @@ namespace PTGI_Remastered
             return new Color[bitmapPixels.Length];
         }
 
-        private static void CUDA_StartRender(Index1 index, Bitmap bitmap, ArrayView<Color> pixels, ArrayView<int> seedArray, int samples, int bounceLimit, ArrayView<Line> walls, ArrayView3D<int> gridData, Grid grid)
+        private static void CUDA_StartRender(Index1D index, Bitmap bitmap, ArrayView1D<Color, Stride1D.Dense> pixels, ArrayView1D<int, Stride1D.Dense> seedArray, int samples, int bounceLimit, ArrayView1D<SLine, Stride1D.Dense> walls, ArrayView1D<int, Stride1D.Dense> gridData, SGrid sGrid)
         {
-            if (index < pixels.Length)
-            {
-                if (pixels[index].Skip == 1)
-                    return;
-                
-                Point raySource = PTGI_Math.Convert1dIndexTo2d(bitmap, index);
-                Line lightRay = new Line();
-                lightRay.Setup(raySource, new Point());
-                var pixelInformaton = RenderBitmap(index, bitmap, lightRay, seedArray, samples, bounceLimit, walls, gridData, grid);
+            if (pixels[index].Skip == 1)
+                return;
+            
+            SPoint raySource = PTGI_Math.Convert1dIndexTo2d(bitmap, index);
+            SLine lightRay = new SLine();
+            lightRay.Setup(raySource, new SPoint());
+            var pixelInformaton = RenderBitmap(index, bitmap, lightRay, seedArray, samples, bounceLimit, walls, gridData, sGrid);
 
-                bitmap.SetPixel(index, pixelInformaton.pixelColor, 1.0f / samples, pixels);
-            }
+            bitmap.SetPixel(index, pixelInformaton.pixelColor, 1.0f / samples, pixels);
         }
 
-        private static PixelInformaton RenderBitmap(Index1 index, Bitmap bitmap, Line lightRay, ArrayView<int> seedArray, int samples, int bounceLimit, ArrayView<Line> walls, ArrayView3D<int> gridData, Grid grid)
+        private static PixelInformaton RenderBitmap(Index1D index, Bitmap bitmap, SLine lightRay, ArrayView1D<int, Stride1D.Dense> seedArray, int samples, int bounceLimit, ArrayView1D<SLine, Stride1D.Dense> walls, ArrayView1D<int, Stride1D.Dense> gridData, SGrid sGrid)
         {
             var pixelInformation = new PixelInformaton(); 
             for (int sampleId = 0; sampleId < samples; sampleId++)
             {
                 lightRay.Destination = PTGI_Random.GetPointInRadius(index, seedArray, 10).AddNew(lightRay.Source);
 
-                Point rayDirection = lightRay.GetDirection();
+                SPoint rayDirection = lightRay.GetDirection();
                 rayDirection.Normalize();
                 rayDirection.Multiply(10000);
 
                 lightRay.Destination.Add(rayDirection);
 
-                Line wallToIgnore = new Line();
-                var rayTraceResult = CUDA_TraceRay(index, seedArray, bitmap, bounceLimit, false, walls, lightRay, wallToIgnore, gridData, grid);
+                SLine wallToIgnore = new SLine();
+                var rayTraceResult = CUDA_TraceRay(index, seedArray, bitmap, bounceLimit, false, walls, lightRay, wallToIgnore, gridData, sGrid);
 
                 pixelInformation.pixelColor.Add(rayTraceResult.pixelColor);
             }
             return pixelInformation;
         }
 
-        private static RayTraceResult CUDA_TraceRay(Index1 index, ArrayView<int> seedArray, Bitmap bitmap, int bounceLimit, bool originDensitySwap,
-            ArrayView<Line> walls, Line lightRay, Line wallToIgnore, ArrayView3D<int> gridData, Grid grid)
+        private static RayTraceResult CUDA_TraceRay(Index1D index, ArrayView1D<int, Stride1D.Dense> seedArray, Bitmap bitmap, int bounceLimit, bool originDensitySwap,
+            ArrayView1D<SLine, Stride1D.Dense> walls, SLine lightRay, SLine wallToIgnore, ArrayView1D<int, Stride1D.Dense> gridData, SGrid sGrid)
         {
             var rayTraceResult = new RayTraceResult();
             rayTraceResult.pixelColor = new Color();
             rayTraceResult.pixelColor.SetColor(1, 1, 1);
 
-            float reflectionAreaSize = 10;
-            for (int bounceIndex = 0; bounceIndex < bounceLimit; bounceIndex++)
+            const float reflectionAreaSize = 10;
+            for (var bounceIndex = 0; bounceIndex < bounceLimit; bounceIndex++)
             {
-                var gridTraversalResult = grid.TraverseGrid(lightRay, bitmap.WallsCount, gridData, walls, wallToIgnore);
+                var gridTraversalResult = sGrid.TraverseGrid(lightRay, bitmap.WallsCount, gridData, walls, wallToIgnore);
                 if (gridTraversalResult.IntesectedWall.HasValue != 1)
                 {
                     rayTraceResult.pixelColor.SetColor(0, 0, 0);
@@ -170,20 +172,19 @@ namespace PTGI_Remastered
                 }
                 else if(gridTraversalResult.IsClosestIntersectionLight)
                 {
-                    rayTraceResult.pixelColor.TintWith(gridTraversalResult.IntesectedWall.Color, gridTraversalResult.IntesectedWall.EmissionStrength);
-                    rayTraceResult.pixelColor.Rescale(255);
+                    rayTraceResult.pixelColor.TintWith(gridTraversalResult.IntesectedWall.Color.GetRescaled(255), gridTraversalResult.IntesectedWall.EmissionStrength);
                     return rayTraceResult;
                 }
                 else
                 {
-                    if(lightRay.Source.IsEqualTo(gridTraversalResult.IntersectionPoint))
+                    if(lightRay.Source.IsEqualTo(gridTraversalResult.IntersectionSPoint))
                     {
                         rayTraceResult.pixelColor.SetColor(0, 0, 0);
                         return rayTraceResult;
                     }
                     wallToIgnore = gridTraversalResult.IntesectedWall;
 
-                    var nextRayDirection = TraceRayUtility.NextRayDirection(index, seedArray, gridTraversalResult.IntesectedWall, wallToIgnore, lightRay.Source, gridTraversalResult.IntersectionPoint, reflectionAreaSize, originDensitySwap);
+                    var nextRayDirection = TraceRayUtility.NextRayDirection(index, seedArray, gridTraversalResult.IntesectedWall, wallToIgnore, lightRay.Source, gridTraversalResult.IntersectionSPoint, reflectionAreaSize, originDensitySwap);
                     originDensitySwap = nextRayDirection.SwapDensity;
 
                     if(gridTraversalResult.IntesectedWall.ReflectivnessType == 4)
@@ -192,10 +193,16 @@ namespace PTGI_Remastered
                     }
                     else
                     {
-                        rayTraceResult.pixelColor.Multiply(gridTraversalResult.IntesectedWall.Color.GetRescaled(255).GetRescaled(XMath.PI));
+                        rayTraceResult.pixelColor.Multiply(gridTraversalResult.IntesectedWall.Color.GetRescaled(XMath.PI).GetRescaled(255));
                     }
 
-                    lightRay.Source = gridTraversalResult.IntersectionPoint;
+                    if (rayTraceResult.pixelColor.IsDim())
+                    {
+                        rayTraceResult.pixelColor.SetColor(0, 0, 0);
+                        return rayTraceResult;
+                    }
+
+                    lightRay.Source = gridTraversalResult.IntersectionSPoint;
                     lightRay.Destination = nextRayDirection.Destination;
                 }
             }

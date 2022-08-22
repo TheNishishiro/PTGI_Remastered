@@ -4,6 +4,7 @@ using MaterialSkin2DotNet.Controls;
 using PTGI_Remastered.Inputs;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
@@ -13,6 +14,13 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Xml.Serialization;
+using PTGI_Remastered.Classes;
+using PTGI_Remastered.Structs;
+using PTGI_Remastered.Utilities;
+using Bitmap = System.Drawing.Bitmap;
+using Color = System.Drawing.Color;
+using SystemPoint = System.Drawing.Point;
+using Point = PTGI_Remastered.Classes.Point;
 
 namespace PTGI_UI
 {
@@ -23,9 +31,8 @@ namespace PTGI_UI
         protected PTGI_Denoiser.Denoiser Denoiser { get; set; }
         protected PTGI_Remastered.PTGI PathTracer { get; set; }
         protected SettingsView Settings { get; set; }
-        protected AcceleratorId GpuId { get; set; }
         protected int popupTime { get; set; } = 0;
-        protected List<PTGI_Remastered.Structs.Polygon> Polygons { get; set; }
+        protected List<Polygon> Polygons { get; set; }
 
         protected MaterialCard PopupMessage { get; set; }
         protected MaterialLabel RenderTimeMessageText { get; set; }
@@ -46,28 +53,32 @@ namespace PTGI_UI
 
         protected bool IsRenderingInProgress { get; set; }
 
-        protected int SelectedPolygon { get; set; }
+        protected Polygon SelectedPolygon { get; set; }
         protected float ZoomFactor { get; set; }
         protected int CurrentZoomDelta { get; set; }
 
-        protected void PathTraceThread()
+        protected void PathTraceThread(RenderSpecification renderSpecification = null)
         {
             try
             {
                 IsRenderingInProgress = true;
-                var pathTraceResult = PathTracer.PathTraceRender(
-                    new RenderSpecification()
+                if (renderSpecification == null)
+                {
+                    renderSpecification = new RenderSpecification()
                     {
                         BounceLimit = Settings.BounceLimit,
-                        GpuId = GpuId,
+                        DeviceId = Settings.DeviceId,
                         GridSize = Settings.GridDivider,
-                        UseCUDARenderer = Settings.UseCUDA,
+                        AcceleratorType = Settings.AcceleratorType,
                         ImageHeight = Settings.RenderHeight,
                         ImageWidth = Settings.RenderWidth,
                         Objects = Polygons.ToArray(),
                         SampleCount = Settings.SamplesPerPixel,
                         IgnoreEnclosedPixels = Settings.RenderFlag_IgnoreObstacleInterior
-                    });
+                    };
+                }
+
+                var pathTraceResult = PathTracer.PathTraceRender(renderSpecification);
 
                 var pixels = pathTraceResult.Pixels;
 
@@ -77,19 +88,24 @@ namespace PTGI_UI
                     denoiseResult = Denoiser.Denoise(new PTGI_Denoiser.DenoiseRequest()
                     {
                         bitmap = pathTraceResult.bitmap,
-                        GpuId = GpuId,
+                        DeviceId = Settings.DeviceId,
                         Pixels = pathTraceResult.Pixels,
-                        KernelSize = Settings.DenoiserKernelSize
+                        KernelSize = Settings.DenoiserKernelSize,
+                        IterationCount = Settings.DenoiserIterationCount
                     });
                     pixels = denoiseResult.Pixels;
                 }
 
-                this.Invoke(new MethodInvoker(delegate () {
+                this.Invoke(new MethodInvoker(delegate ()
+                {
+                    var stopwatch = Stopwatch.StartNew();
+                    RenderedPictureBox.BackgroundImage = RenderedImage = ApplyBitmap(pixels, pathTraceResult.bitmap.Size);
+                    stopwatch.Stop();
                     ShowPopupMessage($"Render time: {pathTraceResult.RenderTime} ms;" +
                         $"Allocation time: {pathTraceResult.ProcessTime - pathTraceResult.RenderTime} ms;" +
                         $"Denoiser time: {denoiseResult.DenoiseTime} ms;" +
-                        $"Total time: {pathTraceResult.ProcessTime + denoiseResult.DenoiseTime} ms", 10);
-                    RenderedPictureBox.BackgroundImage = RenderedImage = ApplyBitmap(pixels, pathTraceResult.bitmap.Size);
+                        $"Apply bitmap: {stopwatch.ElapsedMilliseconds} ms;" +
+                        $"Total time: {pathTraceResult.ProcessTime + denoiseResult.DenoiseTime + stopwatch.ElapsedMilliseconds} ms", 10);
                     ZoomImage();
                 }));
             }
@@ -98,18 +114,23 @@ namespace PTGI_UI
                 Settings.IsLivePreview = false;
                 this.Invoke(new MethodInvoker(delegate ()
                 {
-                    MessageBox.Show(this, ex.Message, "Render failed");
+                    if (ex.InnerException == null)
+                        MessageBox.Show(this, ex.Message, "Render failed");
+                    else if (ex.InnerException.InnerException == null)
+                        MessageBox.Show(this, ex.InnerException.Message, "Render failed");
+                    else
+                        MessageBox.Show(this, ex.InnerException.InnerException.Message, "Render failed");
                 }));
             }
             IsRenderingInProgress = false;
         }
 
-        protected Bitmap ApplyBitmap(PTGI_Remastered.Structs.Color[] pixels, int bitmapSize)
+        private Bitmap ApplyBitmap(PTGI_Remastered.Structs.Color[] pixels, int bitmapSize)
         {
-            Bitmap bmp = new Bitmap(Settings.RenderWidth, Settings.RenderHeight, PixelFormat.Format24bppRgb);
+            var bmp = new Bitmap(Settings.RenderWidth, Settings.RenderHeight, PixelFormat.Format24bppRgb);
             var rect = new Rectangle(0, 0, Settings.RenderWidth, Settings.RenderHeight);
             var data = bmp.LockBits(rect, ImageLockMode.ReadWrite, bmp.PixelFormat);
-            var depth = Bitmap.GetPixelFormatSize(data.PixelFormat) / 8; //bytes per pixel
+            var depth = Image.GetPixelFormatSize(data.PixelFormat) / 8; //bytes per pixel
 
             var buffer = new byte[data.Width * data.Height * depth];
 
@@ -118,9 +139,9 @@ namespace PTGI_UI
 
             Parallel.For(0, bitmapSize, (i) =>
             {
-                int row = i % Settings.RenderWidth;
-                int col = i / Settings.RenderWidth;
-                Color c = Color.FromArgb((int)(pixels[i].R * 255.0), (int)(pixels[i].G * 255.0), (int)(pixels[i].B * 255.0));
+                var row = i % Settings.RenderWidth;
+                var col = i / Settings.RenderWidth;
+                var c = Color.FromArgb((int)(pixels[i].R * 255.0), (int)(pixels[i].G * 255.0), (int)(pixels[i].B * 255.0));
 
                 Process(buffer, row, col, Settings.RenderWidth, depth, c);
             });
@@ -132,7 +153,7 @@ namespace PTGI_UI
             return bmp;
         }
 
-        private void Process(byte[] buffer, int x, int y, int width, int depth, Color c)
+        private static void Process(IList<byte> buffer, int x, int y, int width, int depth, Color c)
         {
             var offset = ((y * width) + x) * depth;
             buffer[offset + 0] = c.B;
@@ -194,20 +215,18 @@ namespace PTGI_UI
 
         protected void PopupMessageTimeout()
         {
-            if (popupTime > 0)
-            {
-                popupTime--;
+            if (popupTime <= 0) return;
+            popupTime--;
 
-                if (popupTime == 0)
-                {
-                    HidePopupMessage();
-                }
+            if (popupTime == 0)
+            {
+                HidePopupMessage();
             }
         }
 
         protected virtual void pictureBox1_Paint(object sender, PaintEventArgs e)
         {
-            for (int i = 0; i < QueuedVerticiesList.Items.Count; i++)
+            for (var i = 0; i < QueuedVerticiesList.Items.Count; i++)
             {
                 var pointZoomFactor = float.Parse(QueuedVerticiesList.Items[i].Text.Split(';')[2]);
                 e.Graphics.DrawEllipse(
@@ -220,10 +239,9 @@ namespace PTGI_UI
 
             if(Settings.DrawObjectsOverline)
             {
-                int polygonId = 0;
                 foreach(var polygon in Polygons)
                 {
-                    for(int i = 0; i < polygon.Walls.Length; i++)
+                    for(var i = 0; i < polygon.Walls.Length; i++)
                     {
                         e.Graphics.DrawLine(
                             new Pen(Color.Green, 1f),
@@ -232,14 +250,12 @@ namespace PTGI_UI
                             polygon.Walls[i].Destination.X * ZoomFactor,
                             polygon.Walls[i].Destination.Y * ZoomFactor);
                     }
-                    polygonId++;
                 }
             }
 
-            if (SelectedPolygon != -1 && Polygons.Count > 0 && Settings.DrawObjectsOverline)
+            if (SelectedPolygon != null && Polygons.Count > 0)
             {
-                var polygon = Polygons[SelectedPolygon];
-                foreach (var wall in polygon.Walls)
+                foreach (var wall in SelectedPolygon.Walls)
                 {
                     e.Graphics.DrawLine(
                             new Pen(Color.Red, 1f),
@@ -250,50 +266,46 @@ namespace PTGI_UI
                 }
             }
 
-            if (Settings.DrawGrid)
+            if (!Settings.DrawGrid) return;
+            
+            var bitmap = new PTGI_Remastered.Structs.Bitmap();
+            bitmap.SetBitmapSettings(Settings.RenderWidth, Settings.RenderHeight, 0);
+            var cellGrid = new SGrid();
+            cellGrid.Create(bitmap, Settings.GridDivider);
+            for (var i = 0; i < cellGrid.GridSize; i++)
             {
-                PTGI_Remastered.Structs.Bitmap bitmap = new PTGI_Remastered.Structs.Bitmap();
-                bitmap.SetBitmapSettings(Settings.RenderWidth, Settings.RenderHeight, 0);
-                PTGI_Remastered.Structs.Grid cellGrid = new PTGI_Remastered.Structs.Grid();
-                cellGrid.Create(bitmap, Settings.GridDivider);
-                for (int i = 0; i < cellGrid.GridSize; i++)
-                {
-                    int row = (int)Math.Floor(i % (float)Settings.GridDivider);
-                    int col = (int)Math.Floor(i / (float)Settings.GridDivider);
+                var row = (int)Math.Floor(i % (float)Settings.GridDivider);
+                var col = (int)Math.Floor(i / (float)Settings.GridDivider);
 
-                    e.Graphics.DrawRectangle(
-                        new Pen(Color.Blue, 1f),
-                        (row * cellGrid.CellWidth) * ZoomFactor,
-                        (col * cellGrid.CellHeight) * ZoomFactor,
-                        cellGrid.CellWidth * ZoomFactor,
-                        cellGrid.CellHeight * ZoomFactor);
-                    
-                }
+                e.Graphics.DrawRectangle(
+                    new Pen(Color.Blue, 1f),
+                    (row * cellGrid.CellWidth) * ZoomFactor,
+                    (col * cellGrid.CellHeight) * ZoomFactor,
+                    cellGrid.CellWidth * ZoomFactor,
+                    cellGrid.CellHeight * ZoomFactor);
+                
             }
+            
         }
 
         protected virtual void saveSceneButton_Click(object sender, EventArgs e)
         {
             try
             {
-                var aSerializer = new XmlSerializer(typeof(List<PTGI_Remastered.Structs.Polygon>));
-                StringBuilder sb = new StringBuilder();
-                StringWriter sw = new StringWriter(sb);
+                var aSerializer = new XmlSerializer(typeof(List<Polygon>));
+                var sb = new StringBuilder();
+                var sw = new StringWriter(sb);
                 aSerializer.Serialize(sw, Polygons);
-                string xmlResult = sw.GetStringBuilder().ToString();
+                var xmlResult = sw.GetStringBuilder().ToString();
 
-                using (SaveFileDialog saveFileDialog = new SaveFileDialog())
-                {
-                    saveFileDialog.Title = "Save Scene";
-                    saveFileDialog.Filter = "XML Files|*.xml";
-                    if (saveFileDialog.ShowDialog() == DialogResult.OK)
-                    {
-                        using (var streamWriter = new StreamWriter(saveFileDialog.FileName))
-                        {
-                            streamWriter.Write(xmlResult);
-                        }
-                    }
-                }
+                using var saveFileDialog = new SaveFileDialog();
+                saveFileDialog.Title = "Save Scene";
+                saveFileDialog.Filter = "XML Files|*.xml";
+                
+                if (saveFileDialog.ShowDialog() != DialogResult.OK) return;
+                
+                using var streamWriter = new StreamWriter(saveFileDialog.FileName);
+                streamWriter.Write(xmlResult);
             }
             catch(Exception ex)
             {
@@ -303,22 +315,17 @@ namespace PTGI_UI
 
         protected virtual void loadSceneButton_Click(object sender, EventArgs e)
         {
-            try 
+            try
             {
-                using (OpenFileDialog openFileDialog = new OpenFileDialog())
-                {
-                    openFileDialog.Title = "Open scene file";
-                    openFileDialog.Filter = "XML Files|*.xml";
-                    if (openFileDialog.ShowDialog() == DialogResult.OK)
-                    {
-                        using (var streamReader = new StreamReader(openFileDialog.FileName))
-                        {
-                            var aSerializer = new XmlSerializer(typeof(List<PTGI_Remastered.Structs.Polygon>));
-                            Polygons = (List<PTGI_Remastered.Structs.Polygon>)aSerializer.Deserialize(streamReader);
-                            RenderedPictureBox.Refresh();
-                        }
-                    }
-                }
+                using var openFileDialog = new OpenFileDialog();
+                openFileDialog.Title = "Open scene file";
+                openFileDialog.Filter = "XML Files|*.xml";
+                if (openFileDialog.ShowDialog() != DialogResult.OK) return;
+                
+                using var streamReader = new StreamReader(openFileDialog.FileName);
+                var aSerializer = new XmlSerializer(typeof(List<Polygon>));
+                Polygons = (List<Polygon>)aSerializer.Deserialize(streamReader);
+                RenderedPictureBox.Refresh();
             }
             catch (Exception ex)
             {
@@ -330,65 +337,60 @@ namespace PTGI_UI
         {
             if (QueuedVerticiesList.Items.Count < 2)
                 return;
-
-            PTGI_Remastered.Structs.Polygon polygon = new PTGI_Remastered.Structs.Polygon();
-            PTGI_Remastered.Structs.Color color = new PTGI_Remastered.Structs.Color();
+            
+            var color = new PTGI_Remastered.Structs.Color();
             color.SetColor(ObjectColor.R, ObjectColor.G, ObjectColor.B);
 
-            List<PTGI_Remastered.Structs.Point> Vertices = new List<PTGI_Remastered.Structs.Point>();
+            var vertices = new List<Point>();
 
-            for (int i = 0; i < QueuedVerticiesList.Items.Count; i++)
+            for (var i = 0; i < QueuedVerticiesList.Items.Count; i++)
             {
                 var pointZoomFactor = float.Parse(QueuedVerticiesList.Items[i].Text.Split(';')[2]);
-                float x = float.Parse(QueuedVerticiesList.Items[i].Text.Split(';')[0]) * (1 / pointZoomFactor);
-                float y = float.Parse(QueuedVerticiesList.Items[i].Text.Split(';')[1]) * (1 / pointZoomFactor);
+                var x = float.Parse(QueuedVerticiesList.Items[i].Text.Split(';')[0]) * (1 / pointZoomFactor);
+                var y = float.Parse(QueuedVerticiesList.Items[i].Text.Split(';')[1]) * (1 / pointZoomFactor);
 
-                PTGI_Remastered.Structs.Point point = new PTGI_Remastered.Structs.Point();
-                point.SetCoords(x, y);
+                var point = new Point(x, y);
 
-                Vertices.Add(point);
+                vertices.Add(point);
             }
-            polygon.Name = ObjectName;
-            polygon.Setup(Vertices.ToArray(),
-                IsObjectEmittingLight ? PTGI_Remastered.Utilities.PTGI_ObjectTypes.LightSource : PTGI_Remastered.Utilities.PTGI_ObjectTypes.Solid,
-                (PTGI_Remastered.Utilities.PTGI_MaterialReflectivness)Enum.Parse(typeof(PTGI_Remastered.Utilities.PTGI_MaterialReflectivness), SelectedObjectMaterial), 
+            var polygon = new Polygon(vertices.ToArray(),
+                IsObjectEmittingLight ? PTGI_ObjectTypes.LightSource : PTGI_ObjectTypes.Solid,
+                (PTGI_MaterialReflectivness)Enum.Parse(typeof(PTGI_MaterialReflectivness), SelectedObjectMaterial), 
                 color,
                 ObjectEmissionStrength, 
                 ObjectDensity);
+            polygon.Name = ObjectName;
 
             Polygons.Add(polygon);
             QueuedVerticiesList.Items.Clear();
         }
 
-        protected void SelectObject(Point mouseLocation)
+        protected void SelectObject(System.Drawing.Point mouseLocation)
         {
             if (Polygons.Count <= 0)
                 return;
 
-            var mousePoint = new PTGI_Remastered.Structs.Point();
-            mousePoint.SetCoords(mouseLocation.X, mouseLocation.Y);
+            var mousePoint = new Point(mouseLocation.X, mouseLocation.Y);
+            var selectedPolygon = Polygons.FirstOrDefault(polygon => mousePoint.LiesInObject(polygon));
+            SelectedPolygon = selectedPolygon == SelectedPolygon ? null : selectedPolygon;
+            
+            UpdateControlsBySelectedPolygon();
+        }
 
-            for (int i = 0; i < Polygons.Count; i++)
-            {
-                if (mousePoint.LiesInObject(Polygons[i]))
-                {
-                    SelectedPolygon = i;
-                    break;
-                }
-            }
+        protected virtual void UpdateControlsBySelectedPolygon()
+        {
+            
         }
 
         protected void SaveRender()
         {
             try
             {
-                using (SaveFileDialog saveFileDialog = new SaveFileDialog())
-                {
-                    saveFileDialog.Title = "Save an Image File";
-                    saveFileDialog.Filter = "PNG Files|*.png";
-                    if (saveFileDialog.ShowDialog() == DialogResult.OK)
-                        RenderedPictureBox.BackgroundImage.Save(saveFileDialog.FileName, System.Drawing.Imaging.ImageFormat.Png);
-                }
+                using var saveFileDialog = new SaveFileDialog();
+                saveFileDialog.Title = "Save an Image File";
+                saveFileDialog.Filter = "PNG Files|*.png";
+                if (saveFileDialog.ShowDialog() == DialogResult.OK)
+                    RenderedPictureBox.BackgroundImage.Save(saveFileDialog.FileName, System.Drawing.Imaging.ImageFormat.Png);
             }
             catch(Exception ex)
             {
@@ -398,13 +400,13 @@ namespace PTGI_UI
 
         protected void DeleteObject()
         {
-            if (Polygons.Count <= 0 && SelectedPolygon < 0)
+            if (Polygons.Count <= 0 && SelectedPolygon is null)
                 return;
 
             try
             {
-                Polygons.RemoveAt(SelectedPolygon);
-                SelectedPolygon = -1; 
+                Polygons.Remove(SelectedPolygon);
+                SelectedPolygon = null; 
             }
             catch(Exception ex)
             {
@@ -420,106 +422,191 @@ namespace PTGI_UI
 
         protected void TerrariaWorldGenerator()
         {
-            Random rnd = new Random();
+            var rnd = new Random();
             var blockSize = Settings.TerrariaWorldCellSize;
-            int maxY = Settings.RenderHeight / 2;
-            var generatorStartingPoints = new List<PTGI_Remastered.Structs.Point>();
+            var maxY = Settings.RenderHeight / 2;
+            var generatorStartingPoints = new List<Point>();
 
-            for (int x = 0; x <= Settings.RenderWidth - (blockSize+1); x += blockSize)
+            for (var x = 0; x <= Settings.RenderWidth - (blockSize+1); x += blockSize)
             {
-                for(int y = maxY; y <= Settings.RenderHeight - (blockSize+1); y += blockSize)
+                for(var y = maxY; y <= Settings.RenderHeight - (blockSize+1); y += blockSize)
                 {
-                    PTGI_Remastered.Structs.Point topRight = new PTGI_Remastered.Structs.Point();
-                    topRight.SetCoords(x, y);
-                    PTGI_Remastered.Structs.Point rightBottom = new PTGI_Remastered.Structs.Point();
-                    rightBottom.SetCoords(x + blockSize, y + blockSize);
-
-                    PTGI_Remastered.Structs.Polygon block = new PTGI_Remastered.Structs.Polygon();
-                    PTGI_Remastered.Structs.Color color = new PTGI_Remastered.Structs.Color();
+                    var topRight = new Point(x, y);
+                    var rightBottom = new Point(x + blockSize, y + blockSize);
+                    
+                    var color = new PTGI_Remastered.Structs.Color();
                     color.SetColor(255, 255, 255);
-                    block.Setup(new PTGI_Remastered.Structs.Point[] { topRight, rightBottom }, PTGI_Remastered.Utilities.PTGI_ObjectTypes.Solid, PTGI_Remastered.Utilities.PTGI_MaterialReflectivness.Rough, color, 1, 1);
+                    var block = new Polygon(new Point[] { topRight, rightBottom }, PTGI_ObjectTypes.Solid, PTGI_MaterialReflectivness.Rough, color, 1, 1);
                     block.Name = $"{x};{y}";
                     Polygons.Add(block);
 
                     if (rnd.NextDouble() < 0.3)
                     {
-                        generatorStartingPoints.Add(new PTGI_Remastered.Structs.Point()
+                        generatorStartingPoints.Add(new Point()
                         {
                             X = x,
                             Y = y
                         });
                     }
                 }
-                int yDirection = rnd.Next(2) == 0 ? -blockSize : blockSize;
+                var yDirection = rnd.Next(2) == 0 ? -blockSize : blockSize;
                 maxY += yDirection;
             }
 
-            for(int x = 0; x < generatorStartingPoints.Count; x++)
+            for(var x = 0; x < generatorStartingPoints.Count; x++)
             {
                 var lifetime = rnd.Next(10, 20);
-                for(int i = 0; i < lifetime; i++)
+                for(var i = 0; i < lifetime; i++)
                 {
                     Polygons.RemoveAll(z => z.Name == $"{generatorStartingPoints[x].X};{generatorStartingPoints[x].Y}");
 
                     switch (rnd.Next(4))
                     {
                         case 0:
-                            generatorStartingPoints[x].SetCoords(generatorStartingPoints[x].X + blockSize, generatorStartingPoints[x].Y);
+                            generatorStartingPoints[x] = new Point(generatorStartingPoints[x].X + blockSize, generatorStartingPoints[x].Y);
                             break;
                         case 1:
-                            generatorStartingPoints[x].SetCoords(generatorStartingPoints[x].X - blockSize, generatorStartingPoints[x].Y);
+                            generatorStartingPoints[x] = new Point(generatorStartingPoints[x].X - blockSize, generatorStartingPoints[x].Y);
                             break;
                         case 2:
-                            generatorStartingPoints[x].SetCoords(generatorStartingPoints[x].X, generatorStartingPoints[x].Y + blockSize);
+                            generatorStartingPoints[x] = new Point(generatorStartingPoints[x].X, generatorStartingPoints[x].Y + blockSize);
                             break;
                         case 3:
-                            generatorStartingPoints[x].SetCoords(generatorStartingPoints[x].X, generatorStartingPoints[x].Y - blockSize);
+                            generatorStartingPoints[x] = new Point(generatorStartingPoints[x].X, generatorStartingPoints[x].Y - blockSize);
                             break;
                     }
                 }
             }
         }
 
-        protected void RenderImageWithMouseAsLight(int mouseX, int mouseY)
+        private int _previousObjectCount = 0;
+        protected void GenerateScene()
         {
-            if (Settings.IsLivePreview)
+            Polygons.Clear();
+            var rnd = new Random();
+
+            var objectCount = _previousObjectCount;
+            while (objectCount == _previousObjectCount)
+                objectCount = rnd.Next(10, 20);
+
+            const int vertexSpread = 200;
+            _previousObjectCount = objectCount;
+            var generatedLight = false;
+            var forceLightGeneration = false;
+            for (var i = 0; i < objectCount; i++)
             {
-                mouseX = (int)(mouseX / ZoomFactor);
-                mouseY = (int)(mouseY / ZoomFactor);
-
-                PTGI_Remastered.Structs.Polygon polygon = new PTGI_Remastered.Structs.Polygon();
-                PTGI_Remastered.Structs.Color color = new PTGI_Remastered.Structs.Color();
-                color.SetColor(ObjectColor.R, ObjectColor.G, ObjectColor.B);
-
-                var verticies = new PTGI_Remastered.Structs.Point[]
+                var vertexCount = rnd.Next(2, 5);
+                var objectType = rnd.NextDouble();
+                var vertices = new List<Point>();
+                for (var v = 0; v < vertexCount; v++)
                 {
-                    new PTGI_Remastered.Structs.Point()
+                    var point = new Point();
+                    while (true)
                     {
-                        X = mouseX,
-                        Y = mouseY,
-                        HasValue = 1
-                    },
-                    new PTGI_Remastered.Structs.Point()
-                    {
-                        X = mouseX+5,
-                        Y = mouseY+5,
-                        HasValue = 1
-                    }
-                };
+                        if (!vertices.Any())
+                            point = new Point(rnd.Next(Settings.RenderWidth), rnd.Next(Settings.RenderHeight));
+                        else
+                            point = new Point(
+                                rnd.Next(Math.Max(0, (int)vertices.LastOrDefault().X - vertexSpread),
+                                    Math.Min(Settings.RenderWidth, (int)vertices.LastOrDefault().X + vertexSpread)),
+                                rnd.Next(Math.Max(0, (int)vertices.LastOrDefault().Y - vertexSpread),
+                                    Math.Min(Settings.RenderHeight, (int)vertices.LastOrDefault().Y + vertexSpread)));
 
-                polygon.Name = "MouseCursor";
-                polygon.Setup(verticies,
-                    IsObjectEmittingLight ? PTGI_Remastered.Utilities.PTGI_ObjectTypes.LightSource : PTGI_Remastered.Utilities.PTGI_ObjectTypes.Solid,
-                    (PTGI_Remastered.Utilities.PTGI_MaterialReflectivness)Enum.Parse(typeof(PTGI_Remastered.Utilities.PTGI_MaterialReflectivness), SelectedObjectMaterial),
+                        var liesInPolygon = Polygons.Any(tempPolygons => point.LiesInObject(tempPolygons));
+
+                        if (!liesInPolygon)
+                            break;
+                    }
+                    vertices.Add(point);
+                }
+                var color = new PTGI_Remastered.Structs.Color();
+                color.SetColor(rnd.Next(10, 255), rnd.Next(10, 255), rnd.Next(10, 255));
+                if (objectType > 0.8)
+                    generatedLight = true;
+                if (!generatedLight && i == objectCount - 1)
+                    forceLightGeneration = true;
+
+                var polygon = new Polygon(vertices.ToArray(),
+                    objectType > 0.8 || forceLightGeneration ? PTGI_ObjectTypes.LightSource : PTGI_ObjectTypes.Solid,
+                    PTGI_MaterialReflectivness.Rough,
                     color,
-                    ObjectEmissionStrength,
+                    (float)(rnd.NextDouble()+0.7),
                     ObjectDensity);
 
                 Polygons.Add(polygon);
-                PathTraceThread();
-                Polygons.RemoveAll(x => x.Name == "MouseCursor");
-                RenderedPictureBox.Refresh();
             }
+        }
+
+        protected void RenderImageWithMouseAsLight(int mouseX, int mouseY)
+        {
+            if (!Settings.IsLivePreview) return;
+            mouseX = (int) (mouseX / ZoomFactor);
+            mouseY = (int) (mouseY / ZoomFactor);
+            
+            var color = new PTGI_Remastered.Structs.Color();
+            color.SetColor(ObjectColor.R, ObjectColor.G, ObjectColor.B);
+
+            var verticies = new Point[]
+            {
+                new(mouseX, mouseY),
+                new(mouseX + 5, mouseY + 5)
+            };
+
+            var polygon = new Polygon(verticies,
+                IsObjectEmittingLight
+                    ? PTGI_ObjectTypes.LightSource
+                    : PTGI_ObjectTypes.Solid,
+                (PTGI_MaterialReflectivness) Enum.Parse(
+                    typeof(PTGI_MaterialReflectivness), SelectedObjectMaterial),
+                color,
+                ObjectEmissionStrength,
+                ObjectDensity);
+            polygon.Name = "MouseCursor";
+            Polygons.Add(polygon);
+            PathTraceThread();
+            Polygons.RemoveAll(x => x.Name == "MouseCursor");
+            RenderedPictureBox.Refresh();
+        }
+
+        protected void MoveSelected(Keys keyPress)
+        {
+            if (SelectedPolygon is null)
+                return;
+
+            var movementSpeed = 3;
+            switch (keyPress)
+            {
+                case Keys.Up:
+                    SelectedPolygon.Move(0, -movementSpeed);
+                    break;
+                case Keys.Down:
+                    SelectedPolygon.Move(0, movementSpeed);
+                    break;
+                case Keys.Left:
+                    SelectedPolygon.Move(-movementSpeed, 0);
+                    break;
+                case Keys.Right:
+                    SelectedPolygon.Move(movementSpeed, 0);
+                    break;
+            }
+            PathTraceThread();
+            RenderedPictureBox.Refresh();
+        }
+
+        protected void UpdateSelected()
+        {
+            if (SelectedPolygon is null)
+                return;
+
+            var color = new PTGI_Remastered.Structs.Color();
+            color.SetColor(ObjectColor.R, ObjectColor.G, ObjectColor.B);
+            SelectedPolygon.Color = color;
+            SelectedPolygon.objectType = IsObjectEmittingLight ? PTGI_ObjectTypes.LightSource : PTGI_ObjectTypes.Solid;
+            SelectedPolygon.reflectivnessType = (PTGI_MaterialReflectivness) Enum.Parse(typeof(PTGI_MaterialReflectivness), SelectedObjectMaterial);
+            SelectedPolygon.EmissionStrength = ObjectEmissionStrength;
+            SelectedPolygon.Density = ObjectDensity;
+            SelectedPolygon.Name = ObjectName;
+            SelectedPolygon.IsUpdated = true;
         }
     }
 }

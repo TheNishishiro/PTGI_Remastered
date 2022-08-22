@@ -1,6 +1,7 @@
 ﻿using ILGPU;
 using ILGPU.Algorithms;
 using ILGPU.Runtime;
+using PTGI_Remastered.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,13 +16,14 @@ namespace PTGI_Remastered.Structs
         public float R;
         public float G;
         public float B;
+        public float Luminocity;
         public byte Skip;
 
-        public void SetColor(float R, float G, float B)
+        public void SetColor(float r, float g, float b)
         {
-            this.R = R;
-            this.G = G;
-            this.B = B;
+            R = r;
+            G = g;
+            B = b;
         }
 
         public void SetColor(Color color, float mixFactor)
@@ -29,6 +31,7 @@ namespace PTGI_Remastered.Structs
             R = color.R * mixFactor;
             G = color.G * mixFactor;
             B = color.B * mixFactor;
+            Luminocity = color.Luminocity;
         }
 
         public void TintWith(Color color, float mixFactor)
@@ -72,8 +75,15 @@ namespace PTGI_Remastered.Structs
 
         public Color GetRescaled(float factor)
         {
-            Color newColor = new Color();
+            var newColor = new Color();
             newColor.SetColor(R / factor, G / factor, B / factor);
+            return newColor;
+        }
+
+        public Color GetMultiplied(float factor)
+        {
+            var newColor = new Color();
+            newColor.SetColor(R * factor, G * factor, B * factor);
             return newColor;
         }
 
@@ -90,6 +100,52 @@ namespace PTGI_Remastered.Structs
             G += color.G;
             B += color.B;
         }
+
+        public bool Compare(Color color)
+        {
+            return R <= color.R && G <= color.G && B <= color.B;
+        }
+
+        public void CalculateSimpleLuminance()
+        {
+            Luminocity = XMath.Sqrt(0.299f * PTGI_Math.Pow(R, 2) + 0.587f * PTGI_Math.Pow(G, 2) + 0.114f * PTGI_Math.Pow(B, 2));
+        }
+
+        public float GetPerceivedLightness()
+        {
+            var luminance = GetLuminance();
+
+            if (luminance <= (216.0f / 24389.0f))
+            {     
+                return luminance * (24389.0f / 27.0f); 
+            }
+            else
+            {
+                return PTGI_Math.PowFloat(luminance, (1.0f / 3.0f)) * 116 - 16;
+            }
+        }
+
+        public float GetLuminance()
+        {
+            return 0.2126f * SrgbToLin(R) + 0.7152f * SrgbToLin(G) + 0.0722f * SrgbToLin(B);
+        }
+
+        public float SrgbToLin(float colorChannel)
+        {
+            if (colorChannel <= 0.04045f)
+            {
+                return colorChannel / 12.92f;
+            }
+            else
+            {
+                return PTGI_Math.PowFloat(((colorChannel + 0.055f) / 1.055f), 2.4f);
+            }
+        }
+
+        public bool IsDim()
+        {
+            return R < 0.01f && B < 0.01f && G < 0.01f;
+        }
     }
 
     /// <summary>
@@ -103,15 +159,15 @@ namespace PTGI_Remastered.Structs
         public int WallsCount;
         public int GridSize;
 
-        public void SetBitmapSettings(int Width, int Height, int wallsCount)
+        public void SetBitmapSettings(int width, int height, int wallsCount)
         {
-            this.Width = Width;
-            this.Height = Height;
-            Size = Width * Height;
+            this.Width = width;
+            this.Height = height;
+            Size = width * height;
             WallsCount = wallsCount;
         }
 
-        public void SetPixel(int id, Color pixelColor, float gammaCorrectionScale, ArrayView<Color> pixels)
+        public void SetPixel(int id, Color pixelColor, float gammaCorrectionScale, ArrayView1D<Color, Stride1D.Dense> pixels)
         {
             pixelColor.ApplyGammaCorrection(gammaCorrectionScale);
             pixelColor.Clip();

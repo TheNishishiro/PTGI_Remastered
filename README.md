@@ -1,6 +1,6 @@
 # Notice
 
-Current branch is under heavy refactorization, some features are completely removed until migration from Alea to ILGPU is completed
+Current implementation is completely moved to ILGPU with only a couple things still missing (material properties for example have not been reimplemented yet as I focus on performance right now), readme and screenshots probably needs redoing at this point
 
 Currently even without previous optimizations performance is greatly improved, up to real time rendering on GTX 1050m
 
@@ -17,7 +17,7 @@ Currently even without previous optimizations performance is greatly improved, u
  <img src="https://github.com/TheNishishiro/PTGI_Remastered/blob/PTGI_ILGPU_Dev/Images/30fps.png?raw=true">
 </p>
 
-#### ~30 fps scene render (median denoiser, 9x9 kernel)
+#### ~30 fps scene render (mean denoiser, 18x18 kernel)
 You can observe some light leaking through objects due to large kernel
 <p align="center">
  <img src="https://github.com/TheNishishiro/PTGI_Remastered/blob/PTGI_ILGPU_Dev/Images/30fps_denoised.png?raw=true">

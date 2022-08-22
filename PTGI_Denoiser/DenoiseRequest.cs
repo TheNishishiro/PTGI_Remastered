@@ -10,7 +10,8 @@ namespace PTGI_Denoiser
     {
         public Bitmap bitmap { get; set; }
         public Color[] Pixels { get; set; }
-        public AcceleratorId GpuId { get; set; }
+        public int DeviceId { get; set; }
         public int KernelSize { get; set; }
+        public int IterationCount { get; set; }
     }
 }

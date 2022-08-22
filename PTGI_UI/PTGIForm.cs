@@ -1,22 +1,16 @@
 ﻿using MaterialSkin2DotNet;
 using Newtonsoft.Json;
-using PTGI_Remastered.Inputs;
-using PTGI_Remastered.Structs;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
-using System.Drawing.Imaging;
+using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Runtime.InteropServices;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 using System.Windows.Forms;
-using Bitmap = System.Drawing.Bitmap;
-using Color = System.Drawing.Color;
+using PTGI_Remastered.Classes;
+using PTGI_Remastered.Structs;
+using PTGI_Remastered.Utilities;
 
 namespace PTGI_UI
 {
@@ -59,14 +53,16 @@ namespace PTGI_UI
 
             PathTracer = new PTGI_Remastered.PTGI();
             Denoiser = new PTGI_Denoiser.Denoiser();
-            Polygons = new List<PTGI_Remastered.Structs.Polygon>();
+            Polygons = new List<Polygon>();
             ResetZoom();
 
-            GpuId = null;
-            var gpus = PathTracer.GetAvaiableHardwareAccelerators().ToArray();
+            var gpus = PathTracer.GetAvailableHardwareAccelerators().ToArray();
             gpuSelectorControl.Items.AddRange(gpus);
             gpuSelectorControl.DisplayMember = "Name";
-            gpuSelectorControl.ValueMember = "Id";
+
+            var savedSelection = gpus.FirstOrDefault(x => x.Id == Settings.DeviceId && x.AcceleratorType == Settings.AcceleratorType);
+            if (savedSelection is not null)
+                gpuSelectorControl.SelectedItem = savedSelection;
         }
 
         private void UpdateObjectSettings(object sender, EventArgs e)
@@ -78,6 +74,21 @@ namespace PTGI_UI
             ObjectDensity = float.Parse(objectDensityControl.Text.Replace('.', ','));
             ObjectName = objectNameControl.Text;
             colorDisplayPictureBox.BackColor = ObjectColor;
+        }
+
+        protected override void UpdateControlsBySelectedPolygon()
+        {
+            if (SelectedPolygon is null)
+                return;
+            
+            emitsLightControl.Checked = SelectedPolygon.objectType == PTGI_ObjectTypes.LightSource;
+            objectMaterialControl.SelectedItem = SelectedPolygon.reflectivnessType.ToString();
+            colorEditor1.Color = System.Drawing.Color.FromArgb((int) SelectedPolygon.Color.R, (int) SelectedPolygon.Color.G, (int) SelectedPolygon.Color.B);
+            objectEmissionStrengthControl.Text = SelectedPolygon.EmissionStrength.ToString(CultureInfo.InvariantCulture);
+            objectEmissionStrengthControl.Text = SelectedPolygon.EmissionStrength.ToString(CultureInfo.InvariantCulture);
+            objectDensityControl.Text = SelectedPolygon.Density.ToString(CultureInfo.InvariantCulture);
+            objectNameControl.Text = SelectedPolygon.Name;
+            colorDisplayPictureBox.BackColor = colorEditor1.Color;
         }
 
         private void startRenderButton_Click(object sender, EventArgs e)
@@ -101,31 +112,29 @@ namespace PTGI_UI
             IsObjectEmittingLight = emitsLightControl.Checked;
         }
 
-        private void deleteVerticie_Click(object sender, EventArgs e)
+        private void deleteVertices_Click(object sender, EventArgs e)
         {
-
+            throw new NotImplementedException();
         }
 
         private void pictureBox1_Click(object sender, EventArgs e)
         {
-            MouseEventArgs mouseEvent = (MouseEventArgs)e;
+            var mouseEvent = (MouseEventArgs)e;
 
-            if(mouseEvent.Button == MouseButtons.Left)
+            switch (mouseEvent.Button)
             {
-                var clickCoordinates = mouseEvent.Location;
-                QueuedVerticiesList.Items.Add($"{clickCoordinates.X};{clickCoordinates.Y};{ZoomFactor}");
-                Refresh();
+                case MouseButtons.Left:
+                {
+                    var clickCoordinates = mouseEvent.Location;
+                    QueuedVerticiesList.Items.Add($"{clickCoordinates.X};{clickCoordinates.Y};{ZoomFactor}");
+                    Refresh();
+                    break;
+                }
+                case MouseButtons.Right:
+                    SelectObject(mouseEvent.Location);
+                    Refresh();
+                    break;
             }
-            else if(mouseEvent.Button == MouseButtons.Right)
-            {
-                SelectObject(mouseEvent.Location);
-                Refresh();
-            }
-        }
-
-        protected override void pictureBox1_Paint(object sender, PaintEventArgs e)
-        {
-            base.pictureBox1_Paint(sender, e);
         }
 
         private void pictureBox1_MouseWheel(object sender, MouseEventArgs e)
@@ -137,25 +146,40 @@ namespace PTGI_UI
 
         private void PTGIForm_KeyUp(object sender, KeyEventArgs e)
         {
-            if(e.KeyCode == Keys.I)
+            switch (e.KeyCode)
             {
-                AddPolygonToObjects();
-                Refresh();
+                case Keys.I:
+                    AddPolygonToObjects();
+                    Refresh();
+                    break;
+                case Keys.R:
+                    Refresh();
+                    break;
+                case Keys.Enter:
+                    UpdateSelected();
+                    break;
+                case Keys.Delete:
+                    DeleteObject();
+                    Refresh();
+                    break;
+                case Keys.Space:
+                    ResetZoom();
+                    ZoomImage();
+                    Refresh();
+                    break;
             }
-            else if(e.KeyCode == Keys.R)
+        }
+
+        private void PTGIForm_KeyDown(object sender, KeyEventArgs e)
+        {
+            switch (e.KeyCode)
             {
-                Refresh();
-            }
-            else if(e.KeyCode == Keys.Delete)
-            {
-                DeleteObject();
-                Refresh();
-            }
-            else if(e.KeyCode == Keys.Space)
-            {
-                ResetZoom();
-                ZoomImage();
-                Refresh();
+                case Keys.Up:
+                case Keys.Down:
+                case Keys.Left:
+                case Keys.Right:
+                    MoveSelected(e.KeyCode);
+                    break;
             }
         }
 
@@ -167,16 +191,6 @@ namespace PTGI_UI
         private void saveRenderButton_Click(object sender, EventArgs e)
         {
             SaveRender();
-        }
-
-        protected override void saveSceneButton_Click(object sender, EventArgs e)
-        {
-            base.saveSceneButton_Click(sender, e);
-        }
-
-        protected override void loadSceneButton_Click(object sender, EventArgs e)
-        {
-            base.loadSceneButton_Click(sender, e);
         }
 
         private void objectNameControl_KeyDown(object sender, KeyEventArgs e)
@@ -209,6 +223,18 @@ namespace PTGI_UI
         private void pictureBox1_MouseHover(object sender, EventArgs e)
         {
             pictureBox1.Focus();
+        }
+
+        private void generateRandomSceneButton_Click(object sender, EventArgs e)
+        {
+            GenerateScene();
+        }
+
+        private void gpuSelectorControl_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            var selectedGpu = (Gpu)gpuSelectorControl.SelectedItem;
+            Settings.DeviceId = selectedGpu.Id;
+            Settings.AcceleratorType = selectedGpu.AcceleratorType;
         }
     }
 }

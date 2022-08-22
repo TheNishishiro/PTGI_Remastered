@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace PTGI_Remastered.Structs
 {
     [Serializable]
-    public struct LineCoefficient
+    public struct SLineCoefficient
     {
         public float A;
         public float B;

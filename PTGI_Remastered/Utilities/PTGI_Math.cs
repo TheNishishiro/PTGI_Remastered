@@ -6,20 +6,28 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using PTGI_Remastered.Classes;
 
 namespace PTGI_Remastered.Utilities
 {
     public class PTGI_Math
     {
-        public static Point Convert1dIndexTo2d(Bitmap bitmap, int threadId)
+        public static SPoint Convert1dIndexTo2d(Bitmap bitmap, int threadId)
         {
-            int col = threadId / bitmap.Width;
-            int row = threadId % bitmap.Width;
+            var col = threadId / bitmap.Width;
+            var row = threadId % bitmap.Width;
 
-            
-            Point raySource = new Point();
+            var raySource = new SPoint();
             raySource.SetCoords(row, col);
             return raySource;
+        }
+        
+        public static Point Convert1dIndexTo2dPointClass(Bitmap bitmap, int threadId)
+        {
+            var col = threadId / bitmap.Width;
+            var row = threadId % bitmap.Width;
+
+            return new Point(row, col);
         }
 
         public static int Convert2dIndexTo1d(float x, float y, Bitmap bitmap)
@@ -27,12 +35,22 @@ namespace PTGI_Remastered.Utilities
             return (int)y * bitmap.Width + (int)x;
         }
 
+        public static int Convert3dIndexTo1d(int x, int y, int z, int width, int height)
+        {
+            return (z * width * height) + (y * width) + x;
+        }
+        
         public static float Pow(float x, float y)
         {
             float result = 1;
-            for (int i = 0; i < y; i++)
+            for (var i = 0; i < y; i++)
                 result *= x;
             return result;
+        }
+
+        public static float PowFloat(float x, float y)
+        {
+            return XMath.Exp(y * XMath.Log(x, 10));
         }
 
         public static float Modulo(float x, float y)

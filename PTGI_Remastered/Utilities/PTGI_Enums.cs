@@ -19,7 +19,7 @@ namespace PTGI_Remastered.Utilities
         Solid = 1,
         LightSource = 2
     }
-
+    
     public enum PTGI_MaterialReflectivness
     {
         Rough = 1,
