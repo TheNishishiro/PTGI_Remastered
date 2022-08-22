@@ -56,14 +56,14 @@ namespace PTGI_Remastered.Structs
 
     public struct GridTraversalResult
     {
-        public Point IntersectionPoint;
-        public Line IntesectedWall;
+        public SPoint IntersectionSPoint;
+        public SLine IntesectedWall;
         public bool IsClosestIntersectionLight;
 
-        public bool IsIntersectionPointFound() => IntersectionPoint.HasValue == 1;
+        public bool IsIntersectionPointFound() => IntersectionSPoint.HasValue == 1;
     }
 
-    public struct Grid
+    public struct SGrid
     {
         public int CellsInRow;
 
@@ -71,7 +71,7 @@ namespace PTGI_Remastered.Structs
         public int CellHeight;
         public int GridSize;
 
-        public Grid Create(Bitmap bitmap, int cellsInRow)
+        public SGrid Create(Bitmap bitmap, int cellsInRow)
         {
             CellWidth = (int)Math.Ceiling((float)bitmap.Width / (float)cellsInRow);
             CellHeight = (int)Math.Ceiling((float)bitmap.Height / (float)cellsInRow);
@@ -80,7 +80,7 @@ namespace PTGI_Remastered.Structs
             return this;
         }
 
-        public int[] CPU_FillGrid(Line[] walls)
+        public int[] CPU_FillGrid(SLine[] walls)
         {
             var cells = new int[CellsInRow * CellsInRow * walls.Length];
 
@@ -109,9 +109,9 @@ namespace PTGI_Remastered.Structs
             return cells;
         }
 
-        private List<Point> GetVisitedCells(Point StartLocation, Point EndLocation)
+        private List<SPoint> GetVisitedCells(SPoint StartLocation, SPoint EndLocation)
         {
-            var visited = new List<Point>();
+            var visited = new List<SPoint>();
 
             var startTileIdx = (int)XMath.Floor(StartLocation.X / CellWidth);
             var startTileIdy = (int)XMath.Floor(StartLocation.Y / CellHeight);
@@ -122,12 +122,12 @@ namespace PTGI_Remastered.Structs
             var currentTileIdx = startTileIdx;
             var currentTileIdy = startTileIdy;
 
-            var firstPoint = new Point();
+            var firstPoint = new SPoint();
             firstPoint.SetCoords(currentTileIdx, currentTileIdy);
             visited.Add(firstPoint);
 
             if (startTileIdx >= CellsInRow || startTileIdy >= CellsInRow || endTileIdx >= CellsInRow || endTileIdy >= CellsInRow)
-                return new List<Point>();
+                return new List<SPoint>();
 
             if (startTileIdx == endTileIdx && startTileIdy == endTileIdy)
                 return visited;
@@ -189,7 +189,7 @@ namespace PTGI_Remastered.Structs
                 if (currentTileIdy < 0 || currentTileIdy >= CellsInRow || currentTileIdx < 0 || currentTileIdx >= CellsInRow)
                     break;
 
-                var nextPoint = new Point();
+                var nextPoint = new SPoint();
                 nextPoint.SetCoords(currentTileIdx, currentTileIdy);
                 visited.Add(nextPoint);
             }
@@ -205,11 +205,11 @@ namespace PTGI_Remastered.Structs
         {
             return gridVariables.CurrentTileIDY * CellsInRow + gridVariables.CurrentTileIDX;
         }
-        public GridVariables GetGridTraversalVariables(Line line)
+        public GridVariables GetGridTraversalVariables(SLine sLine)
         {
-            return GetGridTraversalVariables(line.Source, line.Destination);
+            return GetGridTraversalVariables(sLine.Source, sLine.Destination);
         }
-        public GridVariables GetGridTraversalVariables(Point StartLocation, Point EndLocation)
+        public GridVariables GetGridTraversalVariables(SPoint StartLocation, SPoint EndLocation)
         {
             var gridVariables = new GridVariables();
 
@@ -261,7 +261,7 @@ namespace PTGI_Remastered.Structs
 
             return gridVariables;
         }
-        public GridTraversalResult TraverseGrid(Line lightRay, int wallsCount, ArrayView1D<int, Stride1D.Dense> gridData, ArrayView1D<Line, Stride1D.Dense> walls, Line ignoredWall)
+        public GridTraversalResult TraverseGrid(SLine lightRay, int wallsCount, ArrayView1D<int, Stride1D.Dense> gridData, ArrayView1D<SLine, Stride1D.Dense> walls, SLine ignoredWall)
         {
             var closestDistance = float.MaxValue;
             var gridVariables = GetGridTraversalVariables(lightRay);
@@ -287,7 +287,7 @@ namespace PTGI_Remastered.Structs
                     var raySourceToWallIntersectionDistance = lightRay.Source.GetDistance(rayWallIntersection);
                     if (raySourceToWallIntersectionDistance >= closestDistance) continue;
                     
-                    gridTraversalResult.IntersectionPoint = rayWallIntersection;
+                    gridTraversalResult.IntersectionSPoint = rayWallIntersection;
                     closestDistance = raySourceToWallIntersectionDistance;
                     gridTraversalResult.IsClosestIntersectionLight = currentWall.ObjectType == 2;
                     gridTraversalResult.IntesectedWall = currentWall;
@@ -296,8 +296,8 @@ namespace PTGI_Remastered.Structs
 
                 if (gridTraversalResult.IsIntersectionPointFound())
                 {
-                    var intersectionTileIdX = (int)(gridTraversalResult.IntersectionPoint.X / CellWidth);
-                    var intersectionTileIdY = (int)(gridTraversalResult.IntersectionPoint.Y / CellHeight);
+                    var intersectionTileIdX = (int)(gridTraversalResult.IntersectionSPoint.X / CellWidth);
+                    var intersectionTileIdY = (int)(gridTraversalResult.IntersectionSPoint.Y / CellHeight);
                     if (intersectionTileIdX == gridVariables.CurrentTileIDX && intersectionTileIdY == gridVariables.CurrentTileIDY)
                         break;
                 }

@@ -14,7 +14,6 @@ using System.Threading.Tasks;
 using PTGI_Remastered.Cache;
 using ILGPU.Algorithms;
 using ILGPU.Runtime.OpenCL;
-using Grid = PTGI_Remastered.Structs.Grid;
 
 namespace PTGI_Remastered
 {
@@ -84,7 +83,7 @@ namespace PTGI_Remastered
                 renderSpecification.SampleCount, 
                 renderSpecification.BounceLimit,
                 _cache.GridDataBuffer,
-                _cache.GridCached);
+                _cache.SGridCached);
             renderTimeStopwatch.Stop();
 
             renderResult.RenderTime = renderTimeStopwatch.ElapsedMilliseconds;
@@ -94,7 +93,7 @@ namespace PTGI_Remastered
             return renderResult;
         }
 
-        private static Color[] StartRender(Accelerator accelerator, Bitmap bitmap, MemoryBuffer1D<Color, Stride1D.Dense> bitmapPixels, MemoryBuffer1D<int, Stride1D.Dense> randomSeedArray, MemoryBuffer1D<Line, Stride1D.Dense> walls, int samples, int bounceLimit, MemoryBuffer1D<int, Stride1D.Dense> gridData, Grid grid)
+        private static Color[] StartRender(Accelerator accelerator, Bitmap bitmap, MemoryBuffer1D<Color, Stride1D.Dense> bitmapPixels, MemoryBuffer1D<int, Stride1D.Dense> randomSeedArray, MemoryBuffer1D<SLine, Stride1D.Dense> walls, int samples, int bounceLimit, MemoryBuffer1D<int, Stride1D.Dense> gridData, SGrid sGrid)
         {
             var ptgiKernel = accelerator.LoadAutoGroupedStreamKernel<
                 Index1D,
@@ -103,13 +102,13 @@ namespace PTGI_Remastered
                 ArrayView1D<int, Stride1D.Dense>,
                 int, 
                 int, 
-                ArrayView1D<Line, Stride1D.Dense>,
+                ArrayView1D<SLine, Stride1D.Dense>,
                 ArrayView1D<int, Stride1D.Dense>,
-                Grid>(CUDA_StartRender);
+                SGrid>(CUDA_StartRender);
 
             try
             {
-                ptgiKernel((int)bitmapPixels.Length, bitmap, bitmapPixels.View, randomSeedArray.View, samples, bounceLimit, walls.View, gridData.View, grid);
+                ptgiKernel((int)bitmapPixels.Length, bitmap, bitmapPixels.View, randomSeedArray.View, samples, bounceLimit, walls.View, gridData.View, sGrid);
                 accelerator.Synchronize();
                 return bitmapPixels.AsContiguous().GetAsArray();
             }
@@ -121,34 +120,34 @@ namespace PTGI_Remastered
             return new Color[bitmapPixels.Length];
         }
 
-        private static void CUDA_StartRender(Index1D index, Bitmap bitmap, ArrayView1D<Color, Stride1D.Dense> pixels, ArrayView1D<int, Stride1D.Dense> seedArray, int samples, int bounceLimit, ArrayView1D<Line, Stride1D.Dense> walls, ArrayView1D<int, Stride1D.Dense> gridData, Grid grid)
+        private static void CUDA_StartRender(Index1D index, Bitmap bitmap, ArrayView1D<Color, Stride1D.Dense> pixels, ArrayView1D<int, Stride1D.Dense> seedArray, int samples, int bounceLimit, ArrayView1D<SLine, Stride1D.Dense> walls, ArrayView1D<int, Stride1D.Dense> gridData, SGrid sGrid)
         {
             if (pixels[index].Skip == 1)
                 return;
             
-            Point raySource = PTGI_Math.Convert1dIndexTo2d(bitmap, index);
-            Line lightRay = new Line();
-            lightRay.Setup(raySource, new Point());
-            var pixelInformaton = RenderBitmap(index, bitmap, lightRay, seedArray, samples, bounceLimit, walls, gridData, grid);
+            SPoint raySource = PTGI_Math.Convert1dIndexTo2d(bitmap, index);
+            SLine lightRay = new SLine();
+            lightRay.Setup(raySource, new SPoint());
+            var pixelInformaton = RenderBitmap(index, bitmap, lightRay, seedArray, samples, bounceLimit, walls, gridData, sGrid);
 
             bitmap.SetPixel(index, pixelInformaton.pixelColor, 1.0f / samples, pixels);
         }
 
-        private static PixelInformaton RenderBitmap(Index1D index, Bitmap bitmap, Line lightRay, ArrayView1D<int, Stride1D.Dense> seedArray, int samples, int bounceLimit, ArrayView1D<Line, Stride1D.Dense> walls, ArrayView1D<int, Stride1D.Dense> gridData, Grid grid)
+        private static PixelInformaton RenderBitmap(Index1D index, Bitmap bitmap, SLine lightRay, ArrayView1D<int, Stride1D.Dense> seedArray, int samples, int bounceLimit, ArrayView1D<SLine, Stride1D.Dense> walls, ArrayView1D<int, Stride1D.Dense> gridData, SGrid sGrid)
         {
             var pixelInformation = new PixelInformaton(); 
             for (int sampleId = 0; sampleId < samples; sampleId++)
             {
                 lightRay.Destination = PTGI_Random.GetPointInRadius(index, seedArray, 10).AddNew(lightRay.Source);
 
-                Point rayDirection = lightRay.GetDirection();
+                SPoint rayDirection = lightRay.GetDirection();
                 rayDirection.Normalize();
                 rayDirection.Multiply(10000);
 
                 lightRay.Destination.Add(rayDirection);
 
-                Line wallToIgnore = new Line();
-                var rayTraceResult = CUDA_TraceRay(index, seedArray, bitmap, bounceLimit, false, walls, lightRay, wallToIgnore, gridData, grid);
+                SLine wallToIgnore = new SLine();
+                var rayTraceResult = CUDA_TraceRay(index, seedArray, bitmap, bounceLimit, false, walls, lightRay, wallToIgnore, gridData, sGrid);
 
                 pixelInformation.pixelColor.Add(rayTraceResult.pixelColor);
             }
@@ -156,7 +155,7 @@ namespace PTGI_Remastered
         }
 
         private static RayTraceResult CUDA_TraceRay(Index1D index, ArrayView1D<int, Stride1D.Dense> seedArray, Bitmap bitmap, int bounceLimit, bool originDensitySwap,
-            ArrayView1D<Line, Stride1D.Dense> walls, Line lightRay, Line wallToIgnore, ArrayView1D<int, Stride1D.Dense> gridData, Grid grid)
+            ArrayView1D<SLine, Stride1D.Dense> walls, SLine lightRay, SLine wallToIgnore, ArrayView1D<int, Stride1D.Dense> gridData, SGrid sGrid)
         {
             var rayTraceResult = new RayTraceResult();
             rayTraceResult.pixelColor = new Color();
@@ -165,7 +164,7 @@ namespace PTGI_Remastered
             const float reflectionAreaSize = 10;
             for (var bounceIndex = 0; bounceIndex < bounceLimit; bounceIndex++)
             {
-                var gridTraversalResult = grid.TraverseGrid(lightRay, bitmap.WallsCount, gridData, walls, wallToIgnore);
+                var gridTraversalResult = sGrid.TraverseGrid(lightRay, bitmap.WallsCount, gridData, walls, wallToIgnore);
                 if (gridTraversalResult.IntesectedWall.HasValue != 1)
                 {
                     rayTraceResult.pixelColor.SetColor(0, 0, 0);
@@ -178,14 +177,14 @@ namespace PTGI_Remastered
                 }
                 else
                 {
-                    if(lightRay.Source.IsEqualTo(gridTraversalResult.IntersectionPoint))
+                    if(lightRay.Source.IsEqualTo(gridTraversalResult.IntersectionSPoint))
                     {
                         rayTraceResult.pixelColor.SetColor(0, 0, 0);
                         return rayTraceResult;
                     }
                     wallToIgnore = gridTraversalResult.IntesectedWall;
 
-                    var nextRayDirection = TraceRayUtility.NextRayDirection(index, seedArray, gridTraversalResult.IntesectedWall, wallToIgnore, lightRay.Source, gridTraversalResult.IntersectionPoint, reflectionAreaSize, originDensitySwap);
+                    var nextRayDirection = TraceRayUtility.NextRayDirection(index, seedArray, gridTraversalResult.IntesectedWall, wallToIgnore, lightRay.Source, gridTraversalResult.IntersectionSPoint, reflectionAreaSize, originDensitySwap);
                     originDensitySwap = nextRayDirection.SwapDensity;
 
                     if(gridTraversalResult.IntesectedWall.ReflectivnessType == 4)
@@ -203,7 +202,7 @@ namespace PTGI_Remastered
                         return rayTraceResult;
                     }
 
-                    lightRay.Source = gridTraversalResult.IntersectionPoint;
+                    lightRay.Source = gridTraversalResult.IntersectionSPoint;
                     lightRay.Destination = nextRayDirection.Destination;
                 }
             }

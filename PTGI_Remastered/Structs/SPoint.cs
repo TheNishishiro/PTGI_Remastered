@@ -6,52 +6,53 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using PTGI_Remastered.Classes;
 
 namespace PTGI_Remastered.Structs
 {
     [Serializable]
-    public struct Point
+    public struct SPoint
     {
         public float X;
         public float Y;
         public byte HasValue;
 
-        public void SetCoords(float X, float Y)
+        public void SetCoords(float x, float y)
         {
-            this.X = X;
-            this.Y = Y;
+            this.X = x;
+            this.Y = y;
             HasValue = 1;
         }
 
-        public Point SubstractNew(Point point)
+        public SPoint SubstractNew(SPoint sPoint)
         {
-            var newPoint = new Point();
-            newPoint.SetCoords(X - point.X, Y - point.Y);
+            var newPoint = new SPoint();
+            newPoint.SetCoords(X - sPoint.X, Y - sPoint.Y);
 
             return newPoint;
         }
 
-        public void Substract(Point point)
+        public void Substract(SPoint sPoint)
         {
-            SetCoords(X - point.X, Y - point.Y);
+            SetCoords(X - sPoint.X, Y - sPoint.Y);
         }
 
-        public Point AddNew(Point point)
+        public SPoint AddNew(SPoint sPoint)
         {
-            var newPoint = new Point();
-            newPoint.SetCoords(X + point.X, Y + point.Y);
+            var newPoint = new SPoint();
+            newPoint.SetCoords(X + sPoint.X, Y + sPoint.Y);
 
             return newPoint;
         }
 
-        public void Add(Point point)
+        public void Add(SPoint sPoint)
         {
-            SetCoords(X + point.X, Y + point.Y);
+            SetCoords(X + sPoint.X, Y + sPoint.Y);
         }
 
-        public Point MultiplyNew(float factor)
+        public SPoint MultiplyNew(float factor)
         {
-            var newPoint = new Point();
+            var newPoint = new SPoint();
             newPoint.SetCoords(X * factor, Y * factor);
 
             return newPoint;
@@ -62,22 +63,22 @@ namespace PTGI_Remastered.Structs
             SetCoords(X * factor, Y * factor);
         }
 
-        public Point MultiplyNew(Point point)
+        public SPoint MultiplyNew(SPoint sPoint)
         {
-            var newPoint = new Point();
-            newPoint.SetCoords(X * point.X, Y * point.Y);
+            var newPoint = new SPoint();
+            newPoint.SetCoords(X * sPoint.X, Y * sPoint.Y);
 
             return newPoint;
         }
 
-        public void Multiply(Point point)
+        public void Multiply(SPoint sPoint)
         {
-            SetCoords(X * point.X, Y * point.Y);
+            SetCoords(X * sPoint.X, Y * sPoint.Y);
         }
 
-        public bool IsEqualTo(Point point)
+        public bool IsEqualTo(SPoint sPoint)
         {
-            return X == point.X && Y == point.Y;
+            return X == sPoint.X && Y == sPoint.Y;
         }
 
         public void Normalize()
@@ -86,25 +87,25 @@ namespace PTGI_Remastered.Structs
             SetCoords(newPoint.X, newPoint.Y);
         }
 
-        public Point GetDirection(Point Destination)
+        public SPoint GetDirection(SPoint Destination)
         {
             return Destination.SubstractNew(this);
         }
 
-        public Point GetNormalized()
+        public SPoint GetNormalized()
         {
-            var newPoint = new Point();
+            var newPoint = new SPoint();
             var length = X * X + Y * Y;
             newPoint.SetCoords(X / XMath.Sqrt(length), Y / XMath.Sqrt(length));
             return newPoint;
         }
 
-        public float DotProduct(Point point)
+        public float DotProduct(SPoint sPoint)
         {
-            return X * point.Y + X * point.Y;
+            return X * sPoint.Y + X * sPoint.Y;
         }
 
-        public float GetDistance(Point destination)
+        public float GetDistance(SPoint destination)
         {
             return XMath.Sqrt((destination.X - X) * (destination.X - X)  + (destination.Y - Y) * (destination.Y - Y));
         }
@@ -114,13 +115,13 @@ namespace PTGI_Remastered.Structs
             return XMath.Sqrt(X * X + Y * Y);
         }
 
-        public bool LiesInLine(Line line)
+        public bool LiesInLine(SLine sLine)
         {
             const float epsilon = 0.001f;
-            return XMath.Abs(Y - (line.Coefficient.A * X + line.Coefficient.B)) < epsilon;
+            return XMath.Abs(Y - (sLine.Coefficient.A * X + sLine.Coefficient.B)) < epsilon;
         }
 
-        public bool LiesInObject(Polygon obstacle)
+        public bool LiesInObject(SPolygon obstacle)
         {
             switch (obstacle.structType)
             {
@@ -133,13 +134,13 @@ namespace PTGI_Remastered.Structs
             }
         }
 
-        private bool LiesInRectangle(Polygon obstacle)
+        private bool LiesInRectangle(SPolygon obstacle)
         {
             return X >= obstacle.Walls[0].Source.X && Y >= obstacle.Walls[0].Source.Y &&
                    X <= obstacle.Walls[1].Destination.X && Y <= obstacle.Walls[1].Destination.Y;
         }
         
-        private bool LiesInPolygon(Polygon obstacle)
+        private bool LiesInPolygon(SPolygon obstacle)
         {
             var result = false;
             var verticiesCount = obstacle.Verticies.Length;
@@ -156,5 +157,7 @@ namespace PTGI_Remastered.Structs
 
             return result;
         }
+
+        
     }
 }

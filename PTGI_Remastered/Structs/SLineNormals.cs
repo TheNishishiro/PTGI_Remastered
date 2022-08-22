@@ -6,12 +6,12 @@ using System.Threading.Tasks;
 
 namespace PTGI_Remastered.Structs
 {
-    public struct LineNormals
+    public struct SLineNormals
     {
-        public Point NormalUp;
-        public Point NormalDown;
+        public SPoint NormalUp;
+        public SPoint NormalDown;
 
-        public LineNormals Normalize()
+        public SLineNormals Normalize()
         {
             NormalUp.Normalize();
             NormalDown.Normalize();

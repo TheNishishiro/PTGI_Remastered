@@ -63,12 +63,12 @@ namespace PTGI_Remastered.Utilities
             return random * (maximum - minimum) + minimum;
         }
 
-        public static Point GetPointInRadius(Index1D index, ArrayView1D<int, Stride1D.Dense> seed, float radius)
+        public static SPoint GetPointInRadius(Index1D index, ArrayView1D<int, Stride1D.Dense> seed, float radius)
         {
             var distance = GetRandomBetween(index, seed, 0, MathF.Floor(radius));
             var angleInRadians = GetRandomBetween(index, seed, 0, 360) / (2 * 3.14f);
 
-            var pointInRadius = new Point();
+            var pointInRadius = new SPoint();
             pointInRadius.SetCoords(distance * MathF.Cos(angleInRadians), distance * MathF.Sin(angleInRadians));
 
             return pointInRadius;

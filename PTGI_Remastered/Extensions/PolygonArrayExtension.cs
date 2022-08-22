@@ -5,17 +5,18 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using PTGI_Remastered.Classes;
 
 namespace PTGI_Remastered.Extensions
 {
-    public static class PolygonArrayExtension
+    internal static class PolygonArrayExtension
     {
         public static Line[] ExtractWalls(this Polygon[] polygons)
         {
             return (
                 from polygon in polygons
                 from wall in polygon.Walls
-                select new Line()
+                select new Line
                 {
                     Coefficient = wall.Coefficient,
                     Color = polygon.Color,

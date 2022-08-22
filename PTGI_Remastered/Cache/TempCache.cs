@@ -12,20 +12,19 @@ using PTGI_Remastered.Structs;
 using PTGI_Remastered.Utilities;
 using System.Threading.Tasks;
 using ILGPU.Runtime.OpenCL;
-using Grid = PTGI_Remastered.Structs.Grid;
 
 namespace PTGI_Remastered.Cache
 {
-    public class TempCache
+    internal class TempCache
     {
         public Context Context { get; private set; }
         public Accelerator Accelerator { get; private set; }
         
         public MemoryBuffer1D<Color, Stride1D.Dense> PixelBuffer { get; set; }
         public MemoryBuffer1D<int, Stride1D.Dense> SeedBuffer { get; set; }
-        public MemoryBuffer1D<Line, Stride1D.Dense> WallBuffer { get; set; }
+        public MemoryBuffer1D<SLine, Stride1D.Dense> WallBuffer { get; set; }
         public MemoryBuffer1D<int, Stride1D.Dense> GridDataBuffer { get; set; }
-        public Grid GridCached { get; set; }
+        public SGrid SGridCached { get; set; }
        
         private int _pixelBufferLength;
         private int _wallBufferLength;
@@ -77,8 +76,11 @@ namespace PTGI_Remastered.Cache
         
         public void WithEnclosureDetection(Bitmap bitmap, RenderSpecification renderSpecification)
         {
-            // TODO: add better update logic
-            if (bitmap.Size == _pixelBufferLength && renderSpecification.Objects.Length == _objectBufferLength && _previousEnclousureOptionState == renderSpecification.IgnoreEnclosedPixels)
+            var hasUpdatedPolygon = renderSpecification.Objects.Any(x => x.IsUpdated);
+            if (bitmap.Size == _pixelBufferLength && 
+                renderSpecification.Objects.Length == _objectBufferLength && 
+                _previousEnclousureOptionState == renderSpecification.IgnoreEnclosedPixels &&
+                !hasUpdatedPolygon)
                 return;
 
             cachePixels = new Color[bitmap.Size];
@@ -87,12 +89,20 @@ namespace PTGI_Remastered.Cache
             _previousEnclousureOptionState = renderSpecification.IgnoreEnclosedPixels;
             _updatePixelBuffer = true;
 
+            if (hasUpdatedPolygon)
+            {
+                foreach (var obj in renderSpecification.Objects.Where(x => x.IsUpdated))
+                {
+                    obj.IsUpdated = false;
+                }
+            }
+
             if (!renderSpecification.IgnoreEnclosedPixels)
                 return;
 
             Parallel.For(0, bitmap.Size, (i) =>
             {
-                var point = PTGI_Math.Convert1dIndexTo2d(bitmap, i);
+                var point = PTGI_Math.Convert1dIndexTo2dPointClass(bitmap, i);
                 TraceRayUtility.IsRayStartingInPolygon(point, renderSpecification.Objects, ref cachePixels[i]);
             });
         }
@@ -124,14 +134,14 @@ namespace PTGI_Remastered.Cache
             return randomSeed;
         }
         
-        public void SetWallBuffer(Line[] walls)
+        public void SetWallBuffer(SLine[] walls)
         {
             if (_wallBufferLength != walls.Length || WallBuffer == null)
                 AllocateWallBuffer(walls.Length);
             WallBuffer.CopyFromCPU(walls);
         }
 
-        public void SetGridDataBuffer(Line[] walls, Bitmap bitmap, int gridSize)
+        public void SetGridDataBuffer(SLine[] walls, Bitmap bitmap, int gridSize)
         {
             if (_isLiveDisplay || _pixelBufferLength != bitmap.Size || GridDataBuffer == null || _updatePixelBuffer || gridLocalData == null || _gridDividerBufferSize != gridSize)
             {
@@ -163,16 +173,16 @@ namespace PTGI_Remastered.Cache
         {
             _wallBufferLength = size;
             WallBuffer?.Dispose();
-            WallBuffer = Accelerator.Allocate1D<Line>(size);
+            WallBuffer = Accelerator.Allocate1D<SLine>(size);
         }
 
-        private void AllocateGridDataBuffer(Line[] walls, Bitmap bitmap, int gridSize)
+        private void AllocateGridDataBuffer(SLine[] walls, Bitmap bitmap, int gridSize)
         {
             _gridDividerBufferSize = gridSize;
             GridDataBuffer?.Dispose();
 
-            GridCached = GridCached.Create(bitmap, gridSize);
-            gridLocalData = GridCached.CPU_FillGrid(walls);
+            SGridCached = SGridCached.Create(bitmap, gridSize);
+            gridLocalData = SGridCached.CPU_FillGrid(walls);
             GridDataBuffer = Accelerator.Allocate1D<int>(gridLocalData);
         }
     }

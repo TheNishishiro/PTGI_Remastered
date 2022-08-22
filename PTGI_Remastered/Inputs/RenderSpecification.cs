@@ -9,11 +9,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
+using PTGI_Remastered.Classes;
 
 namespace PTGI_Remastered.Inputs
 {
     public class RenderSpecification
     {
+        private SPolygon[] _sPolygons;
         public Polygon[] Objects { get; set; }
         public int ImageWidth { get; set; }
         public int ImageHeight { get; set; }
@@ -24,9 +27,20 @@ namespace PTGI_Remastered.Inputs
         public int DeviceId { get; set; }
         public AcceleratorType AcceleratorType { get; set; }
 
-        public Line[] GetWalls()
+        public SLine[] GetWalls()
         {
-            return Objects.ExtractWalls();
+            var json = JsonConvert.SerializeObject(Objects.ExtractWalls());
+            return JsonConvert.DeserializeObject<SLine[]>(json);
+        }
+
+        public SPolygon[] GetPolygons()
+        {
+            if (_sPolygons != null)
+                return _sPolygons;
+            
+            var json = JsonConvert.SerializeObject(Objects);
+            _sPolygons = JsonConvert.DeserializeObject<SPolygon[]>(json);
+            return _sPolygons;
         }
     }
 }

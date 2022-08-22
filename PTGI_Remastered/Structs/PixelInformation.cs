@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace PTGI_Remastered.Structs
 {
-    public struct PixelInformaton
+    internal struct PixelInformaton
     {
         public byte ShouldCancelRender;
         public byte DensityRegionSwap;

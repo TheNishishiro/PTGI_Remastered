@@ -6,19 +6,28 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using PTGI_Remastered.Classes;
 
 namespace PTGI_Remastered.Utilities
 {
     public class PTGI_Math
     {
-        public static Point Convert1dIndexTo2d(Bitmap bitmap, int threadId)
+        public static SPoint Convert1dIndexTo2d(Bitmap bitmap, int threadId)
         {
             var col = threadId / bitmap.Width;
             var row = threadId % bitmap.Width;
 
-            var raySource = new Point();
+            var raySource = new SPoint();
             raySource.SetCoords(row, col);
             return raySource;
+        }
+        
+        public static Point Convert1dIndexTo2dPointClass(Bitmap bitmap, int threadId)
+        {
+            var col = threadId / bitmap.Width;
+            var row = threadId % bitmap.Width;
+
+            return new Point(row, col);
         }
 
         public static int Convert2dIndexTo1d(float x, float y, Bitmap bitmap)

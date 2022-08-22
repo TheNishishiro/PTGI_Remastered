@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace PTGI_Remastered.Structs
 {
-    public struct RayTraceResult
+    internal struct RayTraceResult
     {
         public Color pixelColor;
     }

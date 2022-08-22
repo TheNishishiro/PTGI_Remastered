@@ -7,11 +7,11 @@ using System.Threading.Tasks;
 
 namespace PTGI_Remastered.Structs
 {
-    public struct Line
+    public struct SLine
     {
-        public Point Source;
-        public Point Destination;
-        public LineCoefficient Coefficient;
+        public SPoint Source;
+        public SPoint Destination;
+        public SLineCoefficient Coefficient;
         public byte HasValue;
         public byte WasChecked;
 
@@ -22,7 +22,7 @@ namespace PTGI_Remastered.Structs
         public float EmissionStrength;
         public float Density;
 
-        public Line Setup(Point source, Point destination)
+        public SLine Setup(SPoint source, SPoint destination)
         {
             Source = source;
             Destination = destination;
@@ -31,9 +31,9 @@ namespace PTGI_Remastered.Structs
             return this;
         }
 
-        private LineCoefficient GetCoefficients()
+        private SLineCoefficient GetCoefficients()
         {
-            var lineComponents = new LineCoefficient();
+            var lineComponents = new SLineCoefficient();
 
             lineComponents.A = (Destination.Y - Source.Y) / (Destination.X - Source.X);
             lineComponents.B = Source.Y - lineComponents.A * Source.X;
@@ -56,45 +56,45 @@ namespace PTGI_Remastered.Structs
             return Source.GetDistance(Destination);
         }
 
-        public LineNormals GetNormals()
+        public SLineNormals GetNormals()
         {
             var dx = Destination.X - Source.X;
             var dy = Destination.Y - Source.Y;
 
-            var lineNormals = new LineNormals();
-            lineNormals.NormalDown = new Point();
+            var lineNormals = new SLineNormals();
+            lineNormals.NormalDown = new SPoint();
             lineNormals.NormalDown.SetCoords(-dy, dx);
 
-            lineNormals.NormalUp = new Point();
+            lineNormals.NormalUp = new SPoint();
             lineNormals.NormalUp.SetCoords(dy, -dx);
 
             return lineNormals;
         }
 
-        public bool IsEqualTo(Line line)
+        public bool IsEqualTo(SLine sLine)
         {
-            return Source.IsEqualTo(line.Source) && Destination.IsEqualTo(line.Destination);
+            return Source.IsEqualTo(sLine.Source) && Destination.IsEqualTo(sLine.Destination);
         }
 
-        private LineNormals MoveNormalsRelative(LineNormals lineNormals, Point intersection, float reflectionArea)
+        private SLineNormals MoveNormalsRelative(SLineNormals sLineNormals, SPoint intersection, float reflectionArea)
         {
-            var movedLineNormals = new LineNormals();
-            movedLineNormals.NormalDown = lineNormals.NormalDown.MultiplyNew(reflectionArea).AddNew(intersection);
-            movedLineNormals.NormalUp = lineNormals.NormalUp.MultiplyNew(reflectionArea).AddNew(intersection);
+            var movedLineNormals = new SLineNormals();
+            movedLineNormals.NormalDown = sLineNormals.NormalDown.MultiplyNew(reflectionArea).AddNew(intersection);
+            movedLineNormals.NormalUp = sLineNormals.NormalUp.MultiplyNew(reflectionArea).AddNew(intersection);
 
             return movedLineNormals;
         }
 
-        public Point GetShiftedClosestNormal(Point source, Point intersection, float reflectionArea)
+        public SPoint GetShiftedClosestNormal(SPoint source, SPoint intersection, float reflectionArea)
         {
             var lineNormals = GetNormals().Normalize();
             var lineShiftedNormals = MoveNormalsRelative(lineNormals, intersection, reflectionArea);
             return source.GetDistance(lineShiftedNormals.NormalDown) <= source.GetDistance(lineShiftedNormals.NormalUp) ? lineShiftedNormals.NormalDown : lineShiftedNormals.NormalUp;
         }
 
-        public Point GetDirection()
+        public SPoint GetDirection()
         {
-            var point = new Point();
+            var point = new SPoint();
             point.SetCoords(Destination.X, Destination.Y);
             point.Substract(Source);
             return point;
@@ -103,21 +103,21 @@ namespace PTGI_Remastered.Structs
         /// <summary>
         /// Computes point of intersection between two lines
         /// </summary>
-        /// <param name="intersectingLine">line to check intersection with</param>
-        /// <param name="ignoredLine">line to ignore during intersection</param>
+        /// <param name="intersectingSLine">line to check intersection with</param>
+        /// <param name="ignoredSLine">line to ignore during intersection</param>
         /// <returns>if point exists return point with HasValue set to true</returns>
-        public Point GetIntersection(Line intersectingLine, Line ignoredLine)
+        public SPoint GetIntersection(SLine intersectingSLine, SLine ignoredSLine)
         {
-            var intersectionPoint = new Point();
+            var intersectionPoint = new SPoint();
 
-            if ((ignoredLine.HasValue == 1 && ignoredLine.IsEqualTo(this)) || WasChecked == 1)
+            if ((ignoredSLine.HasValue == 1 && ignoredSLine.IsEqualTo(this)) || WasChecked == 1)
                 return intersectionPoint;
-            var delta = (Source.X - Destination.X) * (intersectingLine.Source.Y - intersectingLine.Destination.Y) - (Source.Y - Destination.Y) * (intersectingLine.Source.X - intersectingLine.Destination.X);
+            var delta = (Source.X - Destination.X) * (intersectingSLine.Source.Y - intersectingSLine.Destination.Y) - (Source.Y - Destination.Y) * (intersectingSLine.Source.X - intersectingSLine.Destination.X);
             if(delta == 0)
                 return intersectionPoint;
 
-            var t = ((Source.X - intersectingLine.Source.X) * (intersectingLine.Source.Y - intersectingLine.Destination.Y) - (Source.Y - intersectingLine.Source.Y) * (intersectingLine.Source.X - intersectingLine.Destination.X)) / delta;
-            var u = -((Source.X - Destination.X) * (Source.Y - intersectingLine.Source.Y) - (Source.Y - Destination.Y) * (Source.X - intersectingLine.Source.X)) / delta;
+            var t = ((Source.X - intersectingSLine.Source.X) * (intersectingSLine.Source.Y - intersectingSLine.Destination.Y) - (Source.Y - intersectingSLine.Source.Y) * (intersectingSLine.Source.X - intersectingSLine.Destination.X)) / delta;
+            var u = -((Source.X - Destination.X) * (Source.Y - intersectingSLine.Source.Y) - (Source.Y - Destination.Y) * (Source.X - intersectingSLine.Source.X)) / delta;
 
             if(t >= 0 && t <= 1 && u >= 0 && u <= 1)
             {

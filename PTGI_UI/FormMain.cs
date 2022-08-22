@@ -14,6 +14,13 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Xml.Serialization;
+using PTGI_Remastered.Classes;
+using PTGI_Remastered.Structs;
+using PTGI_Remastered.Utilities;
+using Bitmap = System.Drawing.Bitmap;
+using Color = System.Drawing.Color;
+using SystemPoint = System.Drawing.Point;
+using Point = PTGI_Remastered.Classes.Point;
 
 namespace PTGI_UI
 {
@@ -25,7 +32,7 @@ namespace PTGI_UI
         protected PTGI_Remastered.PTGI PathTracer { get; set; }
         protected SettingsView Settings { get; set; }
         protected int popupTime { get; set; } = 0;
-        protected List<PTGI_Remastered.Structs.Polygon> Polygons { get; set; }
+        protected List<Polygon> Polygons { get; set; }
 
         protected MaterialCard PopupMessage { get; set; }
         protected MaterialLabel RenderTimeMessageText { get; set; }
@@ -46,7 +53,7 @@ namespace PTGI_UI
 
         protected bool IsRenderingInProgress { get; set; }
 
-        protected int SelectedPolygon { get; set; }
+        protected Polygon SelectedPolygon { get; set; }
         protected float ZoomFactor { get; set; }
         protected int CurrentZoomDelta { get; set; }
 
@@ -246,10 +253,9 @@ namespace PTGI_UI
                 }
             }
 
-            if (SelectedPolygon != -1 && Polygons.Count > 0 && Settings.DrawObjectsOverline)
+            if (SelectedPolygon != null && Polygons.Count > 0)
             {
-                var polygon = Polygons[SelectedPolygon];
-                foreach (var wall in polygon.Walls)
+                foreach (var wall in SelectedPolygon.Walls)
                 {
                     e.Graphics.DrawLine(
                             new Pen(Color.Red, 1f),
@@ -264,7 +270,7 @@ namespace PTGI_UI
             
             var bitmap = new PTGI_Remastered.Structs.Bitmap();
             bitmap.SetBitmapSettings(Settings.RenderWidth, Settings.RenderHeight, 0);
-            var cellGrid = new PTGI_Remastered.Structs.Grid();
+            var cellGrid = new SGrid();
             cellGrid.Create(bitmap, Settings.GridDivider);
             for (var i = 0; i < cellGrid.GridSize; i++)
             {
@@ -286,7 +292,7 @@ namespace PTGI_UI
         {
             try
             {
-                var aSerializer = new XmlSerializer(typeof(List<PTGI_Remastered.Structs.Polygon>));
+                var aSerializer = new XmlSerializer(typeof(List<Polygon>));
                 var sb = new StringBuilder();
                 var sw = new StringWriter(sb);
                 aSerializer.Serialize(sw, Polygons);
@@ -317,8 +323,8 @@ namespace PTGI_UI
                 if (openFileDialog.ShowDialog() != DialogResult.OK) return;
                 
                 using var streamReader = new StreamReader(openFileDialog.FileName);
-                var aSerializer = new XmlSerializer(typeof(List<PTGI_Remastered.Structs.Polygon>));
-                Polygons = (List<PTGI_Remastered.Structs.Polygon>)aSerializer.Deserialize(streamReader);
+                var aSerializer = new XmlSerializer(typeof(List<Polygon>));
+                Polygons = (List<Polygon>)aSerializer.Deserialize(streamReader);
                 RenderedPictureBox.Refresh();
             }
             catch (Exception ex)
@@ -331,12 +337,11 @@ namespace PTGI_UI
         {
             if (QueuedVerticiesList.Items.Count < 2)
                 return;
-
-            var polygon = new PTGI_Remastered.Structs.Polygon();
+            
             var color = new PTGI_Remastered.Structs.Color();
             color.SetColor(ObjectColor.R, ObjectColor.G, ObjectColor.B);
 
-            var vertices = new List<PTGI_Remastered.Structs.Point>();
+            var vertices = new List<Point>();
 
             for (var i = 0; i < QueuedVerticiesList.Items.Count; i++)
             {
@@ -344,37 +349,37 @@ namespace PTGI_UI
                 var x = float.Parse(QueuedVerticiesList.Items[i].Text.Split(';')[0]) * (1 / pointZoomFactor);
                 var y = float.Parse(QueuedVerticiesList.Items[i].Text.Split(';')[1]) * (1 / pointZoomFactor);
 
-                var point = new PTGI_Remastered.Structs.Point();
-                point.SetCoords(x, y);
+                var point = new Point(x, y);
 
                 vertices.Add(point);
             }
-            polygon.Name = ObjectName;
-            polygon.Setup(vertices.ToArray(),
-                IsObjectEmittingLight ? PTGI_Remastered.Utilities.PTGI_ObjectTypes.LightSource : PTGI_Remastered.Utilities.PTGI_ObjectTypes.Solid,
-                (PTGI_Remastered.Utilities.PTGI_MaterialReflectivness)Enum.Parse(typeof(PTGI_Remastered.Utilities.PTGI_MaterialReflectivness), SelectedObjectMaterial), 
+            var polygon = new Polygon(vertices.ToArray(),
+                IsObjectEmittingLight ? PTGI_ObjectTypes.LightSource : PTGI_ObjectTypes.Solid,
+                (PTGI_MaterialReflectivness)Enum.Parse(typeof(PTGI_MaterialReflectivness), SelectedObjectMaterial), 
                 color,
                 ObjectEmissionStrength, 
                 ObjectDensity);
+            polygon.Name = ObjectName;
 
             Polygons.Add(polygon);
             QueuedVerticiesList.Items.Clear();
         }
 
-        protected void SelectObject(Point mouseLocation)
+        protected void SelectObject(System.Drawing.Point mouseLocation)
         {
             if (Polygons.Count <= 0)
                 return;
 
-            var mousePoint = new PTGI_Remastered.Structs.Point();
-            mousePoint.SetCoords(mouseLocation.X, mouseLocation.Y);
+            var mousePoint = new Point(mouseLocation.X, mouseLocation.Y);
+            var selectedPolygon = Polygons.FirstOrDefault(polygon => mousePoint.LiesInObject(polygon));
+            SelectedPolygon = selectedPolygon == SelectedPolygon ? null : selectedPolygon;
+            
+            UpdateControlsBySelectedPolygon();
+        }
 
-            for (var i = 0; i < Polygons.Count; i++)
-            {
-                if (!mousePoint.LiesInObject(Polygons[i])) continue;
-                SelectedPolygon = i;
-                break;
-            }
+        protected virtual void UpdateControlsBySelectedPolygon()
+        {
+            
         }
 
         protected void SaveRender()
@@ -395,13 +400,13 @@ namespace PTGI_UI
 
         protected void DeleteObject()
         {
-            if (Polygons.Count <= 0 && SelectedPolygon < 0)
+            if (Polygons.Count <= 0 && SelectedPolygon is null)
                 return;
 
             try
             {
-                Polygons.RemoveAt(SelectedPolygon);
-                SelectedPolygon = -1; 
+                Polygons.Remove(SelectedPolygon);
+                SelectedPolygon = null; 
             }
             catch(Exception ex)
             {
@@ -420,27 +425,24 @@ namespace PTGI_UI
             var rnd = new Random();
             var blockSize = Settings.TerrariaWorldCellSize;
             var maxY = Settings.RenderHeight / 2;
-            var generatorStartingPoints = new List<PTGI_Remastered.Structs.Point>();
+            var generatorStartingPoints = new List<Point>();
 
             for (var x = 0; x <= Settings.RenderWidth - (blockSize+1); x += blockSize)
             {
                 for(var y = maxY; y <= Settings.RenderHeight - (blockSize+1); y += blockSize)
                 {
-                    var topRight = new PTGI_Remastered.Structs.Point();
-                    topRight.SetCoords(x, y);
-                    var rightBottom = new PTGI_Remastered.Structs.Point();
-                    rightBottom.SetCoords(x + blockSize, y + blockSize);
-
-                    var block = new PTGI_Remastered.Structs.Polygon();
+                    var topRight = new Point(x, y);
+                    var rightBottom = new Point(x + blockSize, y + blockSize);
+                    
                     var color = new PTGI_Remastered.Structs.Color();
                     color.SetColor(255, 255, 255);
-                    block.Setup(new PTGI_Remastered.Structs.Point[] { topRight, rightBottom }, PTGI_Remastered.Utilities.PTGI_ObjectTypes.Solid, PTGI_Remastered.Utilities.PTGI_MaterialReflectivness.Rough, color, 1, 1);
+                    var block = new Polygon(new Point[] { topRight, rightBottom }, PTGI_ObjectTypes.Solid, PTGI_MaterialReflectivness.Rough, color, 1, 1);
                     block.Name = $"{x};{y}";
                     Polygons.Add(block);
 
                     if (rnd.NextDouble() < 0.3)
                     {
-                        generatorStartingPoints.Add(new PTGI_Remastered.Structs.Point()
+                        generatorStartingPoints.Add(new Point()
                         {
                             X = x,
                             Y = y
@@ -461,16 +463,16 @@ namespace PTGI_UI
                     switch (rnd.Next(4))
                     {
                         case 0:
-                            generatorStartingPoints[x].SetCoords(generatorStartingPoints[x].X + blockSize, generatorStartingPoints[x].Y);
+                            generatorStartingPoints[x] = new Point(generatorStartingPoints[x].X + blockSize, generatorStartingPoints[x].Y);
                             break;
                         case 1:
-                            generatorStartingPoints[x].SetCoords(generatorStartingPoints[x].X - blockSize, generatorStartingPoints[x].Y);
+                            generatorStartingPoints[x] = new Point(generatorStartingPoints[x].X - blockSize, generatorStartingPoints[x].Y);
                             break;
                         case 2:
-                            generatorStartingPoints[x].SetCoords(generatorStartingPoints[x].X, generatorStartingPoints[x].Y + blockSize);
+                            generatorStartingPoints[x] = new Point(generatorStartingPoints[x].X, generatorStartingPoints[x].Y + blockSize);
                             break;
                         case 3:
-                            generatorStartingPoints[x].SetCoords(generatorStartingPoints[x].X, generatorStartingPoints[x].Y - blockSize);
+                            generatorStartingPoints[x] = new Point(generatorStartingPoints[x].X, generatorStartingPoints[x].Y - blockSize);
                             break;
                     }
                 }
@@ -495,17 +497,16 @@ namespace PTGI_UI
             {
                 var vertexCount = rnd.Next(2, 5);
                 var objectType = rnd.NextDouble();
-                var polygon = new PTGI_Remastered.Structs.Polygon();
-                var vertices = new List<PTGI_Remastered.Structs.Point>();
+                var vertices = new List<Point>();
                 for (var v = 0; v < vertexCount; v++)
                 {
-                    var point = new PTGI_Remastered.Structs.Point();
+                    var point = new Point();
                     while (true)
                     {
                         if (!vertices.Any())
-                            point.SetCoords(rnd.Next(Settings.RenderWidth), rnd.Next(Settings.RenderHeight));
+                            point = new Point(rnd.Next(Settings.RenderWidth), rnd.Next(Settings.RenderHeight));
                         else
-                            point.SetCoords(
+                            point = new Point(
                                 rnd.Next(Math.Max(0, (int)vertices.LastOrDefault().X - vertexSpread),
                                     Math.Min(Settings.RenderWidth, (int)vertices.LastOrDefault().X + vertexSpread)),
                                 rnd.Next(Math.Max(0, (int)vertices.LastOrDefault().Y - vertexSpread),
@@ -525,9 +526,9 @@ namespace PTGI_UI
                 if (!generatedLight && i == objectCount - 1)
                     forceLightGeneration = true;
 
-                polygon.Setup(vertices.ToArray(),
-                    objectType > 0.8 || forceLightGeneration ? PTGI_Remastered.Utilities.PTGI_ObjectTypes.LightSource : PTGI_Remastered.Utilities.PTGI_ObjectTypes.Solid,
-                    PTGI_Remastered.Utilities.PTGI_MaterialReflectivness.Rough,
+                var polygon = new Polygon(vertices.ToArray(),
+                    objectType > 0.8 || forceLightGeneration ? PTGI_ObjectTypes.LightSource : PTGI_ObjectTypes.Solid,
+                    PTGI_MaterialReflectivness.Rough,
                     color,
                     (float)(rnd.NextDouble()+0.7),
                     ObjectDensity);
@@ -541,38 +542,26 @@ namespace PTGI_UI
             if (!Settings.IsLivePreview) return;
             mouseX = (int) (mouseX / ZoomFactor);
             mouseY = (int) (mouseY / ZoomFactor);
-
-            var polygon = new PTGI_Remastered.Structs.Polygon();
+            
             var color = new PTGI_Remastered.Structs.Color();
             color.SetColor(ObjectColor.R, ObjectColor.G, ObjectColor.B);
 
-            var verticies = new PTGI_Remastered.Structs.Point[]
+            var verticies = new Point[]
             {
-                new()
-                {
-                    X = mouseX,
-                    Y = mouseY,
-                    HasValue = 1
-                },
-                new()
-                {
-                    X = mouseX + 5,
-                    Y = mouseY + 5,
-                    HasValue = 1
-                }
+                new(mouseX, mouseY),
+                new(mouseX + 5, mouseY + 5)
             };
 
-            polygon.Name = "MouseCursor";
-            polygon.Setup(verticies,
+            var polygon = new Polygon(verticies,
                 IsObjectEmittingLight
-                    ? PTGI_Remastered.Utilities.PTGI_ObjectTypes.LightSource
-                    : PTGI_Remastered.Utilities.PTGI_ObjectTypes.Solid,
-                (PTGI_Remastered.Utilities.PTGI_MaterialReflectivness) Enum.Parse(
-                    typeof(PTGI_Remastered.Utilities.PTGI_MaterialReflectivness), SelectedObjectMaterial),
+                    ? PTGI_ObjectTypes.LightSource
+                    : PTGI_ObjectTypes.Solid,
+                (PTGI_MaterialReflectivness) Enum.Parse(
+                    typeof(PTGI_MaterialReflectivness), SelectedObjectMaterial),
                 color,
                 ObjectEmissionStrength,
                 ObjectDensity);
-
+            polygon.Name = "MouseCursor";
             Polygons.Add(polygon);
             PathTraceThread();
             Polygons.RemoveAll(x => x.Name == "MouseCursor");
@@ -581,24 +570,43 @@ namespace PTGI_UI
 
         protected void MoveSelected(Keys keyPress)
         {
-            var selectedPolygon = Polygons[SelectedPolygon];
+            if (SelectedPolygon is null)
+                return;
+
+            var movementSpeed = 3;
             switch (keyPress)
             {
                 case Keys.Up:
-                    selectedPolygon.MovePolygon(0, -10);
+                    SelectedPolygon.Move(0, -movementSpeed);
                     break;
                 case Keys.Down:
-                    selectedPolygon.MovePolygon(0, 10);
+                    SelectedPolygon.Move(0, movementSpeed);
                     break;
                 case Keys.Left:
-                    selectedPolygon.MovePolygon(-10, 0);
+                    SelectedPolygon.Move(-movementSpeed, 0);
                     break;
                 case Keys.Right:
-                    selectedPolygon.MovePolygon(10, 0);
+                    SelectedPolygon.Move(movementSpeed, 0);
                     break;
             }
             PathTraceThread();
             RenderedPictureBox.Refresh();
+        }
+
+        protected void UpdateSelected()
+        {
+            if (SelectedPolygon is null)
+                return;
+
+            var color = new PTGI_Remastered.Structs.Color();
+            color.SetColor(ObjectColor.R, ObjectColor.G, ObjectColor.B);
+            SelectedPolygon.Color = color;
+            SelectedPolygon.objectType = IsObjectEmittingLight ? PTGI_ObjectTypes.LightSource : PTGI_ObjectTypes.Solid;
+            SelectedPolygon.reflectivnessType = (PTGI_MaterialReflectivness) Enum.Parse(typeof(PTGI_MaterialReflectivness), SelectedObjectMaterial);
+            SelectedPolygon.EmissionStrength = ObjectEmissionStrength;
+            SelectedPolygon.Density = ObjectDensity;
+            SelectedPolygon.Name = ObjectName;
+            SelectedPolygon.IsUpdated = true;
         }
     }
 }

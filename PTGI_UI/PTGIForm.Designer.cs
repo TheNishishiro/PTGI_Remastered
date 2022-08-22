@@ -1,4 +1,6 @@
 ﻿
+using System.Windows.Forms;
+
 namespace PTGI_UI
 {
     partial class PTGIForm
@@ -1375,6 +1377,7 @@ namespace PTGI_UI
             this.TransparencyKey = System.Drawing.Color.Fuchsia;
             this.Load += new System.EventHandler(this.Form1_Load);
             this.KeyUp += new System.Windows.Forms.KeyEventHandler(this.PTGIForm_KeyUp);
+            this.KeyDown += new KeyEventHandler(this.PTGIForm_KeyDown);
             this.panel1.ResumeLayout(false);
             this.materialTabControl1.ResumeLayout(false);
             this.tabPage1.ResumeLayout(false);

@@ -2,10 +2,13 @@
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Windows.Forms;
+using PTGI_Remastered.Classes;
 using PTGI_Remastered.Structs;
 using PTGI_Remastered.Utilities;
 
@@ -50,7 +53,7 @@ namespace PTGI_UI
 
             PathTracer = new PTGI_Remastered.PTGI();
             Denoiser = new PTGI_Denoiser.Denoiser();
-            Polygons = new List<PTGI_Remastered.Structs.Polygon>();
+            Polygons = new List<Polygon>();
             ResetZoom();
 
             var gpus = PathTracer.GetAvailableHardwareAccelerators().ToArray();
@@ -71,6 +74,21 @@ namespace PTGI_UI
             ObjectDensity = float.Parse(objectDensityControl.Text.Replace('.', ','));
             ObjectName = objectNameControl.Text;
             colorDisplayPictureBox.BackColor = ObjectColor;
+        }
+
+        protected override void UpdateControlsBySelectedPolygon()
+        {
+            if (SelectedPolygon is null)
+                return;
+            
+            emitsLightControl.Checked = SelectedPolygon.objectType == PTGI_ObjectTypes.LightSource;
+            objectMaterialControl.SelectedItem = SelectedPolygon.reflectivnessType.ToString();
+            colorEditor1.Color = System.Drawing.Color.FromArgb((int) SelectedPolygon.Color.R, (int) SelectedPolygon.Color.G, (int) SelectedPolygon.Color.B);
+            objectEmissionStrengthControl.Text = SelectedPolygon.EmissionStrength.ToString(CultureInfo.InvariantCulture);
+            objectEmissionStrengthControl.Text = SelectedPolygon.EmissionStrength.ToString(CultureInfo.InvariantCulture);
+            objectDensityControl.Text = SelectedPolygon.Density.ToString(CultureInfo.InvariantCulture);
+            objectNameControl.Text = SelectedPolygon.Name;
+            colorDisplayPictureBox.BackColor = colorEditor1.Color;
         }
 
         private void startRenderButton_Click(object sender, EventArgs e)
@@ -137,6 +155,9 @@ namespace PTGI_UI
                 case Keys.R:
                     Refresh();
                     break;
+                case Keys.Enter:
+                    UpdateSelected();
+                    break;
                 case Keys.Delete:
                     DeleteObject();
                     Refresh();
@@ -146,6 +167,13 @@ namespace PTGI_UI
                     ZoomImage();
                     Refresh();
                     break;
+            }
+        }
+
+        private void PTGIForm_KeyDown(object sender, KeyEventArgs e)
+        {
+            switch (e.KeyCode)
+            {
                 case Keys.Up:
                 case Keys.Down:
                 case Keys.Left:
