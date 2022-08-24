@@ -193,7 +193,7 @@ namespace PTGI_Remastered
                     }
                     else
                     {
-                        rayTraceResult.pixelColor.Multiply(gridTraversalResult.IntesectedWall.Color.GetRescaled(XMath.PI).GetRescaled(255));
+                        rayTraceResult.pixelColor.Multiply(gridTraversalResult.IntesectedWall.Color/*.GetRescaled(XMath.PI)*/.GetRescaled(255));
                     }
 
                     if (rayTraceResult.pixelColor.IsDim())
