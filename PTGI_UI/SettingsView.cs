@@ -29,6 +29,7 @@ namespace PTGI_UI
             TerrariaWorldCellSizeControlValue = "32";
             DenoiserKernelSizeControlValue = "9";
             DenoiserIterationCountControlValue = "1";
+            RandomSeed = "0";
         }
 
         public void Save()
@@ -104,6 +105,15 @@ namespace PTGI_UI
                 return result;
             }
         }
+
+        public int Seed
+        { 
+            get
+            {
+                int.TryParse(RandomSeed, out int result);
+                return result;
+            }
+        }
         public Color ObjectColor { get; set; }
 
         public string BounceLimitControlValue { get; set; }
@@ -114,5 +124,6 @@ namespace PTGI_UI
         public string TerrariaWorldCellSizeControlValue { get; set; }
         public string DenoiserKernelSizeControlValue { get; set; }
         public string DenoiserIterationCountControlValue { get; set; }
+        public string RandomSeed { get; set; }
     }
 }

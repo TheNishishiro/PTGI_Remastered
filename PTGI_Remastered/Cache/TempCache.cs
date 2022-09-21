@@ -35,6 +35,7 @@ namespace PTGI_Remastered.Cache
         private AcceleratorType _previouslyUsedAccelerator;
         private int _previouslyDeviceId;
         private bool _isLiveDisplay = true; // TODO: constantly update?
+        private bool _isRefreshSeedPerRender = true; 
 
         private Color[] cachePixels; 
         private int[] gridLocalData { get; set; }
@@ -110,16 +111,16 @@ namespace PTGI_Remastered.Cache
 
         public void SetPixelBuffer()
         {
-            if (_pixelBufferLength != cachePixels.Length || PixelBuffer == null || _updatePixelBuffer)
+            if (_pixelBufferLength != cachePixels.Length || PixelBuffer == null)
                 AllocatePixelBuffer(cachePixels.Length);
             PixelBuffer.CopyFromCPU(cachePixels);
         }
         
-        public void SetSeedBuffer(int bitmapSize)
+        public void SetSeedBuffer(int bitmapSize, int staticSeed = 0)
         {
-            if (_pixelBufferLength == bitmapSize && SeedBuffer != null && !_updatePixelBuffer) return;
-            
-            var seed = GenerateRandomSeed(bitmapSize);
+            if (_pixelBufferLength == bitmapSize && SeedBuffer != null && !_updatePixelBuffer && !_isRefreshSeedPerRender) return;
+
+            var seed = staticSeed is 0 ? GenerateRandomSeed(bitmapSize) : GenerateRandomSeed(bitmapSize, staticSeed);
             AllocateSeedBuffer(seed.Length);
             SeedBuffer.CopyFromCPU(seed);
         }
@@ -131,6 +132,17 @@ namespace PTGI_Remastered.Cache
             {
                 randomSeed[i] = PTGI_Random.Next();
             });
+            return randomSeed;
+        }
+
+        private int[] GenerateRandomSeed(int bitmapSize, int seed)
+        {
+            var randomSeed = new int[bitmapSize];
+            var random = new Random(seed);
+            for (var i = 0; i < bitmapSize; i++)
+            {
+                randomSeed[i] = random.Next();
+            }
             return randomSeed;
         }
         

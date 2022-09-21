@@ -39,7 +39,6 @@ namespace PTGI_UI
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
             this.panel3 = new System.Windows.Forms.Panel();
             this.renderingButtonsPanel = new MaterialSkin2DotNet.Controls.MaterialCard();
-            this.materialButton1 = new MaterialSkin2DotNet.Controls.MaterialButton();
             this.resetSceneButton = new MaterialSkin2DotNet.Controls.MaterialButton();
             this.loadSceneButton = new MaterialSkin2DotNet.Controls.MaterialButton();
             this.saveSceneButton = new MaterialSkin2DotNet.Controls.MaterialButton();
@@ -72,6 +71,8 @@ namespace PTGI_UI
             this.useDenoiserSwitch = new MaterialSkin2DotNet.Controls.MaterialSwitch();
             this.materialLabel15 = new MaterialSkin2DotNet.Controls.MaterialLabel();
             this.materialCard2 = new MaterialSkin2DotNet.Controls.MaterialCard();
+            this.seedControl = new MaterialSkin2DotNet.Controls.MaterialTextBox();
+            this.materialLabel18 = new MaterialSkin2DotNet.Controls.MaterialLabel();
             this.materialLabel5 = new MaterialSkin2DotNet.Controls.MaterialLabel();
             this.samplePerPixelControl = new MaterialSkin2DotNet.Controls.MaterialTextBox();
             this.materialLabel2 = new MaterialSkin2DotNet.Controls.MaterialLabel();
@@ -216,7 +217,6 @@ namespace PTGI_UI
             // 
             this.renderingButtonsPanel.AutoScroll = true;
             this.renderingButtonsPanel.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
-            this.renderingButtonsPanel.Controls.Add(this.materialButton1);
             this.renderingButtonsPanel.Controls.Add(this.resetSceneButton);
             this.renderingButtonsPanel.Controls.Add(this.loadSceneButton);
             this.renderingButtonsPanel.Controls.Add(this.saveSceneButton);
@@ -232,23 +232,6 @@ namespace PTGI_UI
             this.renderingButtonsPanel.Padding = new System.Windows.Forms.Padding(14);
             this.renderingButtonsPanel.Size = new System.Drawing.Size(313, 204);
             this.renderingButtonsPanel.TabIndex = 6;
-            // 
-            // materialButton1
-            // 
-            this.materialButton1.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this.materialButton1.Density = MaterialSkin2DotNet.Controls.MaterialButton.MaterialButtonDensity.Default;
-            this.materialButton1.Depth = 0;
-            this.materialButton1.HighEmphasis = true;
-            this.materialButton1.Icon = null;
-            this.materialButton1.Location = new System.Drawing.Point(0, 0);
-            this.materialButton1.Margin = new System.Windows.Forms.Padding(4, 6, 4, 6);
-            this.materialButton1.MouseState = MaterialSkin2DotNet.MouseState.HOVER;
-            this.materialButton1.Name = "materialButton1";
-            this.materialButton1.NoAccentTextColor = System.Drawing.Color.Empty;
-            this.materialButton1.Size = new System.Drawing.Size(64, 36);
-            this.materialButton1.TabIndex = 0;
-            this.materialButton1.Type = MaterialSkin2DotNet.Controls.MaterialButton.MaterialButtonType.Contained;
-            this.materialButton1.UseAccentColor = false;
             // 
             // resetSceneButton
             // 
@@ -431,6 +414,7 @@ namespace PTGI_UI
             this.objectDensityControl.Text = "1.4";
             this.objectDensityControl.TrailingIcon = null;
             this.objectDensityControl.TextChanged += new System.EventHandler(this.UpdateObjectSettings);
+            // 
             // materialLabel11
             // 
             this.materialLabel11.AutoSize = true;
@@ -757,6 +741,8 @@ namespace PTGI_UI
             // materialCard2
             // 
             this.materialCard2.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
+            this.materialCard2.Controls.Add(this.seedControl);
+            this.materialCard2.Controls.Add(this.materialLabel18);
             this.materialCard2.Controls.Add(this.materialLabel5);
             this.materialCard2.Controls.Add(this.samplePerPixelControl);
             this.materialCard2.Controls.Add(this.materialLabel2);
@@ -774,6 +760,36 @@ namespace PTGI_UI
             this.materialCard2.Padding = new System.Windows.Forms.Padding(14);
             this.materialCard2.Size = new System.Drawing.Size(548, 933);
             this.materialCard2.TabIndex = 3;
+            // 
+            // seedControl
+            // 
+            this.seedControl.AnimateReadOnly = false;
+            this.seedControl.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.seedControl.DataBindings.Add(new System.Windows.Forms.Binding("Text", this.settingsViewBindingSource, "RandomSeed", true));
+            this.seedControl.Depth = 0;
+            this.seedControl.Font = new System.Drawing.Font("Roboto", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.seedControl.LeadingIcon = null;
+            this.seedControl.Location = new System.Drawing.Point(55, 338);
+            this.seedControl.MaxLength = 50;
+            this.seedControl.MouseState = MaterialSkin2DotNet.MouseState.OUT;
+            this.seedControl.Multiline = false;
+            this.seedControl.Name = "seedControl";
+            this.seedControl.Size = new System.Drawing.Size(440, 50);
+            this.seedControl.TabIndex = 9;
+            this.seedControl.Text = "20";
+            this.seedControl.TrailingIcon = null;
+            // 
+            // materialLabel18
+            // 
+            this.materialLabel18.AutoSize = true;
+            this.materialLabel18.Depth = 0;
+            this.materialLabel18.Font = new System.Drawing.Font("Roboto", 14F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Pixel);
+            this.materialLabel18.Location = new System.Drawing.Point(55, 319);
+            this.materialLabel18.MouseState = MaterialSkin2DotNet.MouseState.HOVER;
+            this.materialLabel18.Name = "materialLabel18";
+            this.materialLabel18.Size = new System.Drawing.Size(36, 19);
+            this.materialLabel18.TabIndex = 10;
+            this.materialLabel18.Text = "Seed";
             // 
             // materialLabel5
             // 
@@ -970,7 +986,7 @@ namespace PTGI_UI
             this.materialLabel7.Location = new System.Drawing.Point(14, 176);
             this.materialLabel7.MouseState = MaterialSkin2DotNet.MouseState.HOVER;
             this.materialLabel7.Name = "materialLabel7";
-            this.materialLabel7.Size = new System.Drawing.Size(32, 19);
+            this.materialLabel7.Size = new System.Drawing.Size(48, 19);
             this.materialLabel7.TabIndex = 10;
             this.materialLabel7.Text = "Device";
             // 
@@ -1376,8 +1392,8 @@ namespace PTGI_UI
             this.Text = "PTGI Remastered";
             this.TransparencyKey = System.Drawing.Color.Fuchsia;
             this.Load += new System.EventHandler(this.Form1_Load);
+            this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.PTGIForm_KeyDown);
             this.KeyUp += new System.Windows.Forms.KeyEventHandler(this.PTGIForm_KeyUp);
-            this.KeyDown += new KeyEventHandler(this.PTGIForm_KeyDown);
             this.panel1.ResumeLayout(false);
             this.materialTabControl1.ResumeLayout(false);
             this.tabPage1.ResumeLayout(false);
@@ -1495,7 +1511,8 @@ namespace PTGI_UI
         private MaterialSkin2DotNet.Controls.MaterialTextBox materialTextBox1;
         private MaterialSkin2DotNet.Controls.MaterialLabel materialLabel17;
         private MaterialSkin2DotNet.Controls.MaterialButton generateRandomSceneButton;
-        private MaterialSkin2DotNet.Controls.MaterialButton materialButton1;
+        private MaterialSkin2DotNet.Controls.MaterialTextBox seedControl;
+        private MaterialSkin2DotNet.Controls.MaterialLabel materialLabel18;
     }
 }
 
