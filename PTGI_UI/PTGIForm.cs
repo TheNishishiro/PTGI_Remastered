@@ -159,7 +159,10 @@ namespace PTGI_UI
                     UpdateSelected();
                     break;
                 case Keys.Delete:
-                    DeleteObject();
+                    if (SelectedPolygon is not null)
+                        DeleteObject();
+                    else
+                        DeleteLastVertex();
                     Refresh();
                     break;
                 case Keys.Space:

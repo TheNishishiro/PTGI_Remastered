@@ -25,6 +25,7 @@ namespace PTGI_Remastered.Inputs
         public int GridSize { get; set; }
         public bool IgnoreEnclosedPixels { get; set; }
         public int DeviceId { get; set; }
+        public int Seed { get; set; }
         public AcceleratorType AcceleratorType { get; set; }
 
         public SLine[] GetWalls()

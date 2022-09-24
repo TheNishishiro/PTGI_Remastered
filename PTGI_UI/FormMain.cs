@@ -74,7 +74,8 @@ namespace PTGI_UI
                         ImageWidth = Settings.RenderWidth,
                         Objects = Polygons.ToArray(),
                         SampleCount = Settings.SamplesPerPixel,
-                        IgnoreEnclosedPixels = Settings.RenderFlag_IgnoreObstacleInterior
+                        IgnoreEnclosedPixels = Settings.RenderFlag_IgnoreObstacleInterior,
+                        Seed = Settings.Seed
                     };
                 }
 
@@ -414,6 +415,14 @@ namespace PTGI_UI
             }
         }
 
+        protected void DeleteLastVertex()
+        {
+            if (QueuedVerticiesList.Items.Count <= 0)
+                return;
+            
+            QueuedVerticiesList.Items.RemoveAt(QueuedVerticiesList.Items.Count-1);
+        }
+
         protected void ClearScene()
         {
             Polygons.Clear();
@@ -435,7 +444,7 @@ namespace PTGI_UI
                     var rightBottom = new Point(x + blockSize, y + blockSize);
                     
                     var color = new PTGI_Remastered.Structs.Color();
-                    color.SetColor(255, 255, 255);
+                    color.SetColor(128, 128, 128);
                     var block = new Polygon(new Point[] { topRight, rightBottom }, PTGI_ObjectTypes.Solid, PTGI_MaterialReflectivness.Rough, color, 1, 1);
                     block.Name = $"{x};{y}";
                     Polygons.Add(block);
