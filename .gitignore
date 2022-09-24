@@ -1,10 +1,12 @@
 AleaTests/
 packages/
 PTGI_Denoiser/bin/
-PTGI_Remastered/bin/
-PTGI_UI/bin/
-PTGI_Remastered/obj/
-PTGI_UI/obj/
 PTGI_Denoiser/obj/
+PTGI_Remastered/bin/
+PTGI_Remastered/obj/
+PTGI_UI/bin/
+PTGI_UI/obj/
+PTGI_Remastered.Benchmarks/bin/
+PTGI_Remastered.Benchmarks/obj/
 .vs/
 .idea/

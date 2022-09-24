@@ -9,6 +9,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PTGI_UI", "PTGI_UI\PTGI_UI.
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PTGI_Denoise", "PTGI_Denoiser\PTGI_Denoise.csproj", "{48F5260E-0CF4-4B98-BC82-30FB33D24280}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PTGI_Remastered.Benchmarks", "PTGI_Remastered.Benchmarks\PTGI_Remastered.Benchmarks.csproj", "{CD03D96E-D02F-455F-9474-B5A1B934D42E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -55,6 +57,18 @@ Global
 		{48F5260E-0CF4-4B98-BC82-30FB33D24280}.Release|x64.Build.0 = Release|Any CPU
 		{48F5260E-0CF4-4B98-BC82-30FB33D24280}.Release|x86.ActiveCfg = Release|Any CPU
 		{48F5260E-0CF4-4B98-BC82-30FB33D24280}.Release|x86.Build.0 = Release|Any CPU
+		{CD03D96E-D02F-455F-9474-B5A1B934D42E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CD03D96E-D02F-455F-9474-B5A1B934D42E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CD03D96E-D02F-455F-9474-B5A1B934D42E}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{CD03D96E-D02F-455F-9474-B5A1B934D42E}.Debug|x64.Build.0 = Debug|Any CPU
+		{CD03D96E-D02F-455F-9474-B5A1B934D42E}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{CD03D96E-D02F-455F-9474-B5A1B934D42E}.Debug|x86.Build.0 = Debug|Any CPU
+		{CD03D96E-D02F-455F-9474-B5A1B934D42E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CD03D96E-D02F-455F-9474-B5A1B934D42E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CD03D96E-D02F-455F-9474-B5A1B934D42E}.Release|x64.ActiveCfg = Release|Any CPU
+		{CD03D96E-D02F-455F-9474-B5A1B934D42E}.Release|x64.Build.0 = Release|Any CPU
+		{CD03D96E-D02F-455F-9474-B5A1B934D42E}.Release|x86.ActiveCfg = Release|Any CPU
+		{CD03D96E-D02F-455F-9474-B5A1B934D42E}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
