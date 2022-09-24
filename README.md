@@ -71,3 +71,78 @@ Current iteration is being tested on RTX 3080 and GTX 1050m
 - Improved code readability
 - Structures instead of raw basic data types
 - Renderer and UI seperated
+
+## Use renderer without UI
+
+Reference PTGI_Remastered project
+
+Initialize renderer class
+
+```csharp
+var pathTracer = new PTGI();
+```
+
+Prepare a list of Polygons present on the scene
+
+```csharp
+var polygons = new List<Polygon>();
+
+var lightSource = new Polygon(new[]
+    {
+        new Point(10, 10), // Top left conrner
+        new Point(20, 20), // Top right corner
+    }, 
+    PTGI_ObjectTypes.LightSource, // Emitter or reflector
+    PTGI_MaterialReflectivness.Rough, // Type of surface
+    new PTGI_Remastered.Structs.Color() // Color of the surface
+    {
+        R = 255,
+        B = 255,
+        G = 255
+    }, 
+    1, // Emission strength, discarded for reflectors
+    0); // Density of objects that light can pass through
+    
+
+polygons.Add(lightSource);
+```
+
+Prepare render settings
+
+```csharp
+var renderSpecification = new RenderSpecification()
+{
+    BounceLimit = 8, // Max number of bounces calculated
+    DeviceId = 0,   // Id of a CUDA device
+    GridSize = 16,  // Size of a grid
+    AcceleratorType = AcceleratorType.Cuda,
+    ImageHeight = 640,  // Render height
+    ImageWidth = 800,   // Render width
+    Objects = Polygons.ToArray(),   // Objects present on the scene
+    SampleCount = 300,  // Number of samples to calculate per pixel
+    IgnoreEnclosedPixels = false,   // Whether to trace rays inside of polygons
+    Seed = 1    // Random seed, 0 for different starting conditions each execution
+};
+```
+
+Call renderer
+
+```csharp
+var pathTraceResult = PathTracer.PathTraceRender(renderSpecification);
+```
+
+Path tracer returns a 1D array of pixels which can later be translated into any other type, bitmap dimensions, time it spent rendering a scene and time it spent on allocations and rendering
+
+## Numbers
+
+### benchmark results
+
+Windows 11
+
+11th Gen Intel Core i7-11700KF 3.60GHz
+
+NVIDIA GeForce RTX 3080
+
+.NET 6.0.0 (6.0.21.48005), X64 RyuJIT AVX2
+
+Results table can be found [here](https://github.com/TheNishishiro/PTGI_Remastered/blob/PTGI_ILGPU_Dev/PTGI_Remastered.Benchmarks/Benchmarks/PTGI_Remastered.Benchmarks.PTGIBenchmark-report-default.md)

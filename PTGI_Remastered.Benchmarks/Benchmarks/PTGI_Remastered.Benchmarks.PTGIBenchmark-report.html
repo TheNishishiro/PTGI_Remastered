@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+<meta charset='utf-8' />
+<title>PTGI_Remastered.Benchmarks.PTGIBenchmark-20220924-112142</title>
+
+<style type="text/css">
+	table { border-collapse: collapse; display: block; width: 100%; overflow: auto; }
+	td, th { padding: 6px 13px; border: 1px solid #ddd; text-align: right; }
+	tr { background-color: #fff; border-top: 1px solid #ccc; }
+	tr:nth-child(even) { background: #f8f8f8; }
+</style>
+</head>
+<body>
+<pre><code>
+BenchmarkDotNet=v0.13.2, OS=Windows 11 (10.0.22000.978/21H2)
+11th Gen Intel Core i7-11700KF 3.60GHz, 1 CPU, 16 logical and 8 physical cores
+.NET SDK=6.0.100-rc.2.21505.57
+  [Host]     : .NET 6.0.0 (6.0.21.48005), X64 RyuJIT AVX2
+  DefaultJob : .NET 6.0.0 (6.0.21.48005), X64 RyuJIT AVX2
+</code></pre>
+<pre><code></code></pre>
+
+<table>
+<thead><tr><th>Method</th><th>BounceLimit</th><th>GridSize</th><th>SampleCount</th><th> Mean</th><th>Error</th><th>StdDev</th><th>Median</th><th>  Min</th><th>  Max</th><th>Allocated</th>
+</tr>
+</thead><tbody><tr><td>Render</td><td>1</td><td>1</td><td>1</td><td>47.81 ms</td><td>1.906 ms</td><td>5.559 ms</td><td>46.69 ms</td><td>26.87 ms</td><td>61.83 ms</td><td>14.61 MB</td>
+</tr><tr><td>Render</td><td>1</td><td>1</td><td>10</td><td>27.06 ms</td><td>0.305 ms</td><td>0.285 ms</td><td>27.02 ms</td><td>26.57 ms</td><td>27.54 ms</td><td>14.76 MB</td>
+</tr><tr><td>Render</td><td>1</td><td>1</td><td>100</td><td>70.16 ms</td><td>0.601 ms</td><td>0.501 ms</td><td>70.12 ms</td><td>69.44 ms</td><td>71.37 ms</td><td>14.61 MB</td>
+</tr><tr><td>Render</td><td>1</td><td>1</td><td>500</td><td>284.78 ms</td><td>0.751 ms</td><td>0.665 ms</td><td>284.56 ms</td><td>283.89 ms</td><td>286.12 ms</td><td>14.61 MB</td>
+</tr><tr><td>Render</td><td>1</td><td>1</td><td>1000</td><td>563.48 ms</td><td>1.591 ms</td><td>1.328 ms</td><td>563.44 ms</td><td>561.50 ms</td><td>566.00 ms</td><td>16.96 MB</td>
+</tr><tr><td>Render</td><td>1</td><td>4</td><td>1</td><td>43.55 ms</td><td>5.547 ms</td><td>16.357 ms</td><td>54.25 ms</td><td>17.57 ms</td><td>59.69 ms</td><td>14.63 MB</td>
+</tr><tr><td>Render</td><td>1</td><td>4</td><td>10</td><td>22.27 ms</td><td>0.690 ms</td><td>1.946 ms</td><td>22.18 ms</td><td>18.20 ms</td><td>27.09 ms</td><td>14.92 MB</td>
+</tr><tr><td>Render</td><td>1</td><td>4</td><td>100</td><td>34.93 ms</td><td>0.691 ms</td><td>1.174 ms</td><td>34.86 ms</td><td>32.79 ms</td><td>37.32 ms</td><td>14.78 MB</td>
+</tr><tr><td>Render</td><td>1</td><td>4</td><td>500</td><td>105.04 ms</td><td>0.789 ms</td><td>0.700 ms</td><td>104.90 ms</td><td>104.15 ms</td><td>106.52 ms</td><td>14.15 MB</td>
+</tr><tr><td>Render</td><td>1</td><td>4</td><td>1000</td><td>197.27 ms</td><td>0.823 ms</td><td>0.730 ms</td><td>197.32 ms</td><td>195.82 ms</td><td>198.38 ms</td><td>13.84 MB</td>
+</tr><tr><td>Render</td><td>1</td><td>8</td><td>1</td><td>22.62 ms</td><td>0.442 ms</td><td>0.726 ms</td><td>22.66 ms</td><td>20.02 ms</td><td>23.91 ms</td><td>14.65 MB</td>
+</tr><tr><td>Render</td><td>1</td><td>8</td><td>10</td><td>22.77 ms</td><td>0.619 ms</td><td>1.825 ms</td><td>22.15 ms</td><td>19.43 ms</td><td>27.10 ms</td><td>14.64 MB</td>
+</tr><tr><td>Render</td><td>1</td><td>8</td><td>100</td><td>32.16 ms</td><td>0.638 ms</td><td>0.895 ms</td><td>32.09 ms</td><td>30.70 ms</td><td>34.01 ms</td><td>14.94 MB</td>
+</tr><tr><td>Render</td><td>1</td><td>8</td><td>500</td><td>91.31 ms</td><td>0.958 ms</td><td>0.896 ms</td><td>91.20 ms</td><td>89.83 ms</td><td>93.37 ms</td><td>14.64 MB</td>
+</tr><tr><td>Render</td><td>1</td><td>8</td><td>1000</td><td>162.86 ms</td><td>0.408 ms</td><td>0.362 ms</td><td>162.84 ms</td><td>162.07 ms</td><td>163.35 ms</td><td>14.64 MB</td>
+</tr><tr><td>Render</td><td>1</td><td>16</td><td>1</td><td>23.00 ms</td><td>0.571 ms</td><td>1.657 ms</td><td>22.97 ms</td><td>17.78 ms</td><td>26.35 ms</td><td>15.03 MB</td>
+</tr><tr><td>Render</td><td>1</td><td>16</td><td>10</td><td>23.10 ms</td><td>0.820 ms</td><td>2.419 ms</td><td>23.24 ms</td><td>18.41 ms</td><td>27.70 ms</td><td>15.03 MB</td>
+</tr><tr><td>Render</td><td>1</td><td>16</td><td>100</td><td>31.81 ms</td><td>0.626 ms</td><td>0.937 ms</td><td>31.97 ms</td><td>29.87 ms</td><td>33.08 ms</td><td>14.74 MB</td>
+</tr><tr><td>Render</td><td>1</td><td>16</td><td>500</td><td>92.30 ms</td><td>1.284 ms</td><td>1.201 ms</td><td>92.01 ms</td><td>89.77 ms</td><td>94.27 ms</td><td>14.73 MB</td>
+</tr><tr><td>Render</td><td>1</td><td>16</td><td>1000</td><td>165.13 ms</td><td>0.546 ms</td><td>0.427 ms</td><td>165.14 ms</td><td>164.39 ms</td><td>165.71 ms</td><td>14.74 MB</td>
+</tr><tr><td>Render</td><td>1</td><td>32</td><td>1</td><td>22.52 ms</td><td>0.655 ms</td><td>1.932 ms</td><td>22.97 ms</td><td>16.30 ms</td><td>25.25 ms</td><td>15.1 MB</td>
+</tr><tr><td>Render</td><td>1</td><td>32</td><td>10</td><td>22.18 ms</td><td>0.629 ms</td><td>1.846 ms</td><td>22.19 ms</td><td>18.90 ms</td><td>27.01 ms</td><td>15.4 MB</td>
+</tr><tr><td>Render</td><td>1</td><td>32</td><td>100</td><td>34.03 ms</td><td>0.670 ms</td><td>0.939 ms</td><td>33.82 ms</td><td>32.53 ms</td><td>36.22 ms</td><td>15.26 MB</td>
+</tr><tr><td>Render</td><td>1</td><td>32</td><td>500</td><td>106.48 ms</td><td>0.382 ms</td><td>0.319 ms</td><td>106.53 ms</td><td>106.06 ms</td><td>106.97 ms</td><td>14.64 MB</td>
+</tr><tr><td>Render</td><td>1</td><td>32</td><td>1000</td><td>196.99 ms</td><td>0.637 ms</td><td>0.565 ms</td><td>197.02 ms</td><td>196.29 ms</td><td>197.95 ms</td><td>14.31 MB</td>
+</tr><tr><td>Render</td><td>1</td><td>64</td><td>1</td><td>19.42 ms</td><td>0.767 ms</td><td>2.261 ms</td><td>18.52 ms</td><td>16.17 ms</td><td>24.14 ms</td><td>16.26 MB</td>
+</tr><tr><td>Render</td><td>1</td><td>64</td><td>10</td><td>23.90 ms</td><td>0.599 ms</td><td>1.758 ms</td><td>23.92 ms</td><td>18.40 ms</td><td>27.47 ms</td><td>15.96 MB</td>
+</tr><tr><td>Render</td><td>1</td><td>64</td><td>100</td><td>43.89 ms</td><td>0.845 ms</td><td>1.038 ms</td><td>43.78 ms</td><td>42.14 ms</td><td>45.68 ms</td><td>16.95 MB</td>
+</tr><tr><td>Render</td><td>1</td><td>64</td><td>500</td><td>143.80 ms</td><td>0.626 ms</td><td>0.585 ms</td><td>143.64 ms</td><td>142.99 ms</td><td>144.75 ms</td><td>15.37 MB</td>
+</tr><tr><td>Render</td><td>1</td><td>64</td><td>1000</td><td>276.69 ms</td><td>1.065 ms</td><td>0.944 ms</td><td>276.65 ms</td><td>275.08 ms</td><td>278.29 ms</td><td>16.55 MB</td>
+</tr><tr><td>Render</td><td>1</td><td>128</td><td>1</td><td>22.15 ms</td><td>0.595 ms</td><td>1.728 ms</td><td>21.97 ms</td><td>19.09 ms</td><td>26.84 ms</td><td>21.27 MB</td>
+</tr><tr><td>Render</td><td>1</td><td>128</td><td>10</td><td>25.36 ms</td><td>0.387 ms</td><td>0.323 ms</td><td>25.34 ms</td><td>24.74 ms</td><td>25.82 ms</td><td>20.98 MB</td>
+</tr><tr><td>Render</td><td>1</td><td>128</td><td>100</td><td>55.75 ms</td><td>0.450 ms</td><td>0.399 ms</td><td>55.76 ms</td><td>55.15 ms</td><td>56.43 ms</td><td>21.83 MB</td>
+</tr><tr><td>Render</td><td>1</td><td>128</td><td>500</td><td>206.15 ms</td><td>0.825 ms</td><td>0.731 ms</td><td>205.85 ms</td><td>205.25 ms</td><td>207.48 ms</td><td>21.51 MB</td>
+</tr><tr><td>Render</td><td>1</td><td>128</td><td>1000</td><td>403.22 ms</td><td>1.709 ms</td><td>1.599 ms</td><td>403.57 ms</td><td>400.70 ms</td><td>405.86 ms</td><td>24.65 MB</td>
+</tr><tr><td>Render</td><td>4</td><td>1</td><td>1</td><td>23.79 ms</td><td>0.471 ms</td><td>1.290 ms</td><td>23.76 ms</td><td>21.04 ms</td><td>26.97 ms</td><td>14.47 MB</td>
+</tr><tr><td>Render</td><td>4</td><td>1</td><td>10</td><td>38.72 ms</td><td>0.612 ms</td><td>0.573 ms</td><td>38.86 ms</td><td>37.71 ms</td><td>39.48 ms</td><td>14.79 MB</td>
+</tr><tr><td>Render</td><td>4</td><td>1</td><td>100</td><td>216.35 ms</td><td>0.389 ms</td><td>0.345 ms</td><td>216.42 ms</td><td>215.65 ms</td><td>216.95 ms</td><td>13.83 MB</td>
+</tr><tr><td>Render</td><td>4</td><td>1</td><td>500</td><td>1,040.81 ms</td><td>3.641 ms</td><td>3.040 ms</td><td>1,041.27 ms</td><td>1,036.33 ms</td><td>1,046.85 ms</td><td>16.96 MB</td>
+</tr><tr><td>Render</td><td>4</td><td>1</td><td>1000</td><td>2,066.91 ms</td><td>1.552 ms</td><td>1.296 ms</td><td>2,066.64 ms</td><td>2,064.03 ms</td><td>2,068.72 ms</td><td>16.96 MB</td>
+</tr><tr><td>Render</td><td>4</td><td>4</td><td>1</td><td>23.03 ms</td><td>0.825 ms</td><td>2.432 ms</td><td>23.53 ms</td><td>16.92 ms</td><td>27.77 ms</td><td>14.77 MB</td>
+</tr><tr><td>Render</td><td>4</td><td>4</td><td>10</td><td>27.05 ms</td><td>0.334 ms</td><td>0.296 ms</td><td>27.11 ms</td><td>26.50 ms</td><td>27.36 ms</td><td>14.62 MB</td>
+</tr><tr><td>Render</td><td>4</td><td>4</td><td>100</td><td>104.49 ms</td><td>0.703 ms</td><td>0.657 ms</td><td>104.69 ms</td><td>103.58 ms</td><td>105.29 ms</td><td>15.09 MB</td>
+</tr><tr><td>Render</td><td>4</td><td>4</td><td>500</td><td>461.11 ms</td><td>7.379 ms</td><td>14.565 ms</td><td>457.82 ms</td><td>441.66 ms</td><td>508.42 ms</td><td>16.98 MB</td>
+</tr><tr><td>Render</td><td>4</td><td>4</td><td>1000</td><td>896.88 ms</td><td>0.754 ms</td><td>0.630 ms</td><td>896.98 ms</td><td>895.74 ms</td><td>897.99 ms</td><td>16.97 MB</td>
+</tr><tr><td>Render</td><td>4</td><td>8</td><td>1</td><td>22.09 ms</td><td>0.826 ms</td><td>2.435 ms</td><td>21.63 ms</td><td>18.07 ms</td><td>27.57 ms</td><td>14.65 MB</td>
+</tr><tr><td>Render</td><td>4</td><td>8</td><td>10</td><td>26.51 ms</td><td>0.474 ms</td><td>0.443 ms</td><td>26.57 ms</td><td>25.83 ms</td><td>27.44 ms</td><td>14.64 MB</td>
+</tr><tr><td>Render</td><td>4</td><td>8</td><td>100</td><td>87.40 ms</td><td>0.743 ms</td><td>0.620 ms</td><td>87.22 ms</td><td>86.39 ms</td><td>88.29 ms</td><td>14.65 MB</td>
+</tr><tr><td>Render</td><td>4</td><td>8</td><td>500</td><td>367.34 ms</td><td>1.145 ms</td><td>1.071 ms</td><td>367.16 ms</td><td>365.57 ms</td><td>369.49 ms</td><td>16.99 MB</td>
+</tr><tr><td>Render</td><td>4</td><td>8</td><td>1000</td><td>718.21 ms</td><td>3.247 ms</td><td>2.878 ms</td><td>718.42 ms</td><td>714.26 ms</td><td>723.06 ms</td><td>16.99 MB</td>
+</tr><tr><td>Render</td><td>4</td><td>16</td><td>1</td><td>23.86 ms</td><td>0.781 ms</td><td>2.302 ms</td><td>23.55 ms</td><td>18.52 ms</td><td>28.56 ms</td><td>14.59 MB</td>
+</tr><tr><td>Render</td><td>4</td><td>16</td><td>10</td><td>28.46 ms</td><td>0.567 ms</td><td>0.814 ms</td><td>28.38 ms</td><td>27.17 ms</td><td>30.25 ms</td><td>14.89 MB</td>
+</tr><tr><td>Render</td><td>4</td><td>16</td><td>100</td><td>87.06 ms</td><td>1.466 ms</td><td>1.300 ms</td><td>86.89 ms</td><td>85.34 ms</td><td>89.44 ms</td><td>14.74 MB</td>
+</tr><tr><td>Render</td><td>4</td><td>16</td><td>500</td><td>365.84 ms</td><td>1.510 ms</td><td>1.339 ms</td><td>365.26 ms</td><td>364.42 ms</td><td>368.03 ms</td><td>17.09 MB</td>
+</tr><tr><td>Render</td><td>4</td><td>16</td><td>1000</td><td>712.21 ms</td><td>1.691 ms</td><td>1.582 ms</td><td>712.17 ms</td><td>708.94 ms</td><td>714.58 ms</td><td>17.1 MB</td>
+</tr><tr><td>Render</td><td>4</td><td>32</td><td>1</td><td>23.06 ms</td><td>0.911 ms</td><td>2.685 ms</td><td>22.62 ms</td><td>18.61 ms</td><td>29.71 ms</td><td>14.96 MB</td>
+</tr><tr><td>Render</td><td>4</td><td>32</td><td>10</td><td>29.76 ms</td><td>0.587 ms</td><td>1.171 ms</td><td>30.14 ms</td><td>27.35 ms</td><td>32.01 ms</td><td>15.1 MB</td>
+</tr><tr><td>Render</td><td>4</td><td>32</td><td>100</td><td>98.19 ms</td><td>1.942 ms</td><td>2.907 ms</td><td>98.18 ms</td><td>93.43 ms</td><td>104.88 ms</td><td>15.58 MB</td>
+</tr><tr><td>Render</td><td>4</td><td>32</td><td>500</td><td>422.97 ms</td><td>8.278 ms</td><td>13.831 ms</td><td>416.07 ms</td><td>410.37 ms</td><td>451.89 ms</td><td>17.45 MB</td>
+</tr><tr><td>Render</td><td>4</td><td>32</td><td>1000</td><td>852.92 ms</td><td>16.949 ms</td><td>32.247 ms</td><td>845.21 ms</td><td>808.48 ms</td><td>931.76 ms</td><td>17.46 MB</td>
+</tr><tr><td>Render</td><td>4</td><td>64</td><td>1</td><td>22.32 ms</td><td>0.446 ms</td><td>1.228 ms</td><td>22.14 ms</td><td>18.93 ms</td><td>25.40 ms</td><td>16.26 MB</td>
+</tr><tr><td>Render</td><td>4</td><td>64</td><td>10</td><td>30.40 ms</td><td>0.599 ms</td><td>0.915 ms</td><td>30.60 ms</td><td>27.72 ms</td><td>31.72 ms</td><td>16.4 MB</td>
+</tr><tr><td>Render</td><td>4</td><td>64</td><td>100</td><td>125.07 ms</td><td>2.424 ms</td><td>2.490 ms</td><td>125.59 ms</td><td>122.17 ms</td><td>128.93 ms</td><td>16.08 MB</td>
+</tr><tr><td>Render</td><td>4</td><td>64</td><td>500</td><td>554.34 ms</td><td>1.498 ms</td><td>1.401 ms</td><td>553.92 ms</td><td>551.67 ms</td><td>557.42 ms</td><td>18.91 MB</td>
+</tr><tr><td>Render</td><td>4</td><td>64</td><td>1000</td><td>1,087.00 ms</td><td>1.461 ms</td><td>1.295 ms</td><td>1,087.19 ms</td><td>1,084.45 ms</td><td>1,089.15 ms</td><td>18.91 MB</td>
+</tr><tr><td>Render</td><td>4</td><td>128</td><td>1</td><td>24.08 ms</td><td>0.479 ms</td><td>1.304 ms</td><td>24.03 ms</td><td>21.31 ms</td><td>27.73 ms</td><td>20.98 MB</td>
+</tr><tr><td>Render</td><td>4</td><td>128</td><td>10</td><td>36.10 ms</td><td>0.703 ms</td><td>0.889 ms</td><td>36.09 ms</td><td>34.63 ms</td><td>38.02 ms</td><td>22.15 MB</td>
+</tr><tr><td>Render</td><td>4</td><td>128</td><td>100</td><td>173.94 ms</td><td>0.867 ms</td><td>0.768 ms</td><td>173.88 ms</td><td>172.24 ms</td><td>175.30 ms</td><td>21.52 MB</td>
+</tr><tr><td>Render</td><td>4</td><td>128</td><td>500</td><td>809.45 ms</td><td>2.075 ms</td><td>1.840 ms</td><td>809.03 ms</td><td>806.89 ms</td><td>813.18 ms</td><td>24.65 MB</td>
+</tr><tr><td>Render</td><td>4</td><td>128</td><td>1000</td><td>1,593.56 ms</td><td>2.816 ms</td><td>2.634 ms</td><td>1,593.51 ms</td><td>1,589.66 ms</td><td>1,598.18 ms</td><td>24.65 MB</td>
+</tr><tr><td>Render</td><td>8</td><td>1</td><td>1</td><td>27.09 ms</td><td>0.518 ms</td><td>0.485 ms</td><td>27.13 ms</td><td>26.03 ms</td><td>27.99 ms</td><td>14.62 MB</td>
+</tr><tr><td>Render</td><td>8</td><td>1</td><td>10</td><td>56.15 ms</td><td>1.123 ms</td><td>1.050 ms</td><td>56.03 ms</td><td>54.20 ms</td><td>57.98 ms</td><td>14.88 MB</td>
+</tr><tr><td>Render</td><td>8</td><td>1</td><td>100</td><td>414.59 ms</td><td>1.334 ms</td><td>1.114 ms</td><td>414.34 ms</td><td>413.09 ms</td><td>417.33 ms</td><td>16.97 MB</td>
+</tr><tr><td>Render</td><td>8</td><td>1</td><td>500</td><td>2,010.53 ms</td><td>4.055 ms</td><td>3.793 ms</td><td>2,009.38 ms</td><td>2,005.62 ms</td><td>2,019.74 ms</td><td>16.97 MB</td>
+</tr><tr><td>Render</td><td>8</td><td>1</td><td>1000</td><td>4,002.45 ms</td><td>3.618 ms</td><td>3.021 ms</td><td>4,001.15 ms</td><td>3,998.94 ms</td><td>4,008.85 ms</td><td>16.97 MB</td>
+</tr><tr><td>Render</td><td>8</td><td>4</td><td>1</td><td>23.78 ms</td><td>0.470 ms</td><td>1.285 ms</td><td>23.56 ms</td><td>21.07 ms</td><td>26.89 ms</td><td>14.77 MB</td>
+</tr><tr><td>Render</td><td>8</td><td>4</td><td>10</td><td>36.60 ms</td><td>0.725 ms</td><td>0.890 ms</td><td>36.46 ms</td><td>35.15 ms</td><td>38.48 ms</td><td>14.63 MB</td>
+</tr><tr><td>Render</td><td>8</td><td>4</td><td>100</td><td>193.70 ms</td><td>0.622 ms</td><td>0.582 ms</td><td>193.83 ms</td><td>192.67 ms</td><td>194.47 ms</td><td>13.83 MB</td>
+</tr><tr><td>Render</td><td>8</td><td>4</td><td>500</td><td>922.45 ms</td><td>2.907 ms</td><td>2.719 ms</td><td>921.35 ms</td><td>917.95 ms</td><td>927.18 ms</td><td>16.99 MB</td>
+</tr><tr><td>Render</td><td>8</td><td>4</td><td>1000</td><td>1,834.80 ms</td><td>2.433 ms</td><td>2.157 ms</td><td>1,834.44 ms</td><td>1,831.11 ms</td><td>1,839.25 ms</td><td>16.98 MB</td>
+</tr><tr><td>Render</td><td>8</td><td>8</td><td>1</td><td>23.06 ms</td><td>0.533 ms</td><td>1.573 ms</td><td>22.91 ms</td><td>19.43 ms</td><td>27.20 ms</td><td>14.65 MB</td>
+</tr><tr><td>Render</td><td>8</td><td>8</td><td>10</td><td>33.27 ms</td><td>0.654 ms</td><td>0.727 ms</td><td>33.29 ms</td><td>31.77 ms</td><td>34.79 ms</td><td>14.64 MB</td>
+</tr><tr><td>Render</td><td>8</td><td>8</td><td>100</td><td>158.84 ms</td><td>0.613 ms</td><td>0.574 ms</td><td>158.67 ms</td><td>158.08 ms</td><td>159.96 ms</td><td>14.64 MB</td>
+</tr><tr><td>Render</td><td>8</td><td>8</td><td>500</td><td>732.70 ms</td><td>1.839 ms</td><td>1.720 ms</td><td>732.47 ms</td><td>729.90 ms</td><td>736.35 ms</td><td>16.99 MB</td>
+</tr><tr><td>Render</td><td>8</td><td>8</td><td>1000</td><td>1,453.24 ms</td><td>6.762 ms</td><td>6.325 ms</td><td>1,455.06 ms</td><td>1,442.40 ms</td><td>1,461.78 ms</td><td>16.99 MB</td>
+</tr><tr><td>Render</td><td>8</td><td>16</td><td>1</td><td>24.16 ms</td><td>0.612 ms</td><td>1.786 ms</td><td>23.85 ms</td><td>19.97 ms</td><td>28.46 ms</td><td>14.59 MB</td>
+</tr><tr><td>Render</td><td>8</td><td>16</td><td>10</td><td>33.72 ms</td><td>0.636 ms</td><td>0.624 ms</td><td>33.96 ms</td><td>32.54 ms</td><td>34.51 ms</td><td>14.74 MB</td>
+</tr><tr><td>Render</td><td>8</td><td>16</td><td>100</td><td>154.37 ms</td><td>1.509 ms</td><td>1.411 ms</td><td>154.16 ms</td><td>152.06 ms</td><td>157.43 ms</td><td>14.74 MB</td>
+</tr><tr><td>Render</td><td>8</td><td>16</td><td>500</td><td>708.14 ms</td><td>1.813 ms</td><td>1.607 ms</td><td>707.85 ms</td><td>706.53 ms</td><td>711.45 ms</td><td>17.1 MB</td>
+</tr><tr><td>Render</td><td>8</td><td>16</td><td>1000</td><td>1,398.65 ms</td><td>2.223 ms</td><td>1.970 ms</td><td>1,398.61 ms</td><td>1,395.25 ms</td><td>1,401.99 ms</td><td>17.09 MB</td>
+</tr><tr><td>Render</td><td>8</td><td>32</td><td>1</td><td>22.66 ms</td><td>0.533 ms</td><td>1.547 ms</td><td>22.76 ms</td><td>19.22 ms</td><td>25.92 ms</td><td>15.4 MB</td>
+</tr><tr><td>Render</td><td>8</td><td>32</td><td>10</td><td>35.86 ms</td><td>0.756 ms</td><td>2.218 ms</td><td>35.46 ms</td><td>31.12 ms</td><td>41.95 ms</td><td>15.26 MB</td>
+</tr><tr><td>Render</td><td>8</td><td>32</td><td>100</td><td>169.50 ms</td><td>0.896 ms</td><td>0.794 ms</td><td>169.49 ms</td><td>168.46 ms</td><td>171.13 ms</td><td>14.31 MB</td>
+</tr><tr><td>Render</td><td>8</td><td>32</td><td>500</td><td>810.10 ms</td><td>12.412 ms</td><td>11.610 ms</td><td>803.95 ms</td><td>796.82 ms</td><td>830.83 ms</td><td>17.46 MB</td>
+</tr><tr><td>Render</td><td>8</td><td>32</td><td>1000</td><td>1,579.65 ms</td><td>21.150 ms</td><td>40.749 ms</td><td>1,568.23 ms</td><td>1,557.61 ms</td><td>1,749.78 ms</td><td>17.45 MB</td>
+</tr><tr><td>Render</td><td>8</td><td>64</td><td>1</td><td>22.63 ms</td><td>0.529 ms</td><td>1.560 ms</td><td>22.64 ms</td><td>19.57 ms</td><td>25.88 ms</td><td>15.96 MB</td>
+</tr><tr><td>Render</td><td>8</td><td>64</td><td>10</td><td>38.04 ms</td><td>0.756 ms</td><td>1.324 ms</td><td>38.12 ms</td><td>35.24 ms</td><td>40.67 ms</td><td>16.21 MB</td>
+</tr><tr><td>Render</td><td>8</td><td>64</td><td>100</td><td>216.75 ms</td><td>0.639 ms</td><td>0.567 ms</td><td>216.71 ms</td><td>215.68 ms</td><td>217.53 ms</td><td>15.76 MB</td>
+</tr><tr><td>Render</td><td>8</td><td>64</td><td>500</td><td>1,035.15 ms</td><td>1.167 ms</td><td>1.092 ms</td><td>1,035.18 ms</td><td>1,032.89 ms</td><td>1,037.09 ms</td><td>18.89 MB</td>
+</tr><tr><td>Render</td><td>8</td><td>64</td><td>1000</td><td>2,064.88 ms</td><td>3.322 ms</td><td>3.107 ms</td><td>2,064.30 ms</td><td>2,059.78 ms</td><td>2,071.15 ms</td><td>18.91 MB</td>
+</tr><tr><td>Render</td><td>8</td><td>128</td><td>1</td><td>25.06 ms</td><td>0.497 ms</td><td>0.729 ms</td><td>24.76 ms</td><td>24.13 ms</td><td>26.79 ms</td><td>22.15 MB</td>
+</tr><tr><td>Render</td><td>8</td><td>128</td><td>10</td><td>49.14 ms</td><td>0.908 ms</td><td>0.849 ms</td><td>49.35 ms</td><td>47.34 ms</td><td>50.27 ms</td><td>22.08 MB</td>
+</tr><tr><td>Render</td><td>8</td><td>128</td><td>100</td><td>315.82 ms</td><td>1.126 ms</td><td>1.053 ms</td><td>315.75 ms</td><td>313.54 ms</td><td>317.98 ms</td><td>22.3 MB</td>
+</tr><tr><td>Render</td><td>8</td><td>128</td><td>500</td><td>1,515.83 ms</td><td>4.862 ms</td><td>4.310 ms</td><td>1,517.32 ms</td><td>1,507.20 ms</td><td>1,522.64 ms</td><td>24.64 MB</td>
+</tr><tr><td>Render</td><td>8</td><td>128</td><td>1000</td><td>2,999.09 ms</td><td>2.454 ms</td><td>2.049 ms</td><td>2,998.81 ms</td><td>2,995.79 ms</td><td>3,002.75 ms</td><td>24.65 MB</td>
+</tr><tr><td>Render</td><td>16</td><td>1</td><td>1</td><td>26.86 ms</td><td>0.523 ms</td><td>0.603 ms</td><td>27.01 ms</td><td>25.49 ms</td><td>27.62 ms</td><td>14.76 MB</td>
+</tr><tr><td>Render</td><td>16</td><td>1</td><td>10</td><td>93.18 ms</td><td>1.108 ms</td><td>1.037 ms</td><td>93.38 ms</td><td>91.45 ms</td><td>94.53 ms</td><td>14.61 MB</td>
+</tr><tr><td>Render</td><td>16</td><td>1</td><td>100</td><td>784.99 ms</td><td>1.510 ms</td><td>1.413 ms</td><td>784.84 ms</td><td>782.88 ms</td><td>787.27 ms</td><td>16.96 MB</td>
+</tr><tr><td>Render</td><td>16</td><td>1</td><td>500</td><td>3,850.49 ms</td><td>2.780 ms</td><td>2.322 ms</td><td>3,850.59 ms</td><td>3,846.81 ms</td><td>3,853.75 ms</td><td>16.95 MB</td>
+</tr><tr><td>Render</td><td>16</td><td>1</td><td>1000</td><td>7,676.46 ms</td><td>6.296 ms</td><td>5.890 ms</td><td>7,675.41 ms</td><td>7,669.86 ms</td><td>7,689.40 ms</td><td>16.96 MB</td>
+</tr><tr><td>Render</td><td>16</td><td>4</td><td>1</td><td>25.25 ms</td><td>0.503 ms</td><td>0.956 ms</td><td>25.39 ms</td><td>23.83 ms</td><td>27.45 ms</td><td>14.48 MB</td>
+</tr><tr><td>Render</td><td>16</td><td>4</td><td>10</td><td>51.37 ms</td><td>0.547 ms</td><td>0.485 ms</td><td>51.25 ms</td><td>50.48 ms</td><td>52.06 ms</td><td>14.62 MB</td>
+</tr><tr><td>Render</td><td>16</td><td>4</td><td>100</td><td>367.58 ms</td><td>0.854 ms</td><td>0.799 ms</td><td>367.40 ms</td><td>366.23 ms</td><td>369.02 ms</td><td>16.98 MB</td>
+</tr><tr><td>Render</td><td>16</td><td>4</td><td>500</td><td>1,777.12 ms</td><td>2.040 ms</td><td>1.908 ms</td><td>1,776.65 ms</td><td>1,773.89 ms</td><td>1,780.91 ms</td><td>16.96 MB</td>
+</tr><tr><td>Render</td><td>16</td><td>4</td><td>1000</td><td>3,534.75 ms</td><td>3.243 ms</td><td>2.708 ms</td><td>3,534.80 ms</td><td>3,527.63 ms</td><td>3,538.24 ms</td><td>16.97 MB</td>
+</tr><tr><td>Render</td><td>16</td><td>8</td><td>1</td><td>23.62 ms</td><td>0.468 ms</td><td>0.714 ms</td><td>23.68 ms</td><td>22.54 ms</td><td>25.09 ms</td><td>14.65 MB</td>
+</tr><tr><td>Render</td><td>16</td><td>8</td><td>10</td><td>44.24 ms</td><td>0.600 ms</td><td>0.532 ms</td><td>44.12 ms</td><td>43.52 ms</td><td>45.36 ms</td><td>14.64 MB</td>
+</tr><tr><td>Render</td><td>16</td><td>8</td><td>100</td><td>289.96 ms</td><td>1.073 ms</td><td>1.004 ms</td><td>290.04 ms</td><td>288.33 ms</td><td>291.14 ms</td><td>14.64 MB</td>
+</tr><tr><td>Render</td><td>16</td><td>8</td><td>500</td><td>1,399.79 ms</td><td>1.151 ms</td><td>1.021 ms</td><td>1,399.74 ms</td><td>1,397.93 ms</td><td>1,401.31 ms</td><td>17.01 MB</td>
+</tr><tr><td>Render</td><td>16</td><td>8</td><td>1000</td><td>2,779.55 ms</td><td>2.115 ms</td><td>1.766 ms</td><td>2,779.96 ms</td><td>2,776.12 ms</td><td>2,782.68 ms</td><td>16.99 MB</td>
+</tr><tr><td>Render</td><td>16</td><td>16</td><td>1</td><td>24.73 ms</td><td>0.490 ms</td><td>0.819 ms</td><td>24.80 ms</td><td>22.82 ms</td><td>26.22 ms</td><td>14.88 MB</td>
+</tr><tr><td>Render</td><td>16</td><td>16</td><td>10</td><td>42.73 ms</td><td>0.841 ms</td><td>1.179 ms</td><td>42.56 ms</td><td>41.02 ms</td><td>44.55 ms</td><td>15.13 MB</td>
+</tr><tr><td>Render</td><td>16</td><td>16</td><td>100</td><td>274.90 ms</td><td>1.397 ms</td><td>1.306 ms</td><td>274.96 ms</td><td>272.69 ms</td><td>277.01 ms</td><td>14.73 MB</td>
+</tr><tr><td>Render</td><td>16</td><td>16</td><td>500</td><td>1,324.62 ms</td><td>1.325 ms</td><td>1.239 ms</td><td>1,324.44 ms</td><td>1,322.70 ms</td><td>1,326.62 ms</td><td>17.08 MB</td>
+</tr><tr><td>Render</td><td>16</td><td>16</td><td>1000</td><td>2,630.72 ms</td><td>2.519 ms</td><td>2.356 ms</td><td>2,631.13 ms</td><td>2,626.46 ms</td><td>2,635.13 ms</td><td>17.09 MB</td>
+</tr><tr><td>Render</td><td>16</td><td>32</td><td>1</td><td>24.95 ms</td><td>0.500 ms</td><td>1.476 ms</td><td>25.11 ms</td><td>20.62 ms</td><td>28.58 ms</td><td>15.25 MB</td>
+</tr><tr><td>Render</td><td>16</td><td>32</td><td>10</td><td>46.63 ms</td><td>0.921 ms</td><td>1.261 ms</td><td>46.74 ms</td><td>44.92 ms</td><td>49.49 ms</td><td>15.1 MB</td>
+</tr><tr><td>Render</td><td>16</td><td>32</td><td>100</td><td>310.94 ms</td><td>0.471 ms</td><td>0.441 ms</td><td>310.98 ms</td><td>310.04 ms</td><td>311.60 ms</td><td>15.1 MB</td>
+</tr><tr><td>Render</td><td>16</td><td>32</td><td>500</td><td>1,512.53 ms</td><td>2.382 ms</td><td>1.860 ms</td><td>1,512.47 ms</td><td>1,509.69 ms</td><td>1,516.59 ms</td><td>17.45 MB</td>
+</tr><tr><td>Render</td><td>16</td><td>32</td><td>1000</td><td>3,056.41 ms</td><td>24.733 ms</td><td>19.310 ms</td><td>3,063.54 ms</td><td>3,017.61 ms</td><td>3,076.59 ms</td><td>17.45 MB</td>
+</tr><tr><td>Render</td><td>16</td><td>64</td><td>1</td><td>25.85 ms</td><td>0.546 ms</td><td>1.593 ms</td><td>25.91 ms</td><td>21.88 ms</td><td>29.43 ms</td><td>15.96 MB</td>
+</tr><tr><td>Render</td><td>16</td><td>64</td><td>10</td><td>59.51 ms</td><td>1.165 ms</td><td>1.295 ms</td><td>59.49 ms</td><td>56.46 ms</td><td>61.88 ms</td><td>16.81 MB</td>
+</tr><tr><td>Render</td><td>16</td><td>64</td><td>100</td><td>420.35 ms</td><td>2.026 ms</td><td>1.796 ms</td><td>419.98 ms</td><td>417.48 ms</td><td>424.18 ms</td><td>18.9 MB</td>
+</tr><tr><td>Render</td><td>16</td><td>64</td><td>500</td><td>2,083.39 ms</td><td>11.932 ms</td><td>9.315 ms</td><td>2,080.79 ms</td><td>2,076.33 ms</td><td>2,111.65 ms</td><td>18.9 MB</td>
+</tr><tr><td>Render</td><td>16</td><td>64</td><td>1000</td><td>4,125.98 ms</td><td>27.491 ms</td><td>22.956 ms</td><td>4,134.99 ms</td><td>4,098.78 ms</td><td>4,172.27 ms</td><td>18.9 MB</td>
+</tr><tr><td>Render</td><td>16</td><td>128</td><td>1</td><td>26.16 ms</td><td>0.500 ms</td><td>0.556 ms</td><td>26.09 ms</td><td>25.29 ms</td><td>27.55 ms</td><td>21.42 MB</td>
+</tr><tr><td>Render</td><td>16</td><td>128</td><td>10</td><td>80.02 ms</td><td>1.571 ms</td><td>1.987 ms</td><td>79.77 ms</td><td>75.83 ms</td><td>83.50 ms</td><td>21.97 MB</td>
+</tr><tr><td>Render</td><td>16</td><td>128</td><td>100</td><td>622.63 ms</td><td>3.089 ms</td><td>2.580 ms</td><td>622.98 ms</td><td>619.27 ms</td><td>627.68 ms</td><td>24.66 MB</td>
+</tr><tr><td>Render</td><td>16</td><td>128</td><td>500</td><td>3,025.11 ms</td><td>2.891 ms</td><td>2.414 ms</td><td>3,025.12 ms</td><td>3,020.34 ms</td><td>3,028.25 ms</td><td>24.65 MB</td>
+</tr><tr><td>Render</td><td>16</td><td>128</td><td>1000</td><td>6,054.09 ms</td><td>111.278 ms</td><td>92.922 ms</td><td>6,024.74 ms</td><td>5,875.02 ms</td><td>6,276.64 ms</td><td>24.64 MB</td>
+</tr></tbody></table>
+</body>
+</html>
