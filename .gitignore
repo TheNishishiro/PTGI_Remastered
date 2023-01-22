@@ -8,5 +8,7 @@ PTGI_UI/bin/
 PTGI_UI/obj/
 PTGI_Remastered.Benchmarks/bin/
 PTGI_Remastered.Benchmarks/obj/
+PTGI_Remastered.Interfaces/bin/
+PTGI_Remastered.Interfaces/obj/
 .vs/
 .idea/
